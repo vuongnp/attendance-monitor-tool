@@ -1,0 +1,32 @@
+#login-container{
+    width: 25%;
+    height: 70%;
+    margin: auto;
+    margin-top: 10%;
+    padding: 20px;
+    padding-top: 40px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+.text-signup{
+    text-align: center;
+    margin-top: 50px;
+}
+.link-to-signup{
+    display: flex;
+    width: 182px;
+    height: 40px;
+    margin: auto;
+    font-size: 20px;
+    font-weight: bold;
+}
+.btn-signin{
+    /* width: 150px;
+    height: 40px;
+    margin: auto; */
+    margin-top: 5%;
+    margin-bottom: 10%;
+}
+.label{
+    font-size: 25px;
+}

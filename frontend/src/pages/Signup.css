@@ -1,0 +1,27 @@
+.student-container, .link-to-signup{
+    text-align: center;
+}
+.form-signup-student{
+    width: 38%;
+    height: 70%;
+    margin: auto;
+    /* margin-top: 10%; */
+    padding: 20px;
+    padding-top: 30px;
+    /* border: 2px solid black; */
+    /* border-radius: 10px; */
+    text-align: left;
+}
+.btn-signup-student{
+    /* width: 150px;
+    height: 40px;
+    margin: auto; */
+    margin-top: 2%;
+    /* margin-bottom: 10%; */
+}
+.link-to-sign-in{
+    margin-top: 1%;
+}
+.text-error{
+    color: red;
+}

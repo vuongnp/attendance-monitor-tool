@@ -47,19 +47,17 @@ class TeacherController:
 
     def addClassroom_handling(db, name, description, schedule, type, duration, username):
         try:
-            if name == '' or duration == '':
-                result = {
-                    'code': '9995',
-                    'message': AppConfig.RESPONSE_CODE[9995],
-                    'data': {}
-                }
-                return result
-            if name is None or duration is None:
+            # if name == '' or duration == '':
+            #     result = {
+            #         'code': '9995',
+            #         'message': AppConfig.RESPONSE_CODE[9995],
+            #         'data': {}
+            #     }
+            #     return result
+            if name == '' or duration == '' or name is None or duration is None or schedule is None:
                 return CheckParameter.get_result_for_miss_parameter()
             if description is None:
                 description = ''
-            if schedule is None:
-                schedule = ''
             if type is None:
                 type = 'Lý thuyết'
             duration = int(duration)

@@ -29,6 +29,7 @@ app = Flask(__name__)
 app.secret_key = 'vuongnp'
 db = Connection.get_database()
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 ###################################################################################################################################
 
@@ -38,72 +39,83 @@ def index():
     return "<h1>Welcome!!</h1>"
 
 ########################################################## Auth ####################################################################
-@app.route("/signup_teacher", methods=['POST'])
+@app.route("/signup_teacher", methods=['GET','POST'])
 def signup_teacher():
-    query_params = request.form
-    username = GetParameter.check_and_get(query_params, 'username')
-    password = GetParameter.check_and_get(query_params, 'password')
-    name = GetParameter.check_and_get(query_params, 'name')
-    phone = GetParameter.check_and_get(query_params, 'phone')
-    email = GetParameter.check_and_get(query_params, 'email')
-    gender = GetParameter.check_and_get(query_params, 'gender')
-    age = GetParameter.check_and_get(query_params, 'age')
-    subject = GetParameter.check_and_get(query_params, 'subject')
-    level = GetParameter.check_and_get(query_params, 'level')
-    role = 0
-    result = AuthController.signup_handling(
-        db, username, password, name, phone, email, gender, age, subject, level, role)
-    # return jsonify(result)
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        query_params = request.json
+        username = GetParameter.check_and_get(query_params, 'username')
+        password = GetParameter.check_and_get(query_params, 'password')
+        name = GetParameter.check_and_get(query_params, 'name')
+        phone = GetParameter.check_and_get(query_params, 'phone')
+        email = GetParameter.check_and_get(query_params, 'email')
+        gender = GetParameter.check_and_get(query_params, 'gender')
+        age = GetParameter.check_and_get(query_params, 'age')
+        subject = GetParameter.check_and_get(query_params, 'subject')
+        level = GetParameter.check_and_get(query_params, 'level')
+        role = 0
+        result = AuthController.signup_handling(
+            db, username, password, name, phone, email, gender, age, subject, level, role)
+        if result['code']=='1000':
+        # return jsonify(result)
+            return redirect(url_for('index'))
+            # return result
+        else:
+            return result
 
 
-@app.route("/signup_student", methods=['POST'])
+@app.route("/signup_student", methods=['GET','POST'])
 def signup_student():
-    query_params = request.form
-    username = GetParameter.check_and_get(query_params, 'username')
-    password = GetParameter.check_and_get(query_params, 'password')
-    name = GetParameter.check_and_get(query_params, 'name')
-    phone = GetParameter.check_and_get(query_params, 'phone')
-    email = GetParameter.check_and_get(query_params, 'email')
-    gender = GetParameter.check_and_get(query_params, 'gender')
-    age = GetParameter.check_and_get(query_params, 'age')
-    subject = ''
-    level = ''
-    role = 1
-    result = AuthController.signup_handling(
-        db, username, password, name, phone, email, gender, age, subject, level, role)
-    # return jsonify(result)
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        query_params = request.json
+        username = GetParameter.check_and_get(query_params, 'username')
+        password = GetParameter.check_and_get(query_params, 'password')
+        name = GetParameter.check_and_get(query_params, 'name')
+        phone = GetParameter.check_and_get(query_params, 'phone')
+        email = GetParameter.check_and_get(query_params, 'email')
+        gender = GetParameter.check_and_get(query_params, 'gender')
+        age = GetParameter.check_and_get(query_params, 'age')
+        subject = ''
+        level = ''
+        role = 1
+        result = AuthController.signup_handling(
+            db, username, password, name, phone, email, gender, age, subject, level, role)
+        if result['code']=='1000':
+        # return jsonify(result)
+            return redirect(url_for('index'))
+            # return result
+        else:
+            return result
 
 
-@app.route("/login", methods=['POST'])
+@app.route("/login", methods=['GET','POST'])
 def login():
-    query_params = request.form
-    username = GetParameter.check_and_get(query_params, 'username')
-    password = GetParameter.check_and_get(query_params, 'password')
-    result = AuthController.login_handling(db, username, password)
-    if result['code'] == '1000':
-        session.clear()
-        session['user_id'] = result['data']['id']
-        if result['data']['role'] == 0:
-            session['teacher'] = True
-            session['teacher_username'] = result['data']['username']
-            session['teacher_id'] = result['data']['id']
-            return redirect(url_for('teacher_home'))
-        elif result['data']['role'] == 1:
-            session['student'] = True
-            session['student_username'] = result['data']['username']
-            session['student_id'] = result['data']['id']
-            return redirect(url_for('student_home'))
-    else:
-        return jsonify(result)
+    if request.method == 'POST':
+        query_params = request.json
+        username = GetParameter.check_and_get(query_params, 'username')
+        password = GetParameter.check_and_get(query_params, 'password')
+        result = AuthController.login_handling(db, username, password)
+        if result['code'] == '1000':
+            session.clear()
+            session['user_id'] = result['data']['id']
+            if result['data']['role'] == 0:
+                session['teacher'] = True
+                session['teacher_username'] = result['data']['username']
+                session['teacher_id'] = result['data']['id']
+                # return redirect(url_for('teacher_home'))
+            elif result['data']['role'] == 1:
+                session['student'] = True
+                session['student_username'] = result['data']['username']
+                session['student_id'] = result['data']['id']
+                # return redirect(url_for('student_home'))
+        # else:
+        return result
 
 @app.route("/auth/changepassword", methods=['POST'])
 def changepassword():
     if 'user_id' not in session:
         return redirect(url_for('index')) 
     user_id = session['user_id']
-    query_params = request.form
+    query_params = request.json
     oldpassword = GetParameter.check_and_get(query_params, 'oldpassword')
     newpassword = GetParameter.check_and_get(query_params, 'newpassword')
     result = AuthController.change_password_handling(db, user_id, oldpassword, newpassword)
@@ -111,13 +123,16 @@ def changepassword():
 
 #################################################### Teacher ##############################################################
 
-@app.route("/teacher_home", methods=['GET'])
-def teacher_home():
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
+@app.route("/teacher_home_data/<username>")
+def teacher_home_data(username):
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # if request.method == 'POST':
+    # query_params = request.json
+    # username = GetParameter.check_and_get(query_params, 'username')
     # session.pop('matched_accounts', None)
-    username = session['teacher_username']
+    # username = session['teacher_username']
     result = TeacherController.getTeacher_home_handling(db, username)
     # result = json.loads(json_util.dumps(result))
     return result
@@ -125,11 +140,12 @@ def teacher_home():
 
 @app.route("/teacher/newclass", methods=['POST'])
 def newclass():
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    username = session['teacher_username']
-    query_params = request.form
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # username = session['teacher_username']
+    query_params = request.json
+    username = GetParameter.check_and_get(query_params, 'username')
     name = GetParameter.check_and_get(query_params, 'name')
     description = GetParameter.check_and_get(query_params, 'description')
     schedule = GetParameter.check_and_get(query_params, 'schedule')
@@ -137,10 +153,10 @@ def newclass():
     duration = GetParameter.check_and_get(query_params, 'duration')
     result = TeacherController.addClassroom_handling(
         db, name, description, schedule, type, duration, username)
-    if result['code'] == '1000':
-        return redirect(url_for('teacher_home'))
-    else:
-        return result
+    # if result['code'] == '1000':
+    #     return redirect(url_for('teacher_home'))
+    # else:
+    return result
 
 
 @app.route("/teacher/updateclass", methods=['POST', 'GET'])

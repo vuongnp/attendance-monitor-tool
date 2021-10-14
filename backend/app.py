@@ -180,23 +180,21 @@ def updateclass():
 
 @app.route("/teacher/deleteclass", methods=['POST'])
 def deleteclass():
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    username = session['teacher_username']
-    query_params = request.form
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # username = session['teacher_username']
+    query_params = request.json
     id = GetParameter.check_and_get(query_params, 'id')
+    username = GetParameter.check_and_get(query_params, 'username')
     result = TeacherController.deleteClassroom_handling(db, id, username)
-    if result['code'] == '1000':
-        return redirect(url_for('teacher_home'))
-    else:
-        return result
+    return result
 
 @app.route("/teacher/getclass/<class_id>")
 def getclass(class_id):
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
     result = TeacherController.getClassroom_handling(db, class_id)
     return result
 
@@ -232,11 +230,11 @@ def selectmode():
 
 @app.route("/teacher/startlearning", methods=['POST'])
 def startlearning():
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    query_params = request.form
-    id_class = GetParameter.check_and_get(query_params, 'id_class')
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    query_params = request.json
+    id_class = GetParameter.check_and_get(query_params, 'id')
     result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 

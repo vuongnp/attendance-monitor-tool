@@ -18,13 +18,13 @@ export default function Header(props) {
 
   return (
     <Navbar expand="lg" bg="dark" variant="dark" fixed="top" className="background-header">
-      <Navbar.Brand href="/" style={{ fontSize: "28px" }}>
+      <Navbar.Brand href="#" style={{ fontSize: "28px" }}>
         SmartAssistant
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/" style={{ color: "white" }}>
+          <Nav.Link href={props.home} style={{ color: "white" }}>
             Trang chủ
           </Nav.Link>
           <Nav.Link href="#" style={{ color: "white" }}>

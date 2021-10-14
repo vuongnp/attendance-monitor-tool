@@ -24,6 +24,7 @@ export default function TeacherHome() {
     duration: ""
   });
   const [showAdd, setShowAdd] = useState(false);
+  
   const [showErrorParam, setShowErrorParam] = useState(false);
   
   const refreshPage = () => {
@@ -90,7 +91,7 @@ export default function TeacherHome() {
 
   return (
     <div id="teacher-container">
-      {datahome && <Header name={datahome.name} />}
+      {datahome && <Header name={datahome.name} home="teacher_home"/>}
 
       <div id="main-container">
         <div id="top-container">
@@ -209,6 +210,7 @@ export default function TeacherHome() {
           </Button>
         </Modal.Footer>
       </Modal>
+      
       </div>
     </div>
   );

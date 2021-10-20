@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import config from "../config/config";
-import "./OneTeacherClass.css";
+import "./OneClass.css";
 
 export default function OneTeacherClass(props) {
   const linktoclass = "/teacher/classroom/" + props.class.id;
@@ -56,7 +56,7 @@ export default function OneTeacherClass(props) {
       });
   };
   return (
-    <div className="one-class-teacher">
+    <div className="one-class-item">
       <div className="classname">
         <Link to={linktoclass}>{props.class.name}</Link>
       </div>

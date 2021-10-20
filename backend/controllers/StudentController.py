@@ -73,12 +73,19 @@ class StudentController:
 
     def joinClass_handling(db, student_id, code):
         try:
-            StudentService.join_classroom(db, student_id, code)
-            result = {'code': '1000',
-                      'message': AppConfig.RESPONSE_CODE[1000],
-                      'data': {}
-                      }
-            return result
+            res = StudentService.join_classroom(db, student_id, code)
+            if res:
+                result = {'code': '1000',
+                        'message': AppConfig.RESPONSE_CODE[1000],
+                        'data': {}
+                        }
+                return result
+            else:
+                result = {'code': '9999',
+                        'message': AppConfig.RESPONSE_CODE[9999],
+                        'data': {}
+                        }
+                return result
         except Exception as ex:
             print("Exception in StudentController joinClass_handling", ex)
             result = {

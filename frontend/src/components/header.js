@@ -1,4 +1,4 @@
-import React,{useEffect, useState} from "react";
+import React, { useState } from "react";
 import {
   Navbar,
   Nav,
@@ -9,16 +9,94 @@ import {
   Container,
   Row,
   Col,
+  Modal,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
-
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import config from "../config/config";
+import RouterList from "../router/routerList";
 import "./header.css";
 
 export default function Header(props) {
-
+  const history = useHistory();
+  const [showLogout, setShowLogout] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showErrorParam, setShowErrorParam] = useState(false);
+  const [showErrorPassword, setShowErrorPassword] = useState(false);
+  const [showOldPass, setShowOldPass] = useState(true);
+  const [showNewPass, setShowNewPass] = useState(true);
+  const [itemChangePass, setItemChangePass] = useState({
+    user_id: localStorage.getItem("user_id"),
+    oldpassword: "",
+    newpassword: "",
+  });
+  const toggleShowHideOldPass = () => {
+    setShowOldPass(!showOldPass);
+  };
+  const toggleShowHideNewPass = () => {
+    setShowNewPass(!showNewPass);
+  };
+  const handleChangePasssword = () => {
+    setShowChangePassword(true);
+  };
+  const handleLogout = () => {
+    setShowLogout(true);
+  };
+  const handleClose = () => {
+    setShowLogout(false);
+    setShowChangePassword(false);
+  };
+  const handleChangeOldPassword = (e) => {
+    itemChangePass.oldpassword = e.target.value;
+    setItemChangePass({ ...itemChangePass });
+  };
+  const handleChangeNewPassword = (e) => {
+    itemChangePass.newpassword = e.target.value;
+    setItemChangePass({ ...itemChangePass });
+  };
+  const handleOKChangePassword = () => {
+    axios
+      .post(`${config.SERVER_URI}/auth/changepassword`, itemChangePass)
+      .then((response) => {
+        console.log(response);
+        if (response.data.code == "1002") {
+          setShowErrorPassword(false);
+          setShowErrorParam(true);
+        } else if (response.data.code == "9998") {
+          setShowErrorParam(false);
+          setShowErrorPassword(true);
+        } else {
+          setShowErrorParam(false);
+          setShowErrorPassword(false);
+          history.push(RouterList.WELCOME);
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+  const handleGetInfo = ()=>{
+    if (props.home=="teacher_home"){
+      history.push(RouterList.TEACHER_INFO);
+    }else{
+      history.push(RouterList.STUDENT_INFO);
+    }
+  }
+  const handleOKLogout = () => {
+    window.localStorage.clear();
+    history.push(RouterList.WELCOME);
+  };
   return (
-    <Navbar expand="lg" bg="dark" variant="dark" fixed="top" className="background-header">
-      <Navbar.Brand href="#" style={{ fontSize: "28px" }}>
+    <Navbar
+      expand="lg"
+      // bg="dark"
+      // variant="dark"
+      fixed="top"
+      className="background-header"
+    >
+      <Navbar.Brand href="#" style={{ fontSize: "28px",color: "white" }}>
         SmartAssistant
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -35,14 +113,112 @@ export default function Header(props) {
           </Nav.Link>
         </Nav>
         <NavDropdown title={props.name} id="basic-nav-dropdown">
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#">Thông tin cá nhân</NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#">Đổi mật khẩu</NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#">Đăng xuất</NavDropdown.Item>
-          </NavDropdown>
+          <NavDropdown.Divider />
+          <NavDropdown.Item href="#" onClick={handleGetInfo}>
+            Thông tin cá nhân
+          </NavDropdown.Item>
+          <NavDropdown.Divider />
+          <NavDropdown.Item href="#" onClick={handleChangePasssword}>
+            Đổi mật khẩu
+          </NavDropdown.Item>
+          <NavDropdown.Divider />
+          <NavDropdown.Item href="#" onClick={handleLogout}>
+            Đăng xuất
+          </NavDropdown.Item>
+        </NavDropdown>
       </Navbar.Collapse>
+      <Modal show={showLogout} onHide={handleClose}>
+        {/* <Modal.Header closeButton>
+          <Modal.Title>Xóa xe</Modal.Title>
+        </Modal.Header> */}
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>Đăng xuất?</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Đóng
+          </Button>
+          <Button variant="primary" onClick={handleOKLogout}>
+            Đăng xuất
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Change password */}
+      <Modal show={showChangePassword} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Đổi mật khẩu</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Label>Mật khẩu hiện tại</Form.Label>
+                <div className="item-change-pass">
+                  <Form.Control
+                    type={showOldPass ? "password" : "text"}
+                    placeholder="Nhập mật khẩu hiện tại"
+                    value={itemChangePass.oldpassword}
+                    onChange={handleChangeOldPassword}
+                    className="input-change-pass"
+                  />
+                  {showOldPass && (
+                    <VisibilityIcon
+                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      onClick={toggleShowHideOldPass}
+                    />
+                  )}
+                  {!showOldPass && (
+                    <VisibilityOffIcon
+                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      onClick={toggleShowHideOldPass}
+                    />
+                  )}
+                </div>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Mật khẩu mới</Form.Label>
+                <div className="item-change-pass">
+                  <Form.Control
+                    type={showNewPass ? "password" : "text"}
+                    placeholder="Nhập mật khẩu mới"
+                    value={itemChangePass.newpassword}
+                    onChange={handleChangeNewPassword}
+                    className="input-change-pass"
+                  />
+                  {showNewPass && (
+                    <VisibilityIcon
+                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      onClick={toggleShowHideNewPass}
+                    />
+                  )}
+                  {!showNewPass && (
+                    <VisibilityOffIcon
+                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      onClick={toggleShowHideNewPass}
+                    />
+                  )}
+                </div>
+              </Form.Group>
+            </Form>
+            {showErrorParam && (
+              <div className="text-error" style={{ textAlign: "center" }}>
+                Vui lòng nhập đầy đủ thông tin
+              </div>
+            )}
+            {showErrorPassword && (
+              <div className="text-error" style={{ textAlign: "center" }}>
+                Mật khẩu không chính xác
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Đóng
+            </Button>
+            <Button variant="primary" onClick={handleOKChangePassword}>
+              Đổi mật khẩu
+            </Button>
+          </Modal.Footer>
+      </Modal>
     </Navbar>
   );
 }

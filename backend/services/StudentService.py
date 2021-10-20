@@ -69,28 +69,34 @@ class StudentService:
                 db, DatabaseConfig.USER_COLLECTION)
             # add student to classroom
             classroom = class_collection.find_one(filter={'code': code})
-            list_student_ids = classroom['students']
-            if list_student_ids:
-                list_student_ids = list_student_ids+ [student_id]
+            if classroom:
+                list_student_ids = classroom['students']
+                if list_student_ids:
+                    list_student_ids = list_student_ids+ [student_id]
+                else:
+                    list_student_ids = [student_id]
+                list_student_ids = set(list_student_ids)
+                class_collection.find_one_and_update(filter={'code': code},
+                                                            update={
+                                                                '$set': {'students': list_student_ids}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+                # add classroom to student
+                student = user_collection.find_one(filter={'id': student_id})
+                list_class_ids = student['classes']
+                if list_class_ids:
+                    list_class_ids = list_class_ids + [classroom['id']]
+                else:
+                    list_class_ids = [classroom['id']]
+                list_class_ids = set(list_class_ids)
+                user_collection.find_one_and_update(filter={'id': student_id},
+                                                            update={
+                                                                '$set': {'classes': list_class_ids}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+                return True
             else:
-                list_student_ids = [student_id]
-            class_collection.find_one_and_update(filter={'code': code},
-                                                         update={
-                                                             '$set': {'students': list_student_ids}},
-                                                         return_document=ReturnDocument.AFTER,
-                                                         upsert=False)
-            # add classroom to student
-            student = user_collection.find_one(filter={'id': student_id})
-            list_class_ids = student['classes']
-            if list_class_ids:
-                list_class_ids = list_class_ids + [classroom['id']]
-            else:
-                list_class_ids = [classroom['id']]
-            user_collection.find_one_and_update(filter={'id': student_id},
-                                                         update={
-                                                             '$set': {'classes': list_class_ids}},
-                                                         return_document=ReturnDocument.AFTER,
-                                                         upsert=False)
+                return False
         except Exception as ex:
             print("Exception in StudentService join_classroom function:", ex)
             raise Exception from ex

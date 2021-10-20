@@ -112,10 +112,11 @@ def login():
 
 @app.route("/auth/changepassword", methods=['POST'])
 def changepassword():
-    if 'user_id' not in session:
-        return redirect(url_for('index')) 
-    user_id = session['user_id']
+    # if 'user_id' not in session:
+    #     return redirect(url_for('index')) 
+    # user_id = session['user_id']
     query_params = request.json
+    user_id = GetParameter.check_and_get(query_params, 'user_id')
     oldpassword = GetParameter.check_and_get(query_params, 'oldpassword')
     newpassword = GetParameter.check_and_get(query_params, 'newpassword')
     result = AuthController.change_password_handling(db, user_id, oldpassword, newpassword)
@@ -250,13 +251,13 @@ def finishlearning():
 
 ####################################################### Student ############################################################
 
-@app.route("/student_home", methods=['GET'])
-def student_home():
-    if 'student' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    # session.pop('matched_accounts', None)
-    username = session['student_username']
+@app.route("/student_home_data/<username>")
+def student_home_data(username):
+    # if 'student' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # # session.pop('matched_accounts', None)
+    # username = session['student_username']
     result = StudentController.getStudent_home_handling(db, username)
     # result = json.loads(json_util.dumps(result))
     return result
@@ -271,31 +272,27 @@ def getinfoclass(class_id):
 
 @app.route("/student/joinclass", methods=['POST'])
 def joinclass():
-    if 'student' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    student_id = session['student_id']
-    query_params = request.form
+    # if 'student' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # student_id = session['student_id']
+    query_params = request.json
     code = GetParameter.check_and_get(query_params, 'code')
+    student_id = GetParameter.check_and_get(query_params, 'student_id')
     result = StudentController.joinClass_handling(db, student_id, code)
-    if result['code'] == '1000':
-        return redirect(url_for('student_home'))
-    else:
-        return result
+    return result
 
 @app.route("/student/outclass", methods=['POST'])
 def outclass():
-    if 'student' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    student_id = session['student_id']
-    query_params = request.form
+    # if 'student' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    # student_id = session['student_id']
+    query_params = request.json
+    student_id = GetParameter.check_and_get(query_params, 'student_id')
     class_id = GetParameter.check_and_get(query_params, 'class_id')
     result = StudentController.outClass_handling(db, student_id, class_id)
-    if result['code'] == '1000':
-        return redirect(url_for('student_home'))
-    else:
-        return result
+    return result
 
 ####################################################### User ##############################################################
 
@@ -306,50 +303,60 @@ def logout():
 
 @app.route("/user/userinfo/<user_id>")
 def userinfo(user_id):
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
+    # if 'user_id' not in session:
+    #     return redirect(url_for('index'))
     result = UserController.getUserInfo_handling(db, user_id)
     return result
 
 @app.route("/user/updateuserinfo", methods=['POST'])
 def updateuserinfo():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    query_params = request.form
+    query_params = request.json
+    student_id = GetParameter.check_and_get(query_params, 'student_id')
+    teacher_id = GetParameter.check_and_get(query_params, 'teacher_id')
     name = GetParameter.check_and_get(query_params, 'name')
     phone = GetParameter.check_and_get(query_params, 'phone')
     email = GetParameter.check_and_get(query_params, 'email')
     gender = GetParameter.check_and_get(query_params, 'gender')
     age = GetParameter.check_and_get(query_params, 'age')
-    if 'student_id' in session:
-        student_id = session['student_id']      
+    if student_id:     
         result = UserController.updateStudentInfo_handling(db, student_id, name, phone, email, gender, age)
         return result
     else:
         level = GetParameter.check_and_get(query_params, 'level')
-        subject = GetParameter.check_and_get(query_params, 'subject')
-        teacher_id = session['teacher_id']      
+        subject = GetParameter.check_and_get(query_params, 'subject')    
         result = UserController.updateTeacherInfo_handling(db, teacher_id, name, phone, email, gender, age, level, subject)
         return result
     
-@app.route("/user/changeavt", methods=['POST'])
+@app.route("/user/changeteacheravt", methods=['POST'])
 @cross_origin()
-def changeavt():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    user_id = session['user_id']
+def changeteacheravt():
     upload_result = None
-    if request.method == 'POST':
-        img_to_upload = request.files['file']
-        # app.logger.info('%s file_to_upload', file_to_upload)
-        if img_to_upload:
-            upload_result = cloudinary.uploader.upload(img_to_upload)
-            avatar = upload_result['url']
-            result = UserController.changeAvatar_handling(db, user_id, avatar)
-            if 'student_id' in session:
-                result = UserController.updateEmbedding_handing(db, user_id, retinaface, retina_inname, vectorize, vectorize_inname, avatar)
-                return result
+    # if request.method == 'POST':
+    img_to_upload = request.files['file']
+    # app.logger.info('%s file_to_upload', file_to_upload)
+    # img_to_upload = request.form["file"]
+    user_id = request.form["teacher_id"]
+    if img_to_upload:
+        upload_result = cloudinary.uploader.upload(img_to_upload)
+        avatar = upload_result['url']
+        result = UserController.changeAvatar_handling(db, user_id, avatar)
+        return result
+
+@app.route("/user/changestudentavt", methods=['POST'])
+@cross_origin()
+def changestudentavt():
+    upload_result = None
+    # if request.method == 'POST':
+    img_to_upload = request.files['file']
+    user_id = request.form["student_id"]
+    if img_to_upload:
+        upload_result = cloudinary.uploader.upload(img_to_upload)
+        avatar = upload_result['url']
+        result = UserController.changeAvatar_handling(db, user_id, avatar)
+        if result["code"]=="1000":
+            result = UserController.updateEmbedding_handing(db, user_id, retinaface, retina_inname, vectorize, vectorize_inname, avatar)
             return result
+        return result
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support

@@ -1,0 +1,32 @@
+#teacher-info-container .info-main-container{
+    width: 80%;
+    margin: auto;
+    margin-top: 6%;
+    display: flex;
+    justify-content: space-between;
+    padding: 50px;
+    border: 1px solid black;
+}
+.left-info{
+    width: 50%;
+    border: 1px solid black;
+    padding: 30px;
+}
+.btn-update-info, .btn-update-img{
+    text-align: center;
+    margin-top: 10px;
+}
+.right-info{
+    width: 45%;
+    text-align: center;
+}
+.right-info img{
+    width: 350px;
+    height: 350px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+}
+.form-img{
+    width: 41%;
+    margin: auto;
+}

@@ -46,10 +46,12 @@ export default function Welcome() {
           setShowErrorParam(false);
           localStorage.setItem('user_id', response.data.data.id)
           if (response.data.data.role == "1") {
-            localStorage.setItem('student_username', response.data.data.username)  
+            localStorage.setItem('student_username', response.data.data.username);
+            localStorage.setItem('student_id', response.data.data.id);  
             history.push(RouterList.STUDENT_HOME);
           } else {
-            localStorage.setItem('teacher_username', response.data.data.username)
+            localStorage.setItem('teacher_username', response.data.data.username);
+            localStorage.setItem('teacher_id', response.data.data.id)
             history.push(RouterList.TEACHER_HOME);
           }
         }

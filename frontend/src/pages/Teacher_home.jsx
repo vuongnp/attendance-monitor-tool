@@ -93,10 +93,10 @@ export default function TeacherHome() {
     <div id="teacher-container">
       {datahome && <Header name={datahome.name} home="teacher_home"/>}
 
-      <div id="main-container">
-        <div id="top-container">
+      <div className="main-container">
+        <div className="top-container">
           <Button
-            variant="outline-primary"
+            variant="outline-info"
             type="submit"
             className=""
               onClick={handleShowAdd}

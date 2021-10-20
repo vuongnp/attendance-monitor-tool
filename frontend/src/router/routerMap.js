@@ -14,6 +14,7 @@ import SignupTeacher from "../pages/Signup_teacher";
 import StudentHome from "../pages/Student_home";
 import TeacherHome from "../pages/Teacher_home";
 import TeacherClassroom from "../pages/Teacher_classroom";
+import TeacherInfo from "../pages/Teacher_info";
   
 export default function RouterMap() {
     return (
@@ -25,6 +26,7 @@ export default function RouterMap() {
           <Route exact path={RouterList.STUDENT_HOME} component={StudentHome} />
           <Route exact path={RouterList.TEACHER_HOME} component={TeacherHome} />
           <Route exact path={RouterList.TEACHER_CLASS} component={TeacherClassroom} />
+          <Route exact path={RouterList.TEACHER_INFO} component={TeacherInfo} />
           {/* <Route match = {false} component={() => <Redirect to={RouterList.WELCOME}/>} /> */}
         </Switch>
       </BrowserRouter>

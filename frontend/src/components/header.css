@@ -4,6 +4,16 @@
 .dropdown-menu{
     width:300px !important
 }
-.background-header {
-    background-color: #35699e!important;
+.background-header, .bg-dark {
+    background-color: #388496!important;
+}
+.item-change-pass{
+    display: flex;
+}
+.modal-change-pass{
+    width: 60% !important;
+    margin: auto;
+}
+.input-change-pass{
+    margin-right: 10px;
 }

@@ -1,0 +1,27 @@
+#student-container .main-container{
+    margin-top: 6%;
+}
+.top-container{
+    width: 75%;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+}
+.join-class{
+    width: 50%;
+    height: 50px;
+    display: flex;
+    /* justify-content: center; */
+    margin-top: 10px;
+}
+.input-join{
+    height: 50px !important;
+    width: 30% !important;
+    /* border: 1px solid black !important; */
+    margin-right: 10px;
+}
+
+.MuiPaper-root{
+    background-color: #d4d6ce !important;
+}

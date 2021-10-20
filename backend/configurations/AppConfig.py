@@ -7,6 +7,7 @@ class AppConfig:
         9996: 'User existed',
         9997: 'Method is invalid',
         9998: 'Incorrect password',
+        9999: 'Code Notfound',
         1001: 'Can not connect to DB',
         1002: 'Parameter is not enough',
         1003: 'Parameter type is invalid',

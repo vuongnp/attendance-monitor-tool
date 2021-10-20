@@ -1,4 +1,4 @@
-.one-class-teacher{
+.one-class-item{
     padding: 20px;
     border: 2px solid black;
     margin: 15px;
@@ -11,9 +11,9 @@
     font-size: 25px;
 }
 .classname a{
-    color: #1352c7;
+    color: #32899e;
 }
-.one-class-teacher p, .classname a{
+.one-class-item p, .classname a{
     /* width: 100%;
     height: 50px; */
     white-space: nowrap;
@@ -31,4 +31,21 @@
 }
 .title-name{
     font-weight: bold;
+}
+.name-class{
+    text-align: center;
+    font-weight: bold;
+    color: #32899e;
+}
+.learn-view-out{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px;
+}
+.view-out{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px;
 }

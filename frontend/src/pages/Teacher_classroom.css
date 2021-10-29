@@ -1,0 +1,63 @@
+#classroom-container .main-class-container{
+    width: 95%;
+    /* height: 50px; */
+    margin: auto;
+    margin-top: 5%;
+}
+.main-class-container a{
+    font-size: 22px;
+}
+.top-class-container{
+    display: flex;
+    justify-content: space-between;
+}
+.left-top-class-container{
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+}
+.title-info-class {
+    font-size: 30px;
+    font-weight: bold;
+}
+.center-class-container{
+    /* height: 300px; */
+    display: flex;
+    justify-content: space-between;
+}
+.left-center-class-container{
+    width: 40%;
+    padding: 15px;
+    border: 1px solid #a79b9b;
+    box-shadow: 5px 5px 5px 0px rgb(159 159 167 / 20%);
+}
+.right-center-class-container{
+    width: 55%;
+}
+.main-right-center-class-container{
+    width: 50%;
+    height: 80%;
+    margin: auto;
+    padding: 5%;
+}
+.classroom-mode{
+    margin-left: 30px;
+}
+.one-mode{
+    display: flex;
+    height: 40px;
+    line-height: 40px;
+}
+.one-line{
+    margin-bottom: 0rem !important;
+}
+tr th{
+    text-align: center;
+}
+.paging{
+    display: flex;
+    justify-content: space-between;
+}
+.paging .left-paging{
+    width: 10%;
+}

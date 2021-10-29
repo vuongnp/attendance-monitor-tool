@@ -18,7 +18,7 @@ export default function SignupTeacher() {
     name: "",
     phone: "",
     email: "",
-    gender: "Male",
+    gender: "Nam",
     age: "",
     level:"",
     subject:""
@@ -247,7 +247,7 @@ export default function SignupTeacher() {
         {showErrorUsername &&
             <div className="text-error">Tên đăng nhập đã tồn tại</div>
         }
-        <Button variant="primary" type="submit" className="btn-signup-student" onClick={handleSignup}>
+        <Button variant="info" type="submit" className="btn-signup-student" onClick={handleSignup}>
           Tạo tài khoản
         </Button>
         <div className="link-to-sign-in">

@@ -1,0 +1,19 @@
+td{
+    text-align: center;
+}
+.body-view-student{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.body-view-student .left{
+    width: 60%;
+}
+.body-view-student .right{
+    width: 40%;
+    text-align: center;
+}
+.body-view-student .right img{
+    width: 90%;
+    height: 60%;
+}

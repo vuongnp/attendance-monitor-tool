@@ -4,7 +4,7 @@ const RouterList = {
     SIGNUP_TEACHER: "/signup_teacher",
     TEACHER_HOME: "/teacher_home",
     STUDENT_HOME: "/student_home",
-    TEACHER_CLASS: "/teacher/classroom/:id",
+    TEACHER_CLASS: "/teacher_classroom/:id",
     TEACHER_INFO: "/teacher_info",
     STUDENT_INFO: "/student_info"
   }

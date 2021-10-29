@@ -138,13 +138,13 @@ export default function Header(props) {
           <Button variant="secondary" onClick={handleClose}>
             Đóng
           </Button>
-          <Button variant="primary" onClick={handleOKLogout}>
+          <Button variant="info" onClick={handleOKLogout}>
             Đăng xuất
           </Button>
         </Modal.Footer>
       </Modal>
       {/* Change password */}
-      <Modal show={showChangePassword} onHide={handleClose}>
+      <Modal show={showChangePassword} onHide={handleClose} size="sm">
           <Modal.Header closeButton>
             <Modal.Title>Đổi mật khẩu</Modal.Title>
           </Modal.Header>
@@ -162,13 +162,13 @@ export default function Header(props) {
                   />
                   {showOldPass && (
                     <VisibilityIcon
-                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      style={{ color: "#808080a1", fontSize: 40, cursor: "pointer" }}
                       onClick={toggleShowHideOldPass}
                     />
                   )}
                   {!showOldPass && (
                     <VisibilityOffIcon
-                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      style={{ color: "#808080a1", fontSize: 40, cursor: "pointer" }}
                       onClick={toggleShowHideOldPass}
                     />
                   )}
@@ -186,13 +186,13 @@ export default function Header(props) {
                   />
                   {showNewPass && (
                     <VisibilityIcon
-                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      style={{ color: "#808080a1", fontSize: 40, cursor: "pointer" }}
                       onClick={toggleShowHideNewPass}
                     />
                   )}
                   {!showNewPass && (
                     <VisibilityOffIcon
-                      style={{ color: "gray", fontSize: 45, cursor: "pointer" }}
+                      style={{ color: "#808080a1", fontSize: 40, cursor: "pointer" }}
                       onClick={toggleShowHideNewPass}
                     />
                   )}
@@ -214,7 +214,7 @@ export default function Header(props) {
             <Button variant="secondary" onClick={handleClose}>
               Đóng
             </Button>
-            <Button variant="primary" onClick={handleOKChangePassword}>
+            <Button variant="info" onClick={handleOKChangePassword}>
               Đổi mật khẩu
             </Button>
           </Modal.Footer>

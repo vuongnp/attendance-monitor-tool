@@ -52,7 +52,7 @@ class TeacherService:
                 'duration': duration,
                 'teacher': teacher['id'],
                 'code': code,
-                'mode': 0,
+                'mode': "0",
                 'is_learning': 0,
                 'students': [],
             }
@@ -134,6 +134,11 @@ class TeacherService:
             students=[]
             for id_student in list_ids:
                 one_student = user_collection.find_one(filter={'id': id_student})
+                number_faults = None
+                if one_student['faults']:
+                    number_faults = len(one_student['faults'])
+                else:
+                    number_faults = 0
                 one_object = {
                     'id': id_student,
                     'phone': one_student['phone'],
@@ -142,6 +147,7 @@ class TeacherService:
                     'email': one_student['email'],
                     'gender': one_student['gender'],
                     'age': one_student['age'],
+                    'faults': number_faults,
                     'avatar': one_student['avatar']
                 }
                 students.append(one_object)

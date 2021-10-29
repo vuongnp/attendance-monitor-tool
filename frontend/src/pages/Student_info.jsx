@@ -4,12 +4,12 @@ import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import config from "../config/config";
 import RouterList from "../router/routerList";
-import Header from "../components/header";
 import DefaultInfoAvt from "../assert/default_avt.png"
+import Header from "../components/header";
 import "./UserInfo.css";
 
-export default function TeacherInfo() {
-  const teacher_id = localStorage.getItem("teacher_id");
+export default function StudentInfo() {
+  const student_id = localStorage.getItem("student_id");
   const [selectedFile, setSelectedFile] = useState();
   const [user, setUser] = useState({
     name: "",
@@ -17,13 +17,14 @@ export default function TeacherInfo() {
     email: "",
     gender: "Nam",
     age: "",
-    level: "",
-    subject: "",
-    teacher_id: "",
+    classes: "",
+    student_id: "",
   });
   const [showEdit, setShowEdit] = useState(false);
   const [showErrorParam, setShowErrorParam] = useState(false);
   const [showErrorPhone, setShowErrorPhone] = useState(false);
+  const [showErrorNonFace, setShowErrorNonFace] = useState(false);
+  const [showErrorManyFace, setShowErrorManyFace] = useState(false);
 
   const handleClose = () => {
     setShowErrorParam(false);
@@ -49,19 +50,12 @@ export default function TeacherInfo() {
     user.age = e.target.value;
     setUser({ ...user });
   };
-  const handleChangeLevel = (e) => {
-    user.level = e.target.value;
-    setUser({ ...user });
-  };
-  const handleChangeSubject = (e) => {
-    user.subject = e.target.value;
-    setUser({ ...user });
-  };
+
   const handleUpdateInfo = () => {
     setShowEdit(true);
   };
   const handleOKUpdateInfo = () => {
-    user.teacher_id = teacher_id;
+    user.student_id = student_id;
     setUser({ ...user });
     axios
       .post(`${config.SERVER_URI}/user/updateuserinfo`, user)
@@ -94,18 +88,25 @@ export default function TeacherInfo() {
     if (!selectedFile) return;
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("teacher_id", localStorage.getItem("teacher_id"));
-    console.log(selectedFile);
-    console.log(localStorage.getItem("teacher_id"));
+    formData.append("student_id", localStorage.getItem("student_id"));
     axios({
       method: "post",
-      url: "http://localhost:5000/user/changeteacheravt",
+      url: "http://localhost:5000/user/changestudentavt",
       data: formData,
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((response) => {
-        console.log(response);
-        refreshPage();
+        if (response.data.code == "9993") {
+            setShowErrorNonFace(false);
+            setShowErrorManyFace(true);
+          } else if (response.data.code == "9994") {
+            setShowErrorNonFace(true);
+            setShowErrorManyFace(false);
+          } else {
+            setShowErrorNonFace(false);
+            setShowErrorManyFace(false);
+            refreshPage();
+          }
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -113,7 +114,7 @@ export default function TeacherInfo() {
   };
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/user/userinfo/${teacher_id}`)
+      .get(`http://localhost:5000/user/userinfo/${student_id}`)
       .then((response) => {
         console.log(response);
         if (response) {
@@ -123,90 +124,80 @@ export default function TeacherInfo() {
       .catch((error) => {
         console.error("There was an error!", error);
       });
-  }, [teacher_id]);
+  }, [student_id]);
   return (
     <div className="user-info-container">
-      {user && <Header name={user.name} home="teacher_home" />}
+      {user && <Header name={user.name} home="student_home" />}
       <div className="info-main-container">
         <div className="left-info">
           <Form>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Tên đăng nhập
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.username}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Họ và tên
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.name}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Số điện thoại
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.phone}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Email
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.email}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Giới tính
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.gender}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
                   Tuổi
                 </Form.Label>
-                <Form.Label column lg={7}>
+                <Form.Label column lg={6}>
                   {user.age}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
             <Form.Group>
               <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
-                  Cấp độ
+                <Form.Label column lg={6} style={{ fontWeight: "bold" }}>
+                  Số lớp học
                 </Form.Label>
-                <Form.Label column lg={7}>
-                  {user.level}
-                </Form.Label>
-              </Form.Row>
-            </Form.Group>
-            <Form.Group>
-              <Form.Row>
-                <Form.Label column lg={5} style={{ fontWeight: "bold" }}>
-                  Chuyên môn
-                </Form.Label>
-                <Form.Label column lg={7}>
-                  {user.subject}
+                <Form.Label column lg={6}>
+                  {user.classes}
                 </Form.Label>
               </Form.Row>
             </Form.Group>
@@ -218,7 +209,23 @@ export default function TeacherInfo() {
           </div>
         </div>
         <div className="right-info">
-          {user.avatar !="" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}         
+        {user.avatar !="" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}
+          <div>
+              Ảnh cần chụp chính diện, nhìn rõ khuôn mặt
+          </div>
+          <div>
+              Không nhiều hơn một khuôn mặt
+          </div>
+          {showErrorNonFace && (
+                <div className="text-error" style={{"textAlign":"center"}}>
+                  Không tìm thấy khuôn mặt trong ảnh
+                </div>
+              )}
+              {showErrorManyFace && (
+                <div className="text-error" style={{"textAlign":"center"}}>
+                    Có quá nhiều khuôn mặt trong ảnh
+                </div>
+              )}
           <Form.File
             type="file"
             label=""
@@ -310,36 +317,6 @@ export default function TeacherInfo() {
                       placeholder="Tuổi"
                       value={user.age}
                       onChange={handleChangeAge}
-                    />
-                  </Col>
-                </Form.Row>
-              </Form.Group>
-              <Form.Group>
-                <Form.Row>
-                  <Form.Label column lg={4}>
-                    Cấp độ
-                  </Form.Label>
-                  <Col>
-                    <Form.Control
-                      type="text"
-                      placeholder="Cấp độ"
-                      value={user.level}
-                      onChange={handleChangeLevel}
-                    />
-                  </Col>
-                </Form.Row>
-              </Form.Group>
-              <Form.Group>
-                <Form.Row>
-                  <Form.Label column lg={4}>
-                    Chuyên môn
-                  </Form.Label>
-                  <Col>
-                    <Form.Control
-                      as="textarea"
-                      placeholder="Chuyên môn"
-                      value={user.subject}
-                      onChange={handleChangeSubject}
                     />
                   </Col>
                 </Form.Row>

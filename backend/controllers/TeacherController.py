@@ -60,7 +60,6 @@ class TeacherController:
                 description = ''
             if type is None:
                 type = 'Lý thuyết'
-            duration = int(duration)
             id = RandomTool.get_random_id()
             code = RandomTool.get_classroom_code()
             teacher = TeacherService.addClassroom(
@@ -89,7 +88,7 @@ class TeacherController:
             }
             return result
 
-    def updateClassroom_handling(db, id, code, name, description, schedule, type, duration):
+    def updateClassroom_handling(db, id, name, description, schedule, type, duration):
         try:
             if name == '' or duration == '':
                 result = {
@@ -106,13 +105,8 @@ class TeacherController:
                 schedule = ''
             if type is None:
                 type = 'Lý thuyết'
-            duration = int(duration)
-            if id:
-                TeacherService.update_classroom_by_id(
+            TeacherService.update_classroom_by_id(
                     db, id, name, description, schedule, type, duration)
-            else:
-                TeacherService.update_classroom_by_code(
-                    db, code, name, description, schedule, type, duration)
             result = {'code': '1000',
                       'message': AppConfig.RESPONSE_CODE[1000],
                       'data': {}
@@ -172,6 +166,16 @@ class TeacherController:
     def getStudent_handling(db, id):
         try:
             data = TeacherService.get_student(db, id)
+            numclasss = None
+            numfaults = None
+            if data['classes']:
+                numclasss = len(data['classes'])
+            else:
+                numclasss = 0
+            if data['faults']:
+                numfaults = len(data['faults'])
+            else:
+                numfaults = 0
             result = {
                 'code': '1000',
                 'message': AppConfig.RESPONSE_CODE[1000],
@@ -184,6 +188,8 @@ class TeacherController:
                         'gender': data['gender'],
                         'age': data['age'],
                         'role': data['role'],
+                        'classes': numfaults,
+                        'faults': numclasss,
                         'avatar': data['avatar'],
                 }
             }

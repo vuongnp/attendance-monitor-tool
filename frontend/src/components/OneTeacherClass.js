@@ -7,7 +7,7 @@ import config from "../config/config";
 import "./OneClass.css";
 
 export default function OneTeacherClass(props) {
-  const linktoclass = "/teacher/classroom/" + props.class.id;
+  const linktoclass = "/teacher_classroom/" + props.class.id;
   let flag = true;
   if (props.class.is_learning) {
     flag = false;
@@ -132,7 +132,7 @@ export default function OneTeacherClass(props) {
           <Button variant="secondary" onClick={handleCloseModal}>
             Đóng
           </Button>
-          <Button variant="primary" onClick={handleDeleteClass}>
+          <Button variant="danger" onClick={handleDeleteClass}>
             Xóa
           </Button>
         </Modal.Footer>

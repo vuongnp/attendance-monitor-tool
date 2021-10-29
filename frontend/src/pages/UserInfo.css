@@ -1,15 +1,17 @@
-#teacher-info-container .info-main-container{
+.user-info-container .info-main-container{
     width: 80%;
     margin: auto;
     margin-top: 6%;
     display: flex;
     justify-content: space-between;
     padding: 50px;
-    border: 1px solid black;
+    border: 1px solid #e8dbdb;
+    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
 }
 .left-info{
     width: 50%;
-    border: 1px solid black;
+    border: 1px solid #e8dbdb;
+    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
     padding: 30px;
 }
 .btn-update-info, .btn-update-img{

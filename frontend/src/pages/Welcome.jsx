@@ -1,9 +1,10 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import config from "../config/config";
 import RouterList from "../router/routerList";
+import BackgroundWelcomeImg from "../assert/welcome.jpg";
 import "./Welcome.css";
 
 export default function Welcome() {
@@ -44,14 +45,22 @@ export default function Welcome() {
           setShowErrorPassword(false);
           setShowErrorUser(false);
           setShowErrorParam(false);
-          localStorage.setItem('user_id', response.data.data.id)
+          localStorage.setItem("user_id", response.data.data.id);
           if (response.data.data.role == "1") {
-            localStorage.setItem('student_username', response.data.data.username);
-            localStorage.setItem('student_id', response.data.data.id);  
+            localStorage.setItem("student_name", response.data.data.name);
+            localStorage.setItem(
+              "student_username",
+              response.data.data.username
+            );
+            localStorage.setItem("student_id", response.data.data.id);
             history.push(RouterList.STUDENT_HOME);
           } else {
-            localStorage.setItem('teacher_username', response.data.data.username);
-            localStorage.setItem('teacher_id', response.data.data.id)
+            localStorage.setItem("teacher_name", response.data.data.name);
+            localStorage.setItem(
+              "teacher_username",
+              response.data.data.username
+            );
+            localStorage.setItem("teacher_id", response.data.data.id);
             history.push(RouterList.TEACHER_HOME);
           }
         }
@@ -62,30 +71,33 @@ export default function Welcome() {
   };
   return (
     <div className="home-container">
-      <div id="login-container">
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label className="label">Tên đăng nhập</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Nhập tên đăng nhập"
-              value={user.username}
-              onChange={handleChangeUsername}
-            />
-          </Form.Group>
+      {/* <div className="left-welcome"> */}
+        <img src={BackgroundWelcomeImg} alt="bg-welcome"></img>
+      {/* </div> */}
+      <div className="blur-bg">
+        <div id="login-container">
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label className="label">Tên đăng nhập</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Nhập tên đăng nhập"
+                value={user.username}
+                onChange={handleChangeUsername}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label className="label">Mật khẩu</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Nhập mật khẩu"
-              value={user.password}
-              onChange={handleChangePassword}
-            />
-          </Form.Group>
-          
-        </Form>
-        <div className="text-signup">
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label className="label">Mật khẩu</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Nhập mật khẩu"
+                value={user.password}
+                onChange={handleChangePassword}
+              />
+            </Form.Group>
+          </Form>
+          <div className="text-signup">
             {showErrorParam && (
               <div className="text-error">
                 Vui lòng nhập đầy đủ thông tin bắt buộc
@@ -109,7 +121,7 @@ export default function Welcome() {
               </Link>
             </div>
             <Button
-              variant="primary"
+              variant="info"
               type="submit"
               className="btn-signin"
               onClick={handleSignin}
@@ -117,6 +129,7 @@ export default function Welcome() {
               Đăng nhập
             </Button>
           </div>
+        </div>
       </div>
     </div>
   );

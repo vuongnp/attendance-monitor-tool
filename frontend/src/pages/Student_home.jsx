@@ -11,15 +11,33 @@ import "./Student_home.css";
 
 export default function StudentHome() {
   const student_username = localStorage.getItem("student_username");
-  const [datahome, setDatahome] = useState({
-    name: "User",
-    classes: [],
-  });
+  const [name, setName] = useState("User");
+  const [classes, setClasses] = useState([]);
+  const [oriClasses, setOriClasses] = useState([]);
+  const [textSeach, setTextSearch] = useState("");
+  // const [datahome, setDatahome] = useState({
+  //   name: "User",
+  //   classes: [],
+  // });
   const [itemJoinClass, setItemJoinClass] = useState({
     student_id: localStorage.getItem("student_id"),
     code: "",
   })
   const [showErrorCode, setShowErrorCode] = useState(false);
+
+  const handleSearch = () => {
+    let classesResult = [];
+    if (textSeach != "") {
+      for (var i = 0, c = oriClasses.length; i < c; i++) {
+        if (oriClasses[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
+          classesResult.push(oriClasses[i]);
+        }
+        setClasses(classesResult);
+      }
+    } else {
+      setClasses(oriClasses);
+    }
+  };
   const refreshPage = () => {
     window.location.reload();
   };
@@ -49,7 +67,10 @@ export default function StudentHome() {
       .then((response) => {
         console.log(response);
         if (response) {
-          setDatahome(response.data.data);
+          // setDatahome(response.data.data);
+          setName(response.data.data.name);
+          setClasses(response.data.data.classes);
+          setOriClasses(response.data.data.classes);
         }
       })
       .catch((error) => {
@@ -59,8 +80,8 @@ export default function StudentHome() {
 
   return (
     <div id="student-container">
-      {datahome && <Header name={datahome.name} home="student_home" />}
-
+      {/* {datahome && <Header name={datahome.name} home="student_home" />} */}
+      {name && <Header name={name} home="student_home" />}
       <div className="main-container">
         <div className="top-container">
           <div className="join-class">
@@ -86,8 +107,8 @@ export default function StudentHome() {
           </div>
 
           <SearchBar
-            onChange={() => console.log("onChange")}
-            onRequestSearch={() => console.log("onRequestSearch")}
+            onChange={(text) => setTextSearch(text)}
+            onRequestSearch={handleSearch}
             style={{
               //   margin: "0 auto",
               width: "40%",
@@ -95,7 +116,8 @@ export default function StudentHome() {
             }}
           />
         </div>
-        {datahome && <GridClassStudent classes={datahome.classes} />}
+        {/* {datahome && <GridClassStudent classes={datahome.classes} />} */}
+        {classes && <GridClassStudent classes={classes} />}
       </div>
     </div>
   );

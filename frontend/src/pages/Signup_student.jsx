@@ -18,7 +18,7 @@ export default function SignupStudent() {
     name: "",
     phone: "",
     email: "",
-    gender: "Male",
+    gender: "Nam",
     age: "",
   });
   const handleChangeUsername = (e) => {
@@ -207,7 +207,7 @@ export default function SignupStudent() {
         {showErrorUsername &&
             <div className="text-error">Tên đăng nhập đã tồn tại</div>
         }
-        <Button variant="primary" type="submit" className="btn-signup-student" onClick={handleSignup}>
+        <Button variant="info" type="submit" className="btn-signup-student" onClick={handleSignup}>
           Tạo tài khoản
         </Button>
         <div className="link-to-sign-in">

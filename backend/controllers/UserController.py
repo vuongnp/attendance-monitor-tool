@@ -45,6 +45,11 @@ class UserController:
                     }
                     return result
                 else:
+                    len_classes = None
+                    if data['classes']:
+                        len_classes=len(data['classes'])
+                    else:
+                        len_classes=0
                     result = {
                         'code': '1000',
                         'message': AppConfig.RESPONSE_CODE[1000],
@@ -57,6 +62,7 @@ class UserController:
                             'gender': data['gender'],
                             'age': data['age'],
                             'role': data['role'],
+                            'classes': len_classes,
                             'avatar': data['avatar'],
                         }
                     }

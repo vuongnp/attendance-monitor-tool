@@ -1,7 +1,10 @@
 .one-class-item{
     padding: 20px;
-    border: 2px solid black;
+    border: 1px solid #bdc5c7;
     margin: 15px;
+    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 20px;
 }
 .classname{
     width: 100%;

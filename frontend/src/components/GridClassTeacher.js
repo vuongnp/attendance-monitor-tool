@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import OneTeacherClass from "./OneTeacherClass";
-import "./GridClassTeacher.css";
+import "./GridClass.css";
 
 export default function GridClassTeacher(props) {
   // let [categories, setCategories] = React.useState([]);

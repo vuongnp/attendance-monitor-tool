@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Col, Button } from "react-bootstrap";
+import { Modal, Form, Col, Button, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -115,7 +115,7 @@ export default function OneStudentClass(props) {
           <Button variant="secondary" onClick={handleCloseModal}>
             Đóng
           </Button>
-          <Button variant="primary" onClick={handleOutClass}>
+          <Button variant="danger" onClick={handleOutClass}>
             Rời lớp
           </Button>
         </Modal.Footer>
@@ -129,10 +129,10 @@ export default function OneStudentClass(props) {
               <Form>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3} style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
                       Tên lớp học
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.name}
                     </Form.Label>
                   </Form.Row>
@@ -140,60 +140,60 @@ export default function OneStudentClass(props) {
 
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3} style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
                       Giáo viên
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.teacher}
                     </Form.Label>
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3}  style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4}  style={{"fontWeight":"bold"}}>
                       Mô tả
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.description}
                     </Form.Label>
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3}  style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4}  style={{"fontWeight":"bold"}}>
                       Loại lớp
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.type}
                     </Form.Label>
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3} style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
                       Lịch học
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.schedule}
                     </Form.Label>
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3} style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
                       Thời lượng
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.duration} phút
                     </Form.Label>
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
                   <Form.Row>
-                    <Form.Label column lg={3} style={{"fontWeight":"bold"}}>
+                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
                       Số học sinh
                     </Form.Label>
-                    <Form.Label column lg={9}>
+                    <Form.Label column lg={8}>
                       {props.class.students.length}
                     </Form.Label>
                   </Form.Row>

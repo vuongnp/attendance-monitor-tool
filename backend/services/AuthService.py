@@ -79,7 +79,7 @@ class AuthService:
                 'age': age,
                 'classes': [],
                 'avatar': '',
-                'embedding': ''
+                'embedding': []
             })
         except Exception as ex:
             print("Exception in AuthService.signup_student", ex)

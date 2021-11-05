@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { Modal, Form, Col, Button, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import LogoutIcon from "@mui/icons-material/Logout";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -8,6 +8,8 @@ import config from "../config/config";
 import "./OneClass.css";
 
 export default function OneStudentClass(props) {
+  const history = useHistory();
+  const linktoclass = "/attendance/" + props.class.id;
   const [showOutClass, setShowOutClass] = useState(false);
   const [showViewClass, setShowViewClass] = useState(false);
   //   const [showLearning, setShowLearning] = useState(flag);
@@ -25,9 +27,9 @@ export default function OneStudentClass(props) {
     setShowOutClass(false);
     setShowViewClass(false);
   };
-  const handleShowViewClass = () =>{
+  const handleShowViewClass = () => {
     setShowViewClass(true);
-  }
+  };
   const handleOutClass = () => {
     axios
       .post(`${config.SERVER_URI}/student/outclass`, itemOutClass)
@@ -41,7 +43,7 @@ export default function OneStudentClass(props) {
       });
   };
   const handleJoinLearn = () => {
-    alert("AAAAAAA");
+    history.push(linktoclass);
   };
   return (
     <div className="one-class-item">
@@ -86,9 +88,11 @@ export default function OneStudentClass(props) {
             //   color="secondary"
             className=""
             size="small"
-              onClick={handleShowViewClass}
+            onClick={handleShowViewClass}
           >
-            <VisibilityIcon style={{ color: "rgb(94 132 220)", fontSize: 45 }} />
+            <VisibilityIcon
+              style={{ color: "rgb(94 132 220)", fontSize: 45 }}
+            />
           </Button>
           <Button
             variant="outlined"
@@ -126,80 +130,79 @@ export default function OneStudentClass(props) {
           <Modal.Title>Chi tiết lớp học</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-              <Form>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
-                      Tên lớp học
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.name}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
+          <Form>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Tên lớp học
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.name}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
 
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
-                      Giáo viên
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.teacher}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4}  style={{"fontWeight":"bold"}}>
-                      Mô tả
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.description}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4}  style={{"fontWeight":"bold"}}>
-                      Loại lớp
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.type}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
-                      Lịch học
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.schedule}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
-                      Thời lượng
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.duration} phút
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Row>
-                    <Form.Label column lg={4} style={{"fontWeight":"bold"}}>
-                      Số học sinh
-                    </Form.Label>
-                    <Form.Label column lg={8}>
-                      {props.class.students.length}
-                    </Form.Label>
-                  </Form.Row>
-                </Form.Group>
-              </Form>
-            
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Giáo viên
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.teacher}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Mô tả
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.description}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Loại lớp
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.type}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Lịch học
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.schedule}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Thời lượng
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.duration} phút
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+            <Form.Group>
+              <Form.Row>
+                <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
+                  Số học sinh
+                </Form.Label>
+                <Form.Label column lg={8}>
+                  {props.class.students.length}
+                </Form.Label>
+              </Form.Row>
+            </Form.Group>
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>

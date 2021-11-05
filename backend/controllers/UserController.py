@@ -64,6 +64,7 @@ class UserController:
                             'role': data['role'],
                             'classes': len_classes,
                             'avatar': data['avatar'],
+                            'embedding': data['embedding']
                         }
                     }
                     return result
@@ -235,7 +236,9 @@ class UserController:
                 crop_img = img_raw[(int(b[1])):(int(b[3])), (int(b[0])):(int(b[2]))]
                 crop_img = Vectorize.precess_img_vectorize(crop_img)
                 embedding = Vectorize.get_vectorize(vectorize, vectorize_inname, crop_img)
-                UserService.update_embedding(db, id, str(list(embedding)))
+                str_embedding = [(i*10000000000) for i in list(embedding)]
+                # UserService.update_embedding(db, id, str(list(embedding)))
+                UserService.update_embedding(db, id, str_embedding)
                 # print("Embedding: ",list(embedding))
                 result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
                         'data': {}

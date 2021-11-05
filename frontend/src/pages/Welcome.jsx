@@ -53,6 +53,7 @@ export default function Welcome() {
               response.data.data.username
             );
             localStorage.setItem("student_id", response.data.data.id);
+            // localStorage.setItem("student_embedding", response.data.data.embedding);
             history.push(RouterList.STUDENT_HOME);
           } else {
             localStorage.setItem("teacher_name", response.data.data.name);

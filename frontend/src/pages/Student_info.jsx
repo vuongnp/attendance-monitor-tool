@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button, FormControl } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { Modal, Form, Col, Button} from "react-bootstrap";
+// import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import config from "../config/config";
-import RouterList from "../router/routerList";
+// import RouterList from "../router/routerList";
 import DefaultInfoAvt from "../assert/default_avt.png"
 import Header from "../components/header";
 import "./UserInfo.css";
@@ -61,10 +61,10 @@ export default function StudentInfo() {
       .post(`${config.SERVER_URI}/user/updateuserinfo`, user)
       .then((response) => {
         console.log(response.data);
-        if (response.data.code == "1002") {
+        if (response.data.code === "1002") {
           setShowErrorPhone(false);
           setShowErrorParam(true);
-        } else if (response.data.code == "1004") {
+        } else if (response.data.code === "1004") {
           setShowErrorPhone(true);
           setShowErrorParam(false);
         } else {
@@ -96,15 +96,16 @@ export default function StudentInfo() {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((response) => {
-        if (response.data.code == "9993") {
+        if (response.data.code === "9993") {
             setShowErrorNonFace(false);
             setShowErrorManyFace(true);
-          } else if (response.data.code == "9994") {
+          } else if (response.data.code === "9994") {
             setShowErrorNonFace(true);
             setShowErrorManyFace(false);
           } else {
             setShowErrorNonFace(false);
             setShowErrorManyFace(false);
+            localStorage.setItem("student_avt", "ok");
             refreshPage();
           }
       })
@@ -209,7 +210,7 @@ export default function StudentInfo() {
           </div>
         </div>
         <div className="right-info">
-        {user.avatar !="" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}
+        {user.avatar !=="" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}
           <div>
               Ảnh cần chụp chính diện, nhìn rõ khuôn mặt
           </div>

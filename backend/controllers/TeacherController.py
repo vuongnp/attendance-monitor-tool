@@ -152,6 +152,7 @@ class TeacherController:
                         'code': data['classroom']['code'],
                         'is_learning': data['classroom']['is_learning'],
                         'students': data['students']
+                        # 'notifications': data['notifications']
                 }
             }
             return result
@@ -254,6 +255,52 @@ class TeacherController:
             return result
         except Exception as ex:
             print("Exception in TeacherController toggleStartFinish_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+    def startLearning_handling(db, id, start_time):
+        try:
+            classroom = TeacherService.update_classroom_start_learn(db, id, start_time)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController startLearning_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+    def stopLearning_handling(db, id):
+        try:
+            TeacherService.update_classroom_stop_learn(db, id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController stopLearning_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def getNotification_handling(db, class_id):
+        try:
+            data = TeacherService.get_notification(db, class_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {'notifications': data['notifications']}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController getNotification_handling", ex)
             result = {
                 'code': '1001',
                 'message': AppConfig.RESPONSE_CODE[1001]

@@ -28,6 +28,7 @@ class StudentService:
                     'code': one_class['code'],
                     'mode': one_class['mode'],
                     'is_learning': one_class['is_learning'],
+                    'start_time': one_class['start_time'],
                     'students': one_class['students']
                 }
                 classes.append(one_object)
@@ -54,7 +55,11 @@ class StudentService:
                 'type': classroom['type'],
                 'duration': classroom['duration'],
                 'teacher': teacher['name'],
-                'students': classroom['students']
+                'students': classroom['students'],
+                'teacher_id': classroom['teacher'],
+                'is_learning': classroom['is_learning'],
+                'mode': classroom['mode'],
+                'start_time': classroom['start_time']
             }
             return result
         except Exception as ex:

@@ -14,6 +14,7 @@ from controllers.StudentController import StudentController
 from controllers.UserController import UserController
 from dotenv import load_dotenv
 import onnxruntime as nxrun
+from flask_socketio import SocketIO, emit, join_room
 
 load_dotenv()
 cloudinary.config(cloud_name = os.getenv('CLOUD_NAME'), api_key=os.getenv('API_KEY'), 
@@ -28,9 +29,15 @@ vectorize_inname = [input.name for input in vectorize.get_inputs()]
 app = Flask(__name__)
 app.secret_key = 'vuongnp'
 db = Connection.get_database()
-CORS(app)
+# CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+# socketio = SocketIO(app)
+socketio = SocketIO(app,cors_allowed_origins="*")
+# Set CORS options on app configuration
+CORS(app, resources={ r'/*': {'origins': [
+    'http://localhost:3000', '*'  # React
+      # React
+  ]}}, supports_credentials=True)
 ###################################################################################################################################
 
 
@@ -232,17 +239,26 @@ def startlearning():
     #     return redirect(url_for('index'))
     query_params = request.json
     id_class = GetParameter.check_and_get(query_params, 'id')
-    result = TeacherController.toggleStartFinish_handling(db, id_class)
+    start_time = query_params['start_time']
+    # result = TeacherController.toggleStartFinish_handling(db, id_class)
+    result = TeacherController.startLearning_handling(db, id_class, start_time)
     return result
 
 @app.route("/teacher/finishlearning", methods=['POST'])
 def finishlearning():
-    if 'teacher' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
-    query_params = request.form
-    id_class = GetParameter.check_and_get(query_params, 'id_class')
-    result = TeacherController.toggleStartFinish_handling(db, id_class)
+    # if 'teacher' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
+    query_params = request.json
+    id_class = GetParameter.check_and_get(query_params, 'id')
+    result = TeacherController.stopLearning_handling(db, id_class)
+    # result = TeacherController.toggleStartFinish_handling(db, id_class)
+    return result
+
+@app.route("/teacher/getNotification/<class_id>")
+def getNotification(class_id):
+    result = TeacherController.getNotification_handling(db, class_id)
+    # result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 
 ####################################################### Student ############################################################
@@ -260,9 +276,9 @@ def student_home_data(username):
 
 @app.route("/student/getinfoclass/<class_id>")
 def getinfoclass(class_id):
-    if 'student' not in session:
-        # session['error_login'] = "Please login first!"
-        return redirect(url_for('index'))
+    # if 'student' not in session:
+    #     # session['error_login'] = "Please login first!"
+    #     return redirect(url_for('index'))
     result = StudentController.getClassJoined_handling(db, class_id)
     return result
 
@@ -354,6 +370,37 @@ def changestudentavt():
             return result
         return result
 
+################################################ ATTENDANCE #########################################################
+
+@socketio.on('connect')
+def connected():
+    print('Connected')
+
+@socketio.on('disconnect')
+def disconnected():
+    print('Disconnected')
+
+@socketio.on('joinClassroom')
+def joinClassroom(classId):
+    print('joinClassroom '+classId)
+    join_room(classId)
+
+@socketio.on('attendanced')
+def attendanced(message):
+    print(message)
+    data = message['data']
+    time_delta = data['time_delta']
+    student_username = data['student_username']
+    class_id = data['class_id']
+    timestamp = data['timestamp']
+    UserController.attendance_fault_handling(db, student_username, class_id, time_delta, timestamp)
+    emit('late_attendance',{'data':data}, to=class_id)
+    # else:
+    #     emit('onTime_attendance', {'data':data}, to=classId)
+    
+
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=5000)
+    # app.run(threaded=True, port=5000)
+    socketio.run(app=app,debug=True,port=5000)
+    # socketio.run(app)

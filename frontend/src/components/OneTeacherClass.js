@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Modal, Form, Col, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Modal, Button } from "react-bootstrap";
+import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import config from "../config/config";
 import "./OneClass.css";
 
 export default function OneTeacherClass(props) {
+  const history = useHistory();
   const linktoclass = "/teacher_classroom/" + props.class.id;
   let flag = true;
   if (props.class.is_learning) {
@@ -16,10 +17,16 @@ export default function OneTeacherClass(props) {
   }
   const [showDelete, setShowDelete] = useState(false);
   const [showLearning, setShowLearning] = useState(flag);
-  const itemClass = {
+  const [itemClass, setItemClass] = useState({
     username: localStorage.getItem("teacher_username"),
     id: props.class.id,
-  };
+    start_time: 0
+  })
+  // const itemClass = {
+  //   username: localStorage.getItem("teacher_username"),
+  //   id: props.class.id,
+  //   start_time: 0
+  // };
   const refreshPage = () => {
     window.location.reload();
   };
@@ -30,6 +37,9 @@ export default function OneTeacherClass(props) {
     setShowDelete(false);
   };
   const handleDeleteClass = () => {
+    itemClass.username = localStorage.getItem("teacher_username");
+    itemClass.id = props.class.id;
+    setItemClass({...itemClass})
     axios
       .post(`${config.SERVER_URI}/teacher/deleteclass`, itemClass)
       .then((response) => {
@@ -42,14 +52,31 @@ export default function OneTeacherClass(props) {
       });
   };
   const handleLearning = () => {
+    itemClass.username = localStorage.getItem("teacher_username");
+    itemClass.id = props.class.id;
+    itemClass.start_time = (new Date().getTime()).toString();
+    setItemClass({...itemClass})
+    console.log(itemClass);
+    setShowLearning(true);
     axios
       .post(`${config.SERVER_URI}/teacher/startlearning`, itemClass)
       .then((response) => {
-        if (showLearning) {
           setShowLearning(false);
-        } else {
+          history.push(linktoclass);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+  const handleStopLearning = () => {
+    itemClass.username = localStorage.getItem("teacher_username");
+    itemClass.id = props.class.id;
+    setItemClass({...itemClass})
+    console.log(itemClass);
+    axios
+      .post(`${config.SERVER_URI}/teacher/finishlearning`, itemClass)
+      .then((response) => {
           setShowLearning(true);
-        }
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -102,7 +129,7 @@ export default function OneTeacherClass(props) {
             variant="danger"
             type="submit"
             className=""
-            onClick={handleLearning}
+            onClick={handleStopLearning}
           >
             Kết thúc học
           </Button>

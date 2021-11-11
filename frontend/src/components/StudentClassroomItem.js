@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button, FormControl } from "react-bootstrap";
+import React, { useState} from "react";
+import { Modal, Form, Button } from "react-bootstrap";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -166,11 +166,12 @@ export default function StudentClassroomItem(props) {
           </div>
             <div className="right">
               {user.avatar ? (
-                <img src={user.avatar} className="right-avt"></img>
+                <img src={user.avatar} className="right-avt" alt="avatar"></img>
               ) : (
                 <img
                   src="/src/asset/default_avt.png"
                   className="right-avt"
+                  alt="avatar"
                 ></img>
               )}
             </div>

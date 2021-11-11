@@ -4,14 +4,10 @@ import {
   Nav,
   NavDropdown,
   Form,
-  FormControl,
   Button,
-  Container,
-  Row,
-  Col,
   Modal,
 } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -20,6 +16,9 @@ import RouterList from "../router/routerList";
 import "./header.css";
 
 export default function Header(props) {
+  // console.log(window.location.origin);
+  // console.log(props.home);
+  const link_to_home = window.location.origin+"/"+props.home;
   const history = useHistory();
   const [showLogout, setShowLogout] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -61,10 +60,10 @@ export default function Header(props) {
       .post(`${config.SERVER_URI}/auth/changepassword`, itemChangePass)
       .then((response) => {
         console.log(response);
-        if (response.data.code == "1002") {
+        if (response.data.code === "1002") {
           setShowErrorPassword(false);
           setShowErrorParam(true);
-        } else if (response.data.code == "9998") {
+        } else if (response.data.code === "9998") {
           setShowErrorParam(false);
           setShowErrorPassword(true);
         } else {
@@ -78,7 +77,7 @@ export default function Header(props) {
       });
   };
   const handleGetInfo = ()=>{
-    if (props.home=="teacher_home"){
+    if (props.home==="teacher_home"){
       history.push(RouterList.TEACHER_INFO);
     }else{
       history.push(RouterList.STUDENT_INFO);
@@ -102,7 +101,7 @@ export default function Header(props) {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href={props.home} style={{ color: "white" }}>
+          <Nav.Link href={link_to_home} style={{ color: "white" }}>
             Trang chủ
           </Nav.Link>
           <Nav.Link href="#" style={{ color: "white" }}>

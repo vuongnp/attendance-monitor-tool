@@ -59,7 +59,11 @@ class StudentController:
                             'type': data['type'],
                             'duration': data['duration'],
                             'teacher': data['teacher'],
-                            'students': data['students']
+                            'students': data['students'],
+                            'is_learning': data['is_learning'],
+                            'teacher_id': data['teacher_id'],
+                            'mode': data['mode'],
+                            'start_time': data['start_time']
                         }
                       }
             return result

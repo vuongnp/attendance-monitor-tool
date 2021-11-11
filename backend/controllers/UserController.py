@@ -251,4 +251,21 @@ class UserController:
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
             return result
+
+    def attendance_fault_handling(db, studentId, classId, time_delta, timestamp):
+        try:
+            idF = RandomTool.get_random_id()
+            UserService.addLateFault(
+                    db, idF, studentId, classId, time_delta)
+
+            idN = RandomTool.get_random_id()
+            UserService.addNotification(db, idN, studentId, classId, time_delta, timestamp, type=0)
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in UserController.fault_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result
     

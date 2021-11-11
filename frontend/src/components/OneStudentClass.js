@@ -1,10 +1,11 @@
 import React, { useState} from "react";
-import { Modal, Form, Col, Button, Row } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { Modal, Form, Button} from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import LogoutIcon from "@mui/icons-material/Logout";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import config from "../config/config";
+import RouterList from "../router/routerList";
 import "./OneClass.css";
 
 export default function OneStudentClass(props) {
@@ -12,6 +13,9 @@ export default function OneStudentClass(props) {
   const linktoclass = "/attendance/" + props.class.id;
   const [showOutClass, setShowOutClass] = useState(false);
   const [showViewClass, setShowViewClass] = useState(false);
+  const [showClassNotStart, setShowClassNotStart] = useState(false);
+  const [showSetAvt, setShowSetAvt] = useState(false);
+  const student_avt = localStorage.getItem("student_avt");
   //   const [showLearning, setShowLearning] = useState(flag);
   const itemOutClass = {
     student_id: localStorage.getItem("student_id"),
@@ -26,6 +30,8 @@ export default function OneStudentClass(props) {
   const handleCloseModal = () => {
     setShowOutClass(false);
     setShowViewClass(false);
+    setShowClassNotStart(false);
+    setShowSetAvt(false);
   };
   const handleShowViewClass = () => {
     setShowViewClass(true);
@@ -43,8 +49,32 @@ export default function OneStudentClass(props) {
       });
   };
   const handleJoinLearn = () => {
-    history.push(linktoclass);
+    axios
+      .get(`${config.SERVER_URI}/student/getinfoclass/${props.class.id}`)
+      .then((response) => {
+        console.log(response);
+        if(response.data.data.is_learning===0){
+          setShowClassNotStart(true);
+        }else{
+          if(student_avt===""){
+            setShowSetAvt(true);
+          }else{
+            if(response.data.data.mode==="1"){
+              alert("Giam sat");
+            }else{
+              history.push(linktoclass);
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+    // history.push(linktoclass);
   };
+  const handleToInfo=()=>{
+    history.push(RouterList.STUDENT_INFO);
+  }
   return (
     <div className="one-class-item">
       <h3 className="name-class">{props.class.name}</h3>
@@ -207,6 +237,41 @@ export default function OneStudentClass(props) {
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* ClassNotStart */}
+      <Modal show={showClassNotStart} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thông báo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>
+            Tiết học chưa bắt đầu
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* SetAvatar */}
+      <Modal show={showSetAvt} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thông báo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>
+            Cập nhật ảnh đại diện trước khi bắt đầu!
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Đóng
+          </Button>
+          <Button variant="info" onClick={handleToInfo}>
+            Cập nhật
           </Button>
         </Modal.Footer>
       </Modal>

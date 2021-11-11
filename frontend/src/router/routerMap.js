@@ -1,9 +1,6 @@
 import {
-    Redirect,
     Route,
     Switch,
-    withRouter,
-    Router,
     BrowserRouter,
 } from "react-router-dom";
 import React from "react";
@@ -31,6 +28,7 @@ export default function RouterMap() {
           <Route exact path={RouterList.TEACHER_INFO} component={TeacherInfo} />
           <Route exact path={RouterList.STUDENT_INFO} component={StudentInfo} />
           <Route exact path={RouterList.ATTENDANCE} component={Attendance} />
+          {/* <Route exact path={RouterList.ATTENDANCE} component={() => (<Attendance socket="value" />)} /> */}
           {/* <Route match = {false} component={() => <Redirect to={RouterList.WELCOME}/>} /> */}
         </Switch>
       </BrowserRouter>

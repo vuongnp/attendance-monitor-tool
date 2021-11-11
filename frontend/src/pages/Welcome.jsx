@@ -29,15 +29,15 @@ export default function Welcome() {
       .post(`${config.SERVER_URI}/login`, user)
       .then((response) => {
         // console.log(response.data);
-        if (response.data.code == "1002") {
+        if (response.data.code ==="1002") {
           setShowErrorUser(false);
           setShowErrorPassword(false);
           setShowErrorParam(true);
-        } else if (response.data.code == "9995") {
+        } else if (response.data.code === "9995") {
           setShowErrorUser(true);
           setShowErrorPassword(false);
           setShowErrorParam(false);
-        } else if (response.data.code == "9998") {
+        } else if (response.data.code === "9998") {
           setShowErrorUser(false);
           setShowErrorPassword(true);
           setShowErrorParam(false);
@@ -46,14 +46,14 @@ export default function Welcome() {
           setShowErrorUser(false);
           setShowErrorParam(false);
           localStorage.setItem("user_id", response.data.data.id);
-          if (response.data.data.role == "1") {
+          if (response.data.data.role === 1) {
             localStorage.setItem("student_name", response.data.data.name);
             localStorage.setItem(
               "student_username",
               response.data.data.username
             );
             localStorage.setItem("student_id", response.data.data.id);
-            // localStorage.setItem("student_embedding", response.data.data.embedding);
+            localStorage.setItem("student_avt", response.data.data.avatar);
             history.push(RouterList.STUDENT_HOME);
           } else {
             localStorage.setItem("teacher_name", response.data.data.name);

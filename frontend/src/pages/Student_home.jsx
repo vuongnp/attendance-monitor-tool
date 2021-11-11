@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button, FormControl } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import {Button, FormControl } from "react-bootstrap";
+// import { Link, useHistory } from "react-router-dom";
 import SearchBar from "material-ui-search-bar";
 import axios from "axios";
 import config from "../config/config";
-import RouterList from "../router/routerList";
+// import RouterList from "../router/routerList";
 import Header from "../components/header";
 import GridClassStudent from "../components/GridClassStudent";
 import "./Student_home.css";
@@ -27,7 +27,7 @@ export default function StudentHome() {
 
   const handleSearch = () => {
     let classesResult = [];
-    if (textSeach != "") {
+    if (textSeach !== "") {
       for (var i = 0, c = oriClasses.length; i < c; i++) {
         if (oriClasses[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
           classesResult.push(oriClasses[i]);
@@ -50,7 +50,7 @@ export default function StudentHome() {
     .post(`${config.SERVER_URI}/student/joinclass`, itemJoinClass)
     .then((response) => {
       console.log(response);
-      if (response.data.code == "9999") {
+      if (response.data.code === "9999") {
         setShowErrorCode(true);
       }else{
         setShowErrorCode(false);

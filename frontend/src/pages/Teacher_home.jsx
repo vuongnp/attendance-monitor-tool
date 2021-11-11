@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Col, Button } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+// import { Link, useHistory } from "react-router-dom";
 import SearchBar from "material-ui-search-bar";
 import axios from "axios";
 import config from "../config/config";
-import RouterList from "../router/routerList";
+// import RouterList from "../router/routerList";
 import Header from "../components/header";
 import GridClassTeacher from "../components/GridClassTeacher";
 import "./Teacher_home.css";
@@ -25,7 +25,7 @@ export default function TeacherHome() {
   const [textSeach, setTextSearch] = useState("");
   const handleSearch = () => {
     let classesResult = [];
-    if (textSeach != "") {
+    if (textSeach !== "") {
       for (var i = 0, c = oriClasses.length; i < c; i++) {
         if (oriClasses[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
           classesResult.push(oriClasses[i]);
@@ -76,7 +76,7 @@ export default function TeacherHome() {
       .post(`${config.SERVER_URI}/teacher/newclass`, classAdd)
       .then((response) => {
         console.log(response);
-        if (response.data.code == "1002") {
+        if (response.data.code === "1002") {
           setShowErrorParam(true);
         } else {
           setShowErrorParam(false);

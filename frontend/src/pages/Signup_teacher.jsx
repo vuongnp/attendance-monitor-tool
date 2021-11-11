@@ -65,17 +65,17 @@ export default function SignupTeacher() {
       .post(`${config.SERVER_URI}/signup_student`, user)
       .then((response) => {
         console.log(response.data);
-        if(response.data.code=='1002'){
+        if(response.data.code==='1002'){
             setShowErrorPhone(false);
             setShowErrorUsername(false);
             setShowErrorParam(true);
         }
-        else if(response.data.code=='1004'){
+        else if(response.data.code==='1004'){
             setShowErrorPhone(true);
             setShowErrorUsername(false);
             setShowErrorParam(false);
         }
-        else if(response.data.code=='1015'){
+        else if(response.data.code==='1015'){
             setShowErrorPhone(false);
             setShowErrorUsername(true);
             setShowErrorParam(false);

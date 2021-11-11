@@ -1,19 +1,83 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button, FormControl } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { Modal, Form, Col, Button, Container, Row } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { Table } from "reactstrap";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DoneIcon from "@mui/icons-material/Done";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import config from "../config/config";
 import RouterList from "../router/routerList";
 import Header from "../components/header";
 import StudentClassroomItem from "../components/StudentClassroomItem";
+import OneNotification from "../components/OneNotification";
 import Paging from "../components/Pagination";
+import { socket } from "../App";
 import "./Teacher_classroom.css";
-
+let notis = [
+  {
+    student: 'vuongnp',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp4',
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp1',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp2',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp4',
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp1',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp2',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp4',
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp1',
+    time_delta: 10,
+    timestamp: 1636641495475
+  },
+  {
+    student: 'vuongnp2',
+    time_delta: 10,
+    timestamp: 1636641495475
+  }
+];
 export default function TeacherClassroom(props) {
-  const class_id = props.match.params.id;
+  // console.log(window.location.pathname.split('/')[2]);
+  // const class_id = props.match.params.id;
+  const class_id = window.location.pathname.split("/")[2];
   const teacher_name = localStorage.getItem("teacher_name");
   const [students, setStudents] = useState([]);
   const numberStudentsPage = 1;
@@ -35,11 +99,15 @@ export default function TeacherClassroom(props) {
     id_class: class_id,
     mode: "",
   });
+  const [notifications, setNotifications] = useState([]);
   const [showMode0, setShowMode0] = useState(false);
   const [showMode1, setShowMode1] = useState(false);
   const [showMode2, setShowMode2] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showErrorParam, setShowErrorParam] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [showListNoti, setShowListNoti] = useState(false);
+  const [newNoti, setNewNoti] = useState(false);
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
@@ -56,6 +124,8 @@ export default function TeacherClassroom(props) {
   const handleCloseModal = () => {
     setShowErrorParam(false);
     setShowEdit(false);
+    setShowNotification(false);
+    setShowListNoti(false);
   };
   const handleChangeEditName = (e) => {
     classroom.name = e.target.value;
@@ -85,7 +155,7 @@ export default function TeacherClassroom(props) {
       .post(`${config.SERVER_URI}/teacher/updateclass`, classroom)
       .then((response) => {
         console.log(response.data);
-        if (response.data.code == "1002") {
+        if (response.data.code === "1002") {
           setShowErrorParam(true);
         } else {
           setShowErrorParam(false);
@@ -103,17 +173,18 @@ export default function TeacherClassroom(props) {
           index={students.indexOf(student)}
           item={student}
           class_id={class_id}
+          key={students.indexOf(student)}
         />
       );
     });
   };
   const handleChangeMode = (e) => {
     let mode = e.target.value;
-    if (mode == "0") {
+    if (mode === "0") {
       setShowMode0(true);
       setShowMode1(false);
       setShowMode2(false);
-    } else if (mode == "1") {
+    } else if (mode === "1") {
       setShowMode1(true);
       setShowMode0(false);
       setShowMode2(false);
@@ -137,8 +208,28 @@ export default function TeacherClassroom(props) {
         console.error("There was an error!", error);
       });
   };
+  const handleViewNotification = () => {
+    setShowNotification(false);
+    axios
+      .get(`${config.SERVER_URI}/teacher/getNotification/${class_id}`)
+      .then((response) => {
+        setNotifications(response.data.data.notifications);
+        setNewNoti(false);
+        setShowListNoti(true);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+  socket.on("late_attendance", (data) => {
+    console.log(data);
+    setShowNotification(true);
+    setNewNoti(true);
+  });
+
   useEffect(() => {
     console.log(classroom.mode);
+    socket.emit("joinClassroom", class_id);
     axios
       .get(`http://localhost:5000/teacher/getclass/${class_id}`)
       .then((response) => {
@@ -146,11 +237,15 @@ export default function TeacherClassroom(props) {
         if (response) {
           setClassroom(response.data.data);
           setStudents(response.data.data.students);
-          setNumberPages(Math.ceil(response.data.data.students.length / numberStudentsPage));
-          setStudentsPage(response.data.data.students.slice(0, numberStudentsPage));
-          if (response.data.data.mode == "0") {
+          setNumberPages(
+            Math.ceil(response.data.data.students.length / numberStudentsPage)
+          );
+          setStudentsPage(
+            response.data.data.students.slice(0, numberStudentsPage)
+          );
+          if (response.data.data.mode === "0") {
             setShowMode0(true);
-          } else if (response.data.data.mode == "1") {
+          } else if (response.data.data.mode === "1") {
             setShowMode1(true);
           } else {
             setShowMode2(true);
@@ -177,6 +272,26 @@ export default function TeacherClassroom(props) {
               }}
               onClick={handleShowEdit}
             />
+            {newNoti && (
+              <NotificationsActiveIcon
+                style={{
+                  color: "#eaa82c",
+                  fontSize: 40,
+                  cursor: "pointer",
+                }}
+                onClick={handleViewNotification}
+              />
+            )}
+            {!newNoti && (
+              <NotificationsIcon
+                style={{
+                  color: "rgb(101 174 191)",
+                  fontSize: 40,
+                  cursor: "pointer",
+                }}
+                onClick={handleViewNotification}
+              />
+            )}
           </div>
           <Button
             variant="success"
@@ -326,6 +441,45 @@ export default function TeacherClassroom(props) {
             </div>
           </div>
         </div>
+        {/* Notification */}
+        <Modal show={showNotification} onHide={handleCloseModal}>
+          <Modal.Body style={{ textAlign: "center" }}>
+            <span style={{ fontSize: 24 }}>Bạn có thông báo mới</span>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Đóng
+            </Button>
+            <Button variant="info" onClick={handleViewNotification}>
+              Xem thông báo
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        {/* Notifications */}
+        <Modal show={showListNoti} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Thông báo</Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{ textAlign: "center" }}>
+              <div className="newest">Mới nhất</div>
+              <div className="list-noti-container">
+                {!notifications ? <div>Không có thông báo</div> :  notifications.map((item) => (
+                  <OneNotification
+                    key={notifications.indexOf(item)}
+                    item={item}
+                  />
+                ))}
+              
+              </div>
+
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Đóng
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        {/* Edit class */}
         <Modal show={showEdit} onHide={handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>Sửa thông tin lớp học</Modal.Title>
@@ -428,11 +582,11 @@ export default function TeacherClassroom(props) {
         </Modal>
         <div className="bottom-class-container">
           <div className="paging">
-              <div className="left-paging"></div>
-              <Paging
-            count={numberPages}
-            onChange={(event, page) => handleNextPage(event, page)}
-          />
+            <div className="left-paging"></div>
+            <Paging
+              count={numberPages}
+              onChange={(event, page) => handleNextPage(event, page)}
+            />
           </div>
           <Table hover className="table-content">
             <thead>

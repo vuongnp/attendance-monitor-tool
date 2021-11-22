@@ -1,8 +1,9 @@
 import { InferenceSession } from "onnxruntime-web";
 import React, { useState, useRef, useLayoutEffect, useCallback } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ndarray from "ndarray";
-import { Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 
@@ -14,10 +15,11 @@ import {
 import { processImgVectorizeFromCanvas, cosinesim } from "../utils/vectorize";
 import config from "../config/config";
 import Header from "../components/header";
-import {formatTime} from "../utils/format";
+import { formatTime } from "../utils/format";
+import { imgToServer } from "../utils/common";
 import ModelDetect from "../models/face-detect-RFB.onnx";
 import ModelVectorize from "../models/mobilefacenet_vgg2.onnx";
-import {socket} from "../App";
+import { socket } from "../App";
 import "./Attendance.css";
 
 let inferenceSession;
@@ -27,6 +29,9 @@ const CAM_WIDTH = 640;
 const CAM_HEIGHT = 480;
 let stu_embedding;
 let start_time;
+let time_to_late;
+let count_imgs_report = 0;
+let arr_Imgs = [];
 const student_id = localStorage.getItem("student_id");
 let class_id;
 let count = 0;
@@ -52,40 +57,52 @@ const getEmbeddingDatabase = async () => {
       console.error("There was an error!", error);
     });
 };
-const getStartTime = async () => {
-	console.log("Loading start time");
-	class_id= window.location.pathname.split('/')[2];
-	await axios
-	  .get(`${config.SERVER_URI}/student/getinfoclass/${class_id}`)
-	  .then((response) => {
-		  // console.log(response);
-		if (response) {
-		  start_time = response.data.data.start_time;
-		  console.log("Start time loaded");
-		}
-	  })
-	  .catch((error) => {
-		console.error("There was an error!", error);
-	  });
-  };
+const getInfoAttendance = async () => {
+  console.log("Loading Info Attendance");
+  class_id = window.location.pathname.split("/")[2];
+  await axios
+    .get(`${config.SERVER_URI}/student/getinfoclass/${class_id}`)
+    .then((response) => {
+      // console.log(response);
+      if (response) {
+        start_time = response.data.data.start_time;
+        time_to_late = response.data.data.time_to_late;
+        console.log("Info Attendance loaded");
+      }
+    })
+    .catch((error) => {
+      console.error("There was an error!", error);
+    });
+};
 
 function Attendance(props) {
-	// const class_id = window.location.pathname.split('/')[2];
-//   const class_id = props.match.params.id;
+  // const class_id = window.location.pathname.split('/')[2];
+  //   const class_id = props.match.params.id;
+  const history = useHistory();
+  
   const [errorManyFace, setErrorManyFace] = useState(false);
   const [errorNonFace, setErrorNonFace] = useState(false);
   const [lengthLoading, setLengthLoading] = useState(0);
   const [success, setSuccess] = useState(false);
   const [notSuccess, setNotSuccess] = useState(false);
   const [startTime, setStartTime] = useState("");
+  const [clickedOpenCam, setClickedOpenCam] = useState(true);
+  const [showRefuse, setShowRefuse] = useState(false);
+  const [showAccept, setShowAccept] = useState(false);
 
   const video = useRef();
   const canvas = useRef();
   const destination = useRef();
 
   const gotoLearning = () => {
-    alert("Go to learn");
+    let linktoclass = window.location.origin+"/monitor/" + class_id;
+    history.push(linktoclass);
   };
+  const handleCloseModal = () => {
+    setShowAccept(false);
+    setShowRefuse(false);
+  };
+
   const renderCanvas = useCallback(async () => {
     const ctx = canvas.current.getContext("2d");
     const ctx_dest = destination.current.getContext("2d");
@@ -124,70 +141,78 @@ function Attendance(props) {
         setErrorManyFace(true);
         setErrorNonFace(false);
       } else if (dets.length === 1) {
-			setErrorManyFace(false);
-			setErrorNonFace(false);
+        setErrorManyFace(false);
+        setErrorNonFace(false);
 
-			drawAfterDetect("dstCanvas", dets[0]);
-			const onnxTensorVec = await processImgVectorizeFromCanvas(
-			dets[0],
-			canvas.current
-			);
-			const result = await inferenceSessionVec.run({ data: onnxTensorVec });
-			const embedding = result.reid_embedding;
-			const embeddingTensor = ndarray(new Float32Array(embedding.data), [
-			1,
-			embedding.dims[1],
-			]);
-			let embeddingArr = new Float32Array(256);
-			for (var i = 0; i < 256; ++i) {
-				embeddingArr[i] = embeddingTensor.get(0, i);
-			}
-			let stu_embeddingArr = new Float32Array(256);
-			for (var i = 0; i < 256; ++i) {
-				stu_embeddingArr[i] = stu_embedding[i] / 10000000000;
-			}
-			const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
-			console.log(sim_score);
-			if (sim_score >= 0.8) {
-				loading++;
-			}
-			console.log(loading);
-			if (loading === 1) {
-				setLengthLoading(10);
-			} else if (loading === 2) {
-				setLengthLoading(20);
-			} else if (loading === 3) {
-				setLengthLoading(30);
-			} else if (loading === 4) {
-				setLengthLoading(40);
-			} else if (loading === 5) {
-				setLengthLoading(50);
-			} else if (loading === 6) {
-				setLengthLoading(60);
-			} else if (loading === 7) {
-				setLengthLoading(70);
-			} else if (loading === 8) {
-				setLengthLoading(80);
-			} else if (loading === 9) {
-				setLengthLoading(90);
-			} else if (loading === 10) {
-				let attendance_time = new Date().getTime();
-				setStartTime(formatTime(attendance_time));
-				setLengthLoading(100);
-				setSuccess(true);
-				setNotSuccess(false);
-				let time_delta = parseInt((parseInt(attendance_time)- parseInt(start_time))/60000);
-        console.log(time_delta);
-        if(time_delta>5){
-          socket.emit('attendanced', {'data' : 
-          {'student_username': localStorage.getItem('student_username'), 
-          'class_id': class_id, 
-          'time_delta': time_delta,
-          'timestamp': parseInt(attendance_time)}
-          });
+        drawAfterDetect("dstCanvas", dets[0]);
+        const onnxTensorVec = await processImgVectorizeFromCanvas(
+          dets[0],
+          canvas.current
+        );
+        const result = await inferenceSessionVec.run({ data: onnxTensorVec });
+        const embedding = result.reid_embedding;
+        const embeddingTensor = ndarray(new Float32Array(embedding.data), [
+          1,
+          embedding.dims[1],
+        ]);
+        let embeddingArr = new Float32Array(256);
+        for (var i = 0; i < 256; ++i) {
+          embeddingArr[i] = embeddingTensor.get(0, i);
         }
-        
-			}
+        let stu_embeddingArr = new Float32Array(256);
+        for (var i = 0; i < 256; ++i) {
+          stu_embeddingArr[i] = stu_embedding[i] / 10000000000;
+        }
+        const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
+        console.log(sim_score);
+        if (sim_score >= 0.8) {
+          loading++;
+        } else {
+          if (count_imgs_report < 4) {
+            arr_Imgs.push(imgToServer("srcCanvas"));
+            count_imgs_report++;
+          }
+        }
+        console.log(loading);
+        if (loading === 1) {
+          setLengthLoading(10);
+        } else if (loading === 2) {
+          setLengthLoading(20);
+        } else if (loading === 3) {
+          setLengthLoading(30);
+        } else if (loading === 4) {
+          setLengthLoading(40);
+        } else if (loading === 5) {
+          setLengthLoading(50);
+        } else if (loading === 6) {
+          setLengthLoading(60);
+        } else if (loading === 7) {
+          setLengthLoading(70);
+        } else if (loading === 8) {
+          setLengthLoading(80);
+        } else if (loading === 9) {
+          setLengthLoading(90);
+        } else if (loading === 10) {
+          let attendance_time = new Date().getTime();
+          setStartTime(formatTime(attendance_time));
+          setLengthLoading(100);
+          setSuccess(true);
+          setNotSuccess(false);
+          let time_late = parseInt(
+            (parseInt(attendance_time) - parseInt(start_time)) / 60000
+          );
+          console.log(time_late);
+          if (time_late > time_to_late) {
+            socket.emit("attendanced", {
+              data: {
+                student_id: localStorage.getItem("student_id"),
+                class_id: class_id,
+                time_late: time_late,
+                timestamp: parseInt(attendance_time),
+              },
+            });
+          }
+        }
       } else {
         setErrorNonFace(true);
         setErrorManyFace(false);
@@ -204,14 +229,15 @@ function Attendance(props) {
     setTimeout(renderCanvas, 100);
   }, [canvas]);
 
-  const detectFrame = useCallback(() => {
-    renderCanvas();
-    // requestAnimationFrame(() => {
-    // 	renderCanvas();
-    // });
-  }, [renderCanvas]);
+  // const detectFrame = useCallback(() => {
+  //   renderCanvas();
+  //   // requestAnimationFrame(() => {
+  //   // 	renderCanvas();
+  //   // });
+  // }, [renderCanvas]);
 
-  useLayoutEffect(() => {
+  const openCamera = () => {
+    setClickedOpenCam(false);
     navigator.mediaDevices
       .getUserMedia({
         audio: false,
@@ -225,14 +251,69 @@ function Attendance(props) {
           video.current.play();
         };
       });
-  }, [detectFrame, video]);
+    renderCanvas();
+  };
+  const reportToTeacher = () => {
+    console.log(arr_Imgs);
+    socket.emit("report_attendance", {
+      data: {
+        student_id: localStorage.getItem("student_id"),
+        student_username: localStorage.getItem("student_username"),
+        student_avt: localStorage.getItem("student_avt"),
+        student_name: localStorage.getItem("student_name"),
+        class_id: class_id,
+        imgs: arr_Imgs,
+      },
+    });
+  };
+  const handleAccepted = () => {
+    let attendance_time = new Date().getTime();
+    let time_late = parseInt(
+      (parseInt(attendance_time) - parseInt(start_time)) / 60000
+    );
+    if (time_late > time_to_late) {
+      socket.emit("attendanced", {
+        data: {
+          student_id: localStorage.getItem("student_id"),
+          class_id: class_id,
+          time_late: time_late,
+          timestamp: parseInt(attendance_time),
+        },
+      });
+    }
+    let linktoclass = "/monitor/" + class_id;
+    history.push(linktoclass);
+  };
+
+  socket.on("attendance_refused", () => {
+    setShowRefuse(true);
+  });
+  socket.on("attendance_accepted", () => {
+    setShowAccept(true);
+  });
+  // useLayoutEffect(() => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({
+  //       audio: false,
+  //       video: {
+  //         facingMode: "user",
+  //       },
+  //     })
+  //     .then((stream) => {
+  //       video.current.srcObject = stream;
+  //       video.current.onloadedmetadata = () => {
+  //         video.current.play();
+  //       };
+  //     });
+  // }, [detectFrame, video]);
 
   useLayoutEffect(() => {
     const init = async () => {
       await loadModel();
       await getEmbeddingDatabase();
-      await getStartTime();
-      renderCanvas();
+      await getInfoAttendance();
+      socket.emit("student_join", localStorage.getItem("student_id"));
+      // renderCanvas();
     };
     init();
   }, []);
@@ -242,6 +323,16 @@ function Attendance(props) {
       <Header name={localStorage.getItem("student_name")} home="student_home" />
       <div className="main-attendance">
         <div className="left-main-attendance">
+          {clickedOpenCam && (
+            <Button
+              onClick={openCamera}
+              variant="secondary"
+              className="click-open-cam"
+            >
+              Bắt đầu
+            </Button>
+          )}
+
           <video
             // style={{ display: "none" }}
             id="webcam"
@@ -307,7 +398,9 @@ function Attendance(props) {
                 <div className="text-status">Hoàn thành</div>
                 <DoneOutlineIcon style={{ color: "#28a745", fontSize: 30 }} />
               </div>
-              <div style={{fontSize: "18px",color: "#423c3c"}}>Thời điểm {startTime}</div>
+              <div style={{ fontSize: "18px", color: "#423c3c" }}>
+                Thời điểm {startTime}
+              </div>
               <Button
                 variant="outline-info"
                 className="btn-status"
@@ -337,10 +430,40 @@ function Attendance(props) {
               >
                 Thử lại
               </Button>
+              <Button
+                variant="outline-info"
+                className="btn-status"
+                onClick={reportToTeacher}
+                style={{ marginLeft: "15px" }}
+              >
+                Báo cáo lỗi
+              </Button>
             </div>
           )}
         </div>
       </div>
+      {/* Refused */}
+      <Modal show={showRefuse} onHide={handleCloseModal}>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>Không được chấp nhận!</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Accept */}
+      <Modal show={showAccept} onHide={handleCloseModal}>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>Điểm danh thành công!</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleAccepted}>
+            Vào lớp học
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

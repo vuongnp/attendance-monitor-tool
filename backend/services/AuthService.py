@@ -78,6 +78,7 @@ class AuthService:
                 'gender': gender,
                 'age': age,
                 'classes': [],
+                'require_classes': [],
                 'avatar': '',
                 'embedding': [],
                 'faults': {}

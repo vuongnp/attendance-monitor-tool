@@ -7,7 +7,8 @@ const RouterList = {
     TEACHER_CLASS: "/teacher_classroom/:id",
     TEACHER_INFO: "/teacher_info",
     STUDENT_INFO: "/student_info",
-    ATTENDANCE: "/attendance/:id_class"
+    ATTENDANCE: "/attendance/:id_class",
+    MONITOR: "/monitor/:id_class"
   }
   
   export default RouterList; 

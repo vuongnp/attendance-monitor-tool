@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button, Container, Row } from "react-bootstrap";
+import { Modal, Form, Col, Button} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Table } from "reactstrap";
@@ -15,65 +15,7 @@ import OneNotification from "../components/OneNotification";
 import Paging from "../components/Pagination";
 import { socket } from "../App";
 import "./Teacher_classroom.css";
-let notis = [
-  {
-    student: 'vuongnp',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp4',
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp1',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp2',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp4',
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp1',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp2',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp4',
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp1',
-    time_delta: 10,
-    timestamp: 1636641495475
-  },
-  {
-    student: 'vuongnp2',
-    time_delta: 10,
-    timestamp: 1636641495475
-  }
-];
+
 export default function TeacherClassroom(props) {
   // console.log(window.location.pathname.split('/')[2]);
   // const class_id = props.match.params.id;
@@ -92,13 +34,21 @@ export default function TeacherClassroom(props) {
     mode: "0",
     duration: "",
     code: "",
-    is_learning: "",
+    is_learning: 0,
     students: [],
   });
   const [itemUpdateMode, setItemUpdateMode] = useState({
     id_class: class_id,
     mode: "",
   });
+  const [itemStartLearn, setItemStartLearn] = useState({
+    class_id: class_id,
+    time_to_late: "",
+    time_to_fault_monitor: "",
+    start_time: 0,
+  });
+  const [reportAttendanceItem, setReportAttendanceItem] = useState({});
+
   const [notifications, setNotifications] = useState([]);
   const [showMode0, setShowMode0] = useState(false);
   const [showMode1, setShowMode1] = useState(false);
@@ -108,6 +58,9 @@ export default function TeacherClassroom(props) {
   const [showNotification, setShowNotification] = useState(false);
   const [showListNoti, setShowListNoti] = useState(false);
   const [newNoti, setNewNoti] = useState(false);
+  const [showLearning, setShowLearning] = useState(0);
+  const [showSettingStartLearn, setShowSettingStartLearn] = useState(false);
+  const [showReportAttendance, setShowReportAttendance] = useState(false);
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
@@ -126,6 +79,8 @@ export default function TeacherClassroom(props) {
     setShowEdit(false);
     setShowNotification(false);
     setShowListNoti(false);
+    setShowSettingStartLearn(false);
+    setShowReportAttendance(false);
   };
   const handleChangeEditName = (e) => {
     classroom.name = e.target.value;
@@ -221,10 +176,72 @@ export default function TeacherClassroom(props) {
         console.error("There was an error!", error);
       });
   };
-  socket.on("late_attendance", (data) => {
-    console.log(data);
+  const handleLearning = () => {
+    setShowSettingStartLearn(true);
+  };
+  const handleChangeTimeToLate = (e) => {
+    itemStartLearn.time_to_late = e.target.value;
+    setItemStartLearn({ ...itemStartLearn });
+  };
+  const handleChangeTimeToFaultMonitor = (e) => {
+    itemStartLearn.time_to_fault_monitor = e.target.value;
+    setItemStartLearn({ ...itemStartLearn });
+  };
+  const handleOKStartLearn = () => {
+    // itemStartLearn.class_id = class_id;
+    itemStartLearn.start_time = new Date().getTime().toString();
+    console.log(itemStartLearn);
+    setItemStartLearn({ ...itemStartLearn });
+    axios
+      .post(`${config.SERVER_URI}/teacher/startlearning`, itemStartLearn)
+      .then((response) => {
+        if (response.data.code === "1002") {
+          setShowErrorParam(true);
+        } else {
+          setShowErrorParam(false);
+          setShowLearning(1);
+          setShowSettingStartLearn(false);
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+
+  const handleStopLearning = () => {
+    // itemStartLearn.class_id = class_id;
+    // setItemStartLearn({...itemStartLearn})
+    axios
+      .post(`${config.SERVER_URI}/teacher/finishlearning`, itemStartLearn)
+      .then((response) => {
+        setShowLearning(0);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+
+  const handleRefuseAttendance = () => {
+    setShowReportAttendance(false);
+    socket.emit("refuse_attendance", {data: reportAttendanceItem.student_id});
+  };
+  const handleAcceptAttendace = () => {
+    setShowReportAttendance(false);
+    socket.emit("accept_attenance",{data: reportAttendanceItem.student_id});
+  };
+  // socket.on("late_attendance", (data) => {
+  //   console.log(data);
+  //   setShowNotification(true);
+  //   setNewNoti(true);
+  // });
+  socket.on("student_need_join", () => {
     setShowNotification(true);
     setNewNoti(true);
+  });
+  socket.on("report_attendance_from_student", (data) => {
+    setReportAttendanceItem(data["data"]);
+    console.log(reportAttendanceItem);
+    setShowReportAttendance(true);
   });
 
   useEffect(() => {
@@ -236,6 +253,7 @@ export default function TeacherClassroom(props) {
         console.log(response);
         if (response) {
           setClassroom(response.data.data);
+          setShowLearning(response.data.data.is_learning);
           setStudents(response.data.data.students);
           setNumberPages(
             Math.ceil(response.data.data.students.length / numberStudentsPage)
@@ -293,12 +311,26 @@ export default function TeacherClassroom(props) {
               />
             )}
           </div>
-          <Button
-            variant="success"
-            // onClick={handleCloseModal}
-          >
-            Bắt đầu giám sát
-          </Button>
+          {showLearning === 0 && (
+            <Button
+              variant="success"
+              type="submit"
+              className=""
+              onClick={handleLearning}
+            >
+              Bắt đầu học
+            </Button>
+          )}
+          {showLearning === 1 && (
+            <Button
+              variant="danger"
+              type="submit"
+              className=""
+              onClick={handleStopLearning}
+            >
+              Kết thúc học
+            </Button>
+          )}
         </div>
         <div className="center-class-container">
           <div className="left-center-class-container">
@@ -441,6 +473,71 @@ export default function TeacherClassroom(props) {
             </div>
           </div>
         </div>
+        {/* ReportAttendance */}
+        <Modal show={showReportAttendance} onHide={handleCloseModal} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Không thể điểm danh</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {reportAttendanceItem && (
+              <div className="main-report-attendance">
+                <div className="top-report">
+                  <div className="top-report-text">
+                    <p>{reportAttendanceItem.student_name}</p>
+                    <p>{reportAttendanceItem.student_username}</p>
+                  </div>
+                  <img
+                    className="top-report-img"
+                    src={reportAttendanceItem.student_avt}
+                    alt="ảnh đại diện"
+                  ></img>
+                </div>
+                <div className="bottom-report">
+                  <div className="report-imgs">
+                    {reportAttendanceItem.imgs && (
+                      <img
+                        className="report-img"
+                        src={reportAttendanceItem.imgs[0]}
+                        alt=""
+                      ></img>
+                    )}
+                    {reportAttendanceItem.imgs && (
+                      <img
+                        className="report-img"
+                        src={reportAttendanceItem.imgs[1]}
+                        alt=""
+                      ></img>
+                    )}
+                  </div>
+                  <div className="report-imgs">
+                    {reportAttendanceItem.imgs && (
+                      <img
+                        className="report-img"
+                        src={reportAttendanceItem.imgs[2]}
+                        alt=""
+                      ></img>
+                    )}
+                    {reportAttendanceItem.imgs && (
+                      <img
+                        className="report-img"
+                        src={reportAttendanceItem.imgs[3]}
+                        alt=""
+                      ></img>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleRefuseAttendance}>
+              Bỏ qua
+            </Button>
+            <Button variant="info" onClick={handleAcceptAttendace}>
+              Cho vào lớp
+            </Button>
+          </Modal.Footer>
+        </Modal>
         {/* Notification */}
         <Modal show={showNotification} onHide={handleCloseModal}>
           <Modal.Body style={{ textAlign: "center" }}>
@@ -461,17 +558,19 @@ export default function TeacherClassroom(props) {
             <Modal.Title>Thông báo</Modal.Title>
           </Modal.Header>
           <Modal.Body style={{ textAlign: "center" }}>
-              <div className="newest">Mới nhất</div>
-              <div className="list-noti-container">
-                {!notifications ? <div>Không có thông báo</div> :  notifications.map((item) => (
+            <div className="newest">Mới nhất</div>
+            <div className="list-noti-container">
+              {!notifications ? (
+                <div>Không có thông báo</div>
+              ) : (
+                notifications.map((item) => (
                   <OneNotification
                     key={notifications.indexOf(item)}
                     item={item}
                   />
-                ))}
-              
-              </div>
-
+                ))
+              )}
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>
@@ -577,6 +676,61 @@ export default function TeacherClassroom(props) {
             </Button>
             <Button variant="info" onClick={handleOKEditClass}>
               Lưu
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        {/* Set param Attendance Monitor*/}
+        <Modal show={showSettingStartLearn} onHide={handleCloseModal} size="sm">
+          <Modal.Header closeButton>
+            <Modal.Title>Cài đặt</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Row>
+                  <Form.Label column lg={9}>
+                    Thời điểm vào vào muộn{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </Form.Label>
+                  <Col>
+                    <Form.Control
+                      type="text"
+                      placeholder=""
+                      value={classroom.time_to_late}
+                      onChange={handleChangeTimeToLate}
+                    />
+                  </Col>
+                </Form.Row>
+              </Form.Group>
+              <Form.Group>
+                <Form.Row>
+                  <Form.Label column lg={9}>
+                    Thời gian mất tập trung{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </Form.Label>
+                  <Col>
+                    <Form.Control
+                      type="text"
+                      placeholder=""
+                      value={classroom.time_to_fault_monitor}
+                      onChange={handleChangeTimeToFaultMonitor}
+                    />
+                  </Col>
+                </Form.Row>
+              </Form.Group>
+            </Form>
+            {showErrorParam && (
+              <div className="text-error" style={{ textAlign: "center" }}>
+                Vui lòng nhập đầy đủ thông tin bắt buộc
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Đóng
+            </Button>
+            <Button variant="info" onClick={handleOKStartLearn}>
+              Bắt đầu học
             </Button>
           </Modal.Footer>
         </Modal>

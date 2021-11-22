@@ -45,6 +45,14 @@ CORS(app, resources={ r'/*': {'origins': [
 def index():
     return "<h1>Welcome!!</h1>"
 
+@socketio.on('connect')
+def connected():
+    print('Connected')
+
+@socketio.on('disconnect')
+def disconnected():
+    print('Disconnected')
+
 ########################################################## Auth ####################################################################
 @app.route("/signup_teacher", methods=['GET','POST'])
 def signup_teacher():
@@ -194,6 +202,42 @@ def deleteclass():
     result = TeacherController.deleteClassroom_handling(db, id, username)
     return result
 
+@socketio.on('joinClassroom')
+def joinClassroom(classId):
+    print('joinClassroom '+classId)
+    join_room(classId)
+
+@socketio.on("report_attendance")
+def reportAttendance(message):
+    data = message['data']
+    class_id = data['class_id']
+    # imgs = data['imgs']
+    # data_image = imgs[0]
+    # sbuf = StringIO()
+    # sbuf.write(data_image)
+
+    # # decode and convert into image
+    # b = io.BytesIO(base64.b64decode(data_image))
+    # pimg = Image.open(b)
+
+    # ## converting RGB to BGR, as opencv standards
+    # frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
+
+    # # Process the image frame
+    # imgencode = cv2.imencode('.jpg', frame)[1]
+
+    # # base64 encode
+    # stringData = base64.b64encode(imgencode).decode('utf-8')
+    # b64_src = 'data:image/jpg;base64,'
+    # stringData = b64_src + stringData
+
+    # data= {
+    #     class_id
+    # }
+
+    # emit the frame back
+    emit("report_attendance_from_student", {'data':data}, to=class_id)
+
 @app.route("/teacher/getclass/<class_id>")
 def getclass(class_id):
     # if 'teacher' not in session:
@@ -238,10 +282,12 @@ def startlearning():
     #     # session['error_login'] = "Please login first!"
     #     return redirect(url_for('index'))
     query_params = request.json
-    id_class = GetParameter.check_and_get(query_params, 'id')
+    class_id = query_params['class_id']
     start_time = query_params['start_time']
+    time_to_late = query_params['time_to_late']
+    time_to_fault_monitor = query_params['time_to_fault_monitor']
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
-    result = TeacherController.startLearning_handling(db, id_class, start_time)
+    result = TeacherController.startLearning_handling(db, class_id, start_time, time_to_late, time_to_fault_monitor)
     return result
 
 @app.route("/teacher/finishlearning", methods=['POST'])
@@ -250,8 +296,8 @@ def finishlearning():
     #     # session['error_login'] = "Please login first!"
     #     return redirect(url_for('index'))
     query_params = request.json
-    id_class = GetParameter.check_and_get(query_params, 'id')
-    result = TeacherController.stopLearning_handling(db, id_class)
+    class_id = query_params['class_id']
+    result = TeacherController.stopLearning_handling(db, class_id)
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 
@@ -261,7 +307,30 @@ def getNotification(class_id):
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 
+@app.route("/teacher/refuseJoinClass", methods=['POST'])
+def refuseJoinClass():
+    data = request.json
+    notification_id = data["notification_id"]
+    result = TeacherController.refuseJoinClass_handling(db, notification_id)
+    return result
+
+@app.route("/teacher/acceptJoinClass", methods=['POST'])
+def acceptJoinClass():
+    data = request.json
+    class_id = data["class_id"]
+    student_id = data["student_id"]
+    notification_id = data["notification_id"]
+    result = TeacherController.acceptJoinClass_handling(db, class_id, student_id, notification_id)
+    return result
+
+
 ####################################################### Student ############################################################
+
+@socketio.on('student_join')
+def student_join(student_id):
+    print("socket session student", student_id)
+    join_room(student_id)
+
 
 @app.route("/student_home_data/<username>")
 def student_home_data(username):
@@ -305,6 +374,49 @@ def outclass():
     class_id = GetParameter.check_and_get(query_params, 'class_id')
     result = StudentController.outClass_handling(db, student_id, class_id)
     return result
+
+@socketio.on('check_code')
+def check_code(data):
+    print(data)
+    code = data["code"]
+    student_id = data["student_id"]
+    result = StudentController.check_code_handling(db, code)
+    if result['code'] == '1000':
+        class_id = result["data"]
+        emit('code_found',{'class_id':class_id}, to=student_id)
+    else:
+        emit('code_not_found', to=student_id)
+
+@socketio.on('require_join')
+def require_join(message):
+    print(message)
+    data = message['data']
+    class_id = data['class_id']
+    student_id = data['student_id']
+    timestamp = data['timestamp']
+    result = StudentController.require_join_handling(db, class_id, student_id, timestamp)
+    if result:
+        emit('student_need_join', to=class_id)
+
+@socketio.on('attendanced')
+def attendanced(message):
+    print(message)
+    data = message['data']
+    time_late = data['time_late']
+    student_id = data['student_id']
+    class_id = data['class_id']
+    timestamp = data['timestamp']
+    StudentController.attendance_fault_handling(db, student_id, class_id, time_late, timestamp)
+
+@socketio.on('refuse_attendance')
+def refuse_attendance(message):
+    student_id = message['data']
+    emit("attendance_refused", to=student_id)
+
+@socketio.on('accept_attenance')
+def accept_attendance(message):
+    student_id = message['data']
+    emit("attendance_accepted", to=student_id)
 
 ####################################################### User ##############################################################
 
@@ -372,31 +484,10 @@ def changestudentavt():
 
 ################################################ ATTENDANCE #########################################################
 
-@socketio.on('connect')
-def connected():
-    print('Connected')
 
-@socketio.on('disconnect')
-def disconnected():
-    print('Disconnected')
 
-@socketio.on('joinClassroom')
-def joinClassroom(classId):
-    print('joinClassroom '+classId)
-    join_room(classId)
 
-@socketio.on('attendanced')
-def attendanced(message):
-    print(message)
-    data = message['data']
-    time_delta = data['time_delta']
-    student_username = data['student_username']
-    class_id = data['class_id']
-    timestamp = data['timestamp']
-    UserController.attendance_fault_handling(db, student_username, class_id, time_delta, timestamp)
-    emit('late_attendance',{'data':data}, to=class_id)
-    # else:
-    #     emit('onTime_attendance', {'data':data}, to=classId)
+
     
 
 if __name__ == '__main__':

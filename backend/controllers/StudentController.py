@@ -34,7 +34,8 @@ class StudentController:
                         'role': data['student']['role'],
                         'avatar': data['student']['avatar'],
                         'embedding': data['student']['embedding'],
-                        'classes': data['classes'],                       
+                        'classes': data['classes'],
+                        'require_classes': data['require_classes']                      
                     }
                 }
                 return result
@@ -63,7 +64,9 @@ class StudentController:
                             'is_learning': data['is_learning'],
                             'teacher_id': data['teacher_id'],
                             'mode': data['mode'],
-                            'start_time': data['start_time']
+                            'start_time': data['start_time'],
+                            'time_to_late': data['time_to_late'],
+                            'time_to_fault_monitor': data['time_to_fault_monitor']
                         }
                       }
             return result
@@ -112,4 +115,58 @@ class StudentController:
                 'code': '1001',
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
+            return result
+    
+    def check_code_handling(db, code):
+        try:
+            res = StudentService.check_code_classroom(db, code)
+            if res['found']:
+                result = {'code': '1000',
+                        'message': AppConfig.RESPONSE_CODE[1000],
+                        'data': res['class_id']
+                        }
+                return result
+            else:
+                result = {'code': '9999',
+                        'message': AppConfig.RESPONSE_CODE[9999],
+                        'data': {}
+                        }
+                return result
+        except Exception as ex:
+            print("Exception in StudentController check_code_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def require_join_handling(db, class_id, student_id, timestamp):
+        try:
+            noti_id = RandomTool.get_random_id()
+            res = StudentService.require_classroom(db, noti_id, class_id, student_id, timestamp)
+            if res:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            print("Exception in StudentController require_join_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def attendance_fault_handling(db, student_id, class_id, time_late, timestamp):
+        try:
+            idF = RandomTool.get_random_id()
+            idN = RandomTool.get_random_id()
+            StudentService.add_late_fault(db, idF, idN, student_id, class_id, time_late, timestamp)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.fault_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result

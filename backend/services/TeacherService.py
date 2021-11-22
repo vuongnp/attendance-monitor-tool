@@ -246,14 +246,16 @@ class TeacherService:
             print("Exception in TeacherService update_classroom_status function:", ex)
             raise Exception from ex
 
-    def update_classroom_start_learn(db, id, start_time):
+    def update_classroom_start_learn(db, class_id, start_time, time_to_late, time_to_fault_monitor):
         try:
             class_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.CLASS_COLLECTION)
-            result = class_collection.find_one_and_update(filter={'id': id},
+            result = class_collection.find_one_and_update(filter={'id': class_id},
                                                           update={'$set': {
                                                               'is_learning': 1,
-                                                              'start_time': start_time}},
+                                                              'start_time': start_time,
+                                                              'time_to_late':time_to_late,
+                                                              'time_to_fault_monitor':time_to_fault_monitor}},
                                                           return_document=ReturnDocument.AFTER,
                                                           upsert=False)
             return result
@@ -279,20 +281,94 @@ class TeacherService:
         try:
             noti_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.NOTIFICATION_COLLECTION)
-            notisList = noti_collection.find(filter={'class': class_id}).sort("timestamp", -1)[:10]
+            notisList = noti_collection.find(filter={'class_id': class_id}).sort("timestamp", -1)[:10]
             notifications = []
             for noti in notisList:
-                one_object = {
-                    'id': noti['id'],
-                    'class': noti['class'],
-                    'student': noti['student'],
-                    'type': noti['type'],
-                    'time_delta': noti['time_delta'],
-                    'timestamp': noti['timestamp']
-                }
+                one_object=None
+                if noti['type']==0:
+                    one_object = {
+                        'id': noti['id'],
+                        'class_id': noti['class_id'],
+                        'student_id': noti['message']['student_id'],
+                        'student_username': noti['message']['student_username'],
+                        'student_name': noti['message']['student_name'],
+                        'student_email': noti['message']['student_email'],
+                        'student_phone': noti['message']['student_phone'],
+                        'student_age': noti['message']['student_age'],
+                        'type': 0,
+                        'timestamp': noti['timestamp'],
+                        'is_waiting': noti['is_waiting']
+                    }
+                elif noti['type']==1:
+                    one_object = {
+                        'id': noti['id'],
+                        'class_id': noti['class_id'],
+                        'student_id': noti['message']['student_id'],
+                        'student_username': noti['message']['student_username'],
+                        'student_name': noti['message']['student_name'],
+                        'time_late': noti['message']['time_late'],
+                        'type': 1,
+                        'timestamp': noti['timestamp'],
+                        'is_waiting': noti['is_waiting']
+                    }
                 notifications.append(one_object)
             result = {'notifications': notifications}
             return result
         except Exception as ex:
-            print("Exception in TeacherService update_classroom_stop_learn function:", ex)
+            print("Exception in TeacherService get_notification function:", ex)
+            raise Exception from ex
+
+    def checked_notification(db, notification_id):
+        try:
+            noti_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.NOTIFICATION_COLLECTION)
+
+            noti_collection.find_one_and_update(filter={'id': notification_id},
+                                                          update={'$set': {
+                                                              'is_waiting': 0}},
+                                                          return_document=ReturnDocument.AFTER,
+                                                          upsert=False)
+            
+        except Exception as ex:
+            print("Exception in TeacherService checked_notification function:", ex)
+            raise Exception from ex
+
+    def add_student_to_class(db, class_id, student_id):
+        try:
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
+            user_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.USER_COLLECTION)
+            # add student to classroom
+            classroom = class_collection.find_one(filter={'id': class_id})
+            list_student_ids = classroom['students']
+            if list_student_ids:
+                list_student_ids = list_student_ids+ [student_id]
+            else:
+                list_student_ids = [student_id]
+            # list_student_ids = set(list_student_ids)
+            class_collection.find_one_and_update(filter={'id': class_id},
+                                                            update={
+                                                                '$set': {'students': list_student_ids}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+            # add classroom to student
+            student = user_collection.find_one(filter={'id': student_id})
+            list_class_ids = student['classes']
+            list_require_class_ids = student['require_classes']
+            list_require_class_ids.remove(class_id)
+            if list_class_ids:
+                list_class_ids = list_class_ids + [class_id]
+            else:
+                list_class_ids = [class_id]
+            # list_class_ids = set(list_class_ids)
+            user_collection.find_one_and_update(filter={'id': student_id},
+                                                            update={
+                                                                '$set': {
+                                                                    'classes': list_class_ids,
+                                                                    'require_classes':list_require_class_ids}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+        except Exception as ex:
+            print("Exception in TeacherService add_student_to_class function:", ex)
             raise Exception from ex

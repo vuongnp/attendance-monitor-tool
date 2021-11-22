@@ -260,9 +260,13 @@ class TeacherController:
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
             return result
-    def startLearning_handling(db, id, start_time):
+    def startLearning_handling(db, class_id, start_time, time_to_late, time_to_fault_monitor):
         try:
-            classroom = TeacherService.update_classroom_start_learn(db, id, start_time)
+            if time_to_late is None or time_to_fault_monitor is None or time_to_fault_monitor=='' or time_to_late=='':
+                return CheckParameter.get_result_for_miss_parameter()
+            time_to_late = int(time_to_late)
+            time_to_fault_monitor= int(time_to_fault_monitor)
+            TeacherService.update_classroom_start_learn(db, class_id, start_time, time_to_late, time_to_fault_monitor)
             result = {'code': '1000',
                       'message': AppConfig.RESPONSE_CODE[1000],
                       'data': {}
@@ -301,6 +305,39 @@ class TeacherController:
             return result
         except Exception as ex:
             print("Exception in TeacherController getNotification_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def refuseJoinClass_handling(db, notification_id):
+        try:
+            TeacherService.checked_notification(db, notification_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController refuseJoinClass_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def acceptJoinClass_handling(db, class_id, student_id, notification_id):
+        try:
+            TeacherService.add_student_to_class(db, class_id, student_id)
+            TeacherService.checked_notification(db, notification_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController refuseJoinClass_handling", ex)
             result = {
                 'code': '1001',
                 'message': AppConfig.RESPONSE_CODE[1001]

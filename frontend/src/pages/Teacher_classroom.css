@@ -74,6 +74,33 @@ tr th{
     margin-bottom: -10px;
     margin-top: -5px;
 }
+.main-report-attendance{
+padding: 10px;
+}
+.main-report-attendance .top-report{
+    display: flex;
+}
+.main-report-attendance .top-report .top-report-text{
+    text-align: center;
+    margin-left: 25%;
+    font-size: 20px;
+}
+.main-report-attendance .top-report .top-report-img{
+    margin-left: 10px;
+    width: 20%;
+    height: 20%;
+}
+.main-report-attendance .bottom-report{
+    margin-top: 10px;
+}
+.main-report-attendance .bottom-report .report-imgs{
+    display: flex;
+    margin-left: 15%;
+    width: 70%;
+}
+.main-report-attendance .bottom-report .report-imgs .report-img{
+    width: 50%;
+}
 /* width */
 ::-webkit-scrollbar {
     width: 10px;

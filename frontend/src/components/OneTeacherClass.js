@@ -9,14 +9,14 @@ import "./OneClass.css";
 export default function OneTeacherClass(props) {
   const history = useHistory();
   const linktoclass = "/teacher_classroom/" + props.class.id;
-  let flag = true;
-  if (props.class.is_learning) {
-    flag = false;
-  } else {
-    flag = true;
-  }
+  // let flag = true;
+  // if (props.class.is_learning) {
+  //   flag = false;
+  // } else {
+  //   flag = true;
+  // }
   const [showDelete, setShowDelete] = useState(false);
-  const [showLearning, setShowLearning] = useState(flag);
+  // const [showLearning, setShowLearning] = useState(flag);
   const [itemClass, setItemClass] = useState({
     username: localStorage.getItem("teacher_username"),
     id: props.class.id,
@@ -51,37 +51,40 @@ export default function OneTeacherClass(props) {
         console.error("There was an error!", error);
       });
   };
-  const handleLearning = () => {
-    itemClass.username = localStorage.getItem("teacher_username");
-    itemClass.id = props.class.id;
-    itemClass.start_time = (new Date().getTime()).toString();
-    setItemClass({...itemClass})
-    console.log(itemClass);
-    setShowLearning(true);
-    axios
-      .post(`${config.SERVER_URI}/teacher/startlearning`, itemClass)
-      .then((response) => {
-          setShowLearning(false);
-          history.push(linktoclass);
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
+  const handleGotoManagerClass=()=>{
+    history.push(linktoclass);
   };
-  const handleStopLearning = () => {
-    itemClass.username = localStorage.getItem("teacher_username");
-    itemClass.id = props.class.id;
-    setItemClass({...itemClass})
-    console.log(itemClass);
-    axios
-      .post(`${config.SERVER_URI}/teacher/finishlearning`, itemClass)
-      .then((response) => {
-          setShowLearning(true);
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
-  };
+  // const handleLearning = () => {
+  //   itemClass.username = localStorage.getItem("teacher_username");
+  //   itemClass.id = props.class.id;
+  //   itemClass.start_time = (new Date().getTime()).toString();
+  //   setItemClass({...itemClass})
+  //   console.log(itemClass);
+  //   setShowLearning(true);
+  //   axios
+  //     .post(`${config.SERVER_URI}/teacher/startlearning`, itemClass)
+  //     .then((response) => {
+  //         setShowLearning(false);
+  //         history.push(linktoclass);
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error!", error);
+  //     });
+  // };
+  // const handleStopLearning = () => {
+  //   itemClass.username = localStorage.getItem("teacher_username");
+  //   itemClass.id = props.class.id;
+  //   setItemClass({...itemClass})
+  //   console.log(itemClass);
+  //   axios
+  //     .post(`${config.SERVER_URI}/teacher/finishlearning`, itemClass)
+  //     .then((response) => {
+  //         setShowLearning(true);
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error!", error);
+  //     });
+  // };
   return (
     <div className="one-class-item">
       <div className="classname">
@@ -114,7 +117,7 @@ export default function OneTeacherClass(props) {
       </p>
 
       <div className="start-delete">
-        {showLearning && (
+        {/* {showLearning && (
           <Button
             variant="success"
             type="submit"
@@ -133,8 +136,15 @@ export default function OneTeacherClass(props) {
           >
             Kết thúc học
           </Button>
-        )}
-
+        )} */}
+        <Button
+            variant="success"
+            type="submit"
+            className=""
+            onClick={handleGotoManagerClass}
+          >
+            Quản lý lớp
+          </Button>
         <Button
           variant="outlined"
           //   color="secondary"

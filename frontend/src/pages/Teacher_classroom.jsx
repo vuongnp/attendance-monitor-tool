@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button} from "react-bootstrap";
+import { Modal, Form, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Table } from "reactstrap";
@@ -47,6 +47,7 @@ export default function TeacherClassroom(props) {
     time_to_fault_monitor: "",
     start_time: 0,
   });
+  const [studentdLearned, setStudentdLearned] = useState([]);
   const [reportAttendanceItem, setReportAttendanceItem] = useState({});
 
   const [notifications, setNotifications] = useState([]);
@@ -61,6 +62,7 @@ export default function TeacherClassroom(props) {
   const [showLearning, setShowLearning] = useState(0);
   const [showSettingStartLearn, setShowSettingStartLearn] = useState(false);
   const [showReportAttendance, setShowReportAttendance] = useState(false);
+  const [showStudentNotLearned, setShowListStudentNotLearned] = useState(false);
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
@@ -81,6 +83,7 @@ export default function TeacherClassroom(props) {
     setShowListNoti(false);
     setShowSettingStartLearn(false);
     setShowReportAttendance(false);
+    setShowListStudentNotLearned(false);
   };
   const handleChangeEditName = (e) => {
     classroom.name = e.target.value;
@@ -130,6 +133,17 @@ export default function TeacherClassroom(props) {
           class_id={class_id}
           key={students.indexOf(student)}
         />
+      );
+    });
+  };
+  const renderTableNotLearned = () => {
+    return studentdLearned.map((item) => {
+      return (
+        <tr className="one-row">
+          <td>{studentdLearned.indexOf(item) + 1}</td>
+          <td>{item.username}</td>
+          <td>{item.name}</td>
+        </tr>
       );
     });
   };
@@ -209,8 +223,17 @@ export default function TeacherClassroom(props) {
   };
 
   const handleStopLearning = () => {
-    // itemStartLearn.class_id = class_id;
-    // setItemStartLearn({...itemStartLearn})
+    if (classroom.mode !== "1") {
+      axios
+        .post(`${config.SERVER_URI}/teacher/getStudentLearned`, itemStartLearn)
+        .then((response) => {
+          setStudentdLearned(response.data.data);
+          setShowListStudentNotLearned(true);
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+    }
     axios
       .post(`${config.SERVER_URI}/teacher/finishlearning`, itemStartLearn)
       .then((response) => {
@@ -219,21 +242,21 @@ export default function TeacherClassroom(props) {
       .catch((error) => {
         console.error("There was an error!", error);
       });
+    socket.emit("class_stopped_learn", {data: students});
   };
 
   const handleRefuseAttendance = () => {
     setShowReportAttendance(false);
-    socket.emit("refuse_attendance", {data: reportAttendanceItem.student_id});
+    socket.emit("refuse_attendance", { data: reportAttendanceItem.student_id });
   };
   const handleAcceptAttendace = () => {
     setShowReportAttendance(false);
-    socket.emit("accept_attenance",{data: reportAttendanceItem.student_id});
+    socket.emit("accept_attenance", { data: reportAttendanceItem.student_id });
   };
-  // socket.on("late_attendance", (data) => {
-  //   console.log(data);
-  //   setShowNotification(true);
-  //   setNewNoti(true);
-  // });
+  socket.on("posible_fault_monitor", () => {
+    setShowNotification(true);
+    setNewNoti(true);
+  });
   socket.on("student_need_join", () => {
     setShowNotification(true);
     setNewNoti(true);
@@ -578,6 +601,31 @@ export default function TeacherClassroom(props) {
             </Button>
           </Modal.Footer>
         </Modal>
+        {/* List Student Not Learned */}
+        <Modal show={showStudentNotLearned} onHide={handleCloseModal} >
+          <Modal.Header closeButton>
+            <Modal.Title>Danh sách không tham gia tiết học</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {studentdLearned && (
+              <Table hover className="table-content">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ và tên</th>
+                  </tr>
+                </thead>
+                <tbody>{renderTableNotLearned()}</tbody>
+              </Table>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Đóng
+            </Button>
+          </Modal.Footer>
+        </Modal>
         {/* Edit class */}
         <Modal show={showEdit} onHide={handleCloseModal}>
           <Modal.Header closeButton>
@@ -701,6 +749,15 @@ export default function TeacherClassroom(props) {
                     />
                   </Col>
                 </Form.Row>
+                <div
+                  style={{
+                    fontSize: "15px",
+                    color: "gray",
+                    textAlign: "center",
+                  }}
+                >
+                  Số phút tính từ khi bắt đầu học
+                </div>
               </Form.Group>
               <Form.Group>
                 <Form.Row>
@@ -717,6 +774,15 @@ export default function TeacherClassroom(props) {
                     />
                   </Col>
                 </Form.Row>
+                <div
+                  style={{
+                    fontSize: "15px",
+                    color: "gray",
+                    textAlign: "center",
+                  }}
+                >
+                  Số phút mất tập trung liên tục
+                </div>
               </Form.Group>
             </Form>
             {showErrorParam && (

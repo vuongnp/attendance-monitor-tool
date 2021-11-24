@@ -15,6 +15,7 @@ from controllers.UserController import UserController
 from dotenv import load_dotenv
 import onnxruntime as nxrun
 from flask_socketio import SocketIO, emit, join_room
+import base64
 
 load_dotenv()
 cloudinary.config(cloud_name = os.getenv('CLOUD_NAME'), api_key=os.getenv('API_KEY'), 
@@ -192,10 +193,6 @@ def updateclass():
 
 @app.route("/teacher/deleteclass", methods=['POST'])
 def deleteclass():
-    # if 'teacher' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
-    # username = session['teacher_username']
     query_params = request.json
     id = GetParameter.check_and_get(query_params, 'id')
     username = GetParameter.check_and_get(query_params, 'username')
@@ -204,45 +201,23 @@ def deleteclass():
 
 @socketio.on('joinClassroom')
 def joinClassroom(classId):
-    print('joinClassroom '+classId)
+    print('teacher joinClassroom '+classId)
     join_room(classId)
 
 @socketio.on("report_attendance")
 def reportAttendance(message):
     data = message['data']
     class_id = data['class_id']
-    # imgs = data['imgs']
-    # data_image = imgs[0]
-    # sbuf = StringIO()
-    # sbuf.write(data_image)
-
-    # # decode and convert into image
-    # b = io.BytesIO(base64.b64decode(data_image))
-    # pimg = Image.open(b)
-
-    # ## converting RGB to BGR, as opencv standards
-    # frame = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
-
-    # # Process the image frame
-    # imgencode = cv2.imencode('.jpg', frame)[1]
-
-    # # base64 encode
-    # stringData = base64.b64encode(imgencode).decode('utf-8')
-    # b64_src = 'data:image/jpg;base64,'
-    # stringData = b64_src + stringData
-
-    # data= {
-    #     class_id
-    # }
-
-    # emit the frame back
     emit("report_attendance_from_student", {'data':data}, to=class_id)
+
+@socketio.on("class_stopped_learn")
+def class_stopped_learn(message):
+    data = message['data']
+    for item in data:
+        emit("lession_closed", to=item['id'])
 
 @app.route("/teacher/getclass/<class_id>")
 def getclass(class_id):
-    # if 'teacher' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
     result = TeacherController.getClassroom_handling(db, class_id)
     return result
 
@@ -267,9 +242,6 @@ def deletestudent():
 
 @app.route("/teacher/selectmode", methods=['POST'])
 def selectmode():
-    # if 'teacher' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
     query_params = request.json
     id_class = GetParameter.check_and_get(query_params, 'id_class')
     mode = GetParameter.check_and_get(query_params, 'mode')
@@ -278,9 +250,6 @@ def selectmode():
 
 @app.route("/teacher/startlearning", methods=['POST'])
 def startlearning():
-    # if 'teacher' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
     query_params = request.json
     class_id = query_params['class_id']
     start_time = query_params['start_time']
@@ -292,13 +261,17 @@ def startlearning():
 
 @app.route("/teacher/finishlearning", methods=['POST'])
 def finishlearning():
-    # if 'teacher' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
     query_params = request.json
     class_id = query_params['class_id']
     result = TeacherController.stopLearning_handling(db, class_id)
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
+    return result
+
+@app.route("/teacher/getStudentLearned", methods=['POST'])
+def getStudentLearned():
+    query_params = request.json
+    class_id = query_params['class_id']
+    result = TeacherController.getStudentLearned_handling(db, class_id)
     return result
 
 @app.route("/teacher/getNotification/<class_id>")
@@ -322,6 +295,16 @@ def acceptJoinClass():
     notification_id = data["notification_id"]
     result = TeacherController.acceptJoinClass_handling(db, class_id, student_id, notification_id)
     return result
+
+@app.route("/teacher/acceptFaultMonitor", methods=['POST'])
+def acceptFaultMonitor():
+    data = request.json
+    class_id = data["class_id"]
+    student_id = data["student_id"]
+    notification_id = data["notification_id"]
+    result = TeacherController.acceptFaultMonitor_handling(db, class_id, student_id, notification_id)
+    return result
+
 
 
 ####################################################### Student ############################################################
@@ -398,15 +381,21 @@ def require_join(message):
     if result:
         emit('student_need_join', to=class_id)
 
-@socketio.on('attendanced')
-def attendanced(message):
-    print(message)
+@socketio.on('attendanced_late')
+def attendanced_late(message):
     data = message['data']
     time_late = data['time_late']
     student_id = data['student_id']
     class_id = data['class_id']
     timestamp = data['timestamp']
     StudentController.attendance_fault_handling(db, student_id, class_id, time_late, timestamp)
+
+@socketio.on('attendanced_ontime')
+def attendanced_ontime(message):
+    data = message['data']
+    student_id = data['student_id']
+    class_id = data['class_id']
+    StudentController.attendance_ontime_handling(db, student_id, class_id)
 
 @socketio.on('refuse_attendance')
 def refuse_attendance(message):
@@ -417,6 +406,30 @@ def refuse_attendance(message):
 def accept_attendance(message):
     student_id = message['data']
     emit("attendance_accepted", to=student_id)
+
+@socketio.on("posible_fault_monitor")
+def posible_fault_monitor(message):
+    data = message['data']
+    class_id = data['class_id']
+    student_id = data['student_id']
+    student_name = data['student_name']
+    student_username = data['student_username']
+    timestamp = data['timestamp']
+    imgs = data['imgs']
+    list_imgs = []
+    for one_item in imgs:
+        imgstring = one_item['imgstring']
+        tstamp = one_item['timestamp']
+        imgdata = base64.b64decode(imgstring)
+        filename = './monitor_imgs/'+str(class_id)+"_"+str(student_id)+"_"+str(tstamp)+".jpg"
+        with open(filename, 'wb') as f:
+            f.write(imgdata)
+            f.close()
+        upload_result = cloudinary.uploader.upload(filename)
+        url_uploaded = upload_result['url']
+        list_imgs.append(url_uploaded)
+    StudentController.notification_monitor_handling(db, class_id, student_id, student_name, student_username, timestamp, list_imgs)
+    emit("posible_fault_monitor", to=class_id)
 
 ####################################################### User ##############################################################
 
@@ -457,6 +470,7 @@ def changeteacheravt():
     upload_result = None
     # if request.method == 'POST':
     img_to_upload = request.files['file']
+    print(img_to_upload)
     # app.logger.info('%s file_to_upload', file_to_upload)
     # img_to_upload = request.form["file"]
     user_id = request.form["teacher_id"]

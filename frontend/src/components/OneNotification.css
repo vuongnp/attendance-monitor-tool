@@ -52,3 +52,12 @@
     margin-top: 10px;
     /* justify-content: space-between; */
 }
+.imgs-posible-fault-monitor{
+    overflow-y: scroll;
+    height: 300px;
+    overflow-x: clip;
+}
+.img-posible-fault-monitor{
+    width: 250px;
+    /* height: 100px; */
+}

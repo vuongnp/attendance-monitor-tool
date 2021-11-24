@@ -343,3 +343,37 @@ class TeacherController:
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
             return result
+
+    def getStudentLearned_handling(db, class_id):
+        try:
+            data = TeacherService.get_students_learned(db, class_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': data
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController getStudentLearned_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def acceptFaultMonitor_handling(db, class_id, student_id, notification_id):
+        try:
+            idF = RandomTool.get_random_id()
+            TeacherService.add_fault_monitor(db, class_id, student_id, idF)
+            TeacherService.checked_notification(db, notification_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController refuseJoinClass_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result

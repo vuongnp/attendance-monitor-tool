@@ -55,6 +55,7 @@ class TeacherService:
                 'mode': "0",
                 'is_learning': 0,
                 'students': [],
+                'learning_students':[],
                 'start_time': ""
             }
             class_collection.insert_one(one_class)
@@ -130,21 +131,6 @@ class TeacherService:
                 db, DatabaseConfig.CLASS_COLLECTION)
             user_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.USER_COLLECTION)
-            noti_collection = pymongo.collection.Collection(
-                db, DatabaseConfig.NOTIFICATION_COLLECTION)
-
-            # notisList = noti_collection.find(filter={'class': id}).sort("timestamp", -1)[:10]
-            # notifications = []
-            # for noti in notisList:
-            #     one_object = {
-            #         'id': noti['id'],
-            #         'class': noti['class'],
-            #         'student': noti['student'],
-            #         'type': noti['type'],
-            #         'time_delta': noti['time_delta'],
-            #         'timestamp': noti['timestamp']
-            #     }
-            #     notifications.append(one_object)
 
             classroom = class_collection.find_one(filter={'id': id})
             list_ids = classroom['students']
@@ -254,6 +240,7 @@ class TeacherService:
                                                           update={'$set': {
                                                               'is_learning': 1,
                                                               'start_time': start_time,
+                                                              'learning_students':[],
                                                               'time_to_late':time_to_late,
                                                               'time_to_fault_monitor':time_to_fault_monitor}},
                                                           return_document=ReturnDocument.AFTER,
@@ -308,6 +295,18 @@ class TeacherService:
                         'student_name': noti['message']['student_name'],
                         'time_late': noti['message']['time_late'],
                         'type': 1,
+                        'timestamp': noti['timestamp'],
+                        'is_waiting': noti['is_waiting']
+                    }
+                elif noti['type']==2:
+                    one_object = {
+                        'id': noti['id'],
+                        'class_id': noti['class_id'],
+                        'student_id': noti['message']['student_id'],
+                        'student_username': noti['message']['student_username'],
+                        'student_name': noti['message']['student_name'],
+                        'imgs': noti['message']['imgs'],
+                        'type': 2,
                         'timestamp': noti['timestamp'],
                         'is_waiting': noti['is_waiting']
                     }
@@ -371,4 +370,56 @@ class TeacherService:
                                                             upsert=False)
         except Exception as ex:
             print("Exception in TeacherService add_student_to_class function:", ex)
+            raise Exception from ex
+
+    def add_fault_monitor(db, class_id, student_id, idF):
+        try:
+            fault_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.FAULT_COLLECTION)
+            user_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.USER_COLLECTION)
+
+            fault_collection.insert_one({
+                'id': idF,
+                'class_id': class_id,
+                'student_id': student_id,
+                'type': 2
+            })
+            # add fault to student
+            student = user_collection.find_one(filter={'id': student_id})
+            dict_class = student['faults']
+            if class_id not in dict_class:
+                dict_class[class_id] = [idF]
+            else:
+                dict_class[class_id] = dict_class[class_id] + [idF]
+            user_collection.find_one_and_update(filter={'id': student_id},
+                                                    update={'$set': {'faults': dict_class}},
+                    return_document=ReturnDocument.AFTER,
+                    upsert=False)
+        except Exception as ex:
+            print("Exception in TeacherService add_fault_monitor function:", ex)
+            raise Exception from ex
+
+    def get_students_learned(db, class_id):
+        try:
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
+            user_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.USER_COLLECTION)
+
+            classroom = class_collection.find_one(filter={'id': class_id})
+            students = classroom['students']
+            learning_students = classroom['learning_students']
+            list_students=[]
+            for id in students:
+                if id not in learning_students:
+                    student = user_collection.find_one(filter={'id': id})
+                    one_object={
+                        'name': student['name'],
+                        'username': student['username']
+                    }
+                    list_students.append(one_object)
+            return list_students
+        except Exception as ex:
+            print("Exception in TeacherService get_students_learned function:", ex)
             raise Exception from ex

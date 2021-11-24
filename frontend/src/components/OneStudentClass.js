@@ -7,10 +7,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import config from "../config/config";
 import RouterList from "../router/routerList";
 import "./OneClass.css";
+import Monitor from "../pages/Monitor";
 
 export default function OneStudentClass(props) {
   const history = useHistory();
-  const linktoclass = "/attendance/" + props.class.id;
+  const linktoattendance = "/attendance/" + props.class.id;
+  const linktomonitor = "/monitor/"+props.class.id;
   const [showOutClass, setShowOutClass] = useState(false);
   const [showViewClass, setShowViewClass] = useState(false);
   const [showClassNotStart, setShowClassNotStart] = useState(false);
@@ -60,9 +62,9 @@ export default function OneStudentClass(props) {
             setShowSetAvt(true);
           }else{
             if(response.data.data.mode==="1"){
-              alert("Giam sat");
+              history.push(linktomonitor);
             }else{
-              history.push(linktoclass);
+              history.push(linktoattendance);
             }
           }
         }

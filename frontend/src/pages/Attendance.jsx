@@ -36,6 +36,7 @@ const student_id = localStorage.getItem("student_id");
 let class_id;
 let count = 0;
 let loading = 0;
+var localStream;
 
 const loadModel = async () => {
   inferenceSession = await InferenceSession.create(ModelDetect);
@@ -79,7 +80,7 @@ function Attendance(props) {
   // const class_id = window.location.pathname.split('/')[2];
   //   const class_id = props.match.params.id;
   const history = useHistory();
-  
+
   const [errorManyFace, setErrorManyFace] = useState(false);
   const [errorNonFace, setErrorNonFace] = useState(false);
   const [lengthLoading, setLengthLoading] = useState(0);
@@ -95,7 +96,7 @@ function Attendance(props) {
   const destination = useRef();
 
   const gotoLearning = () => {
-    let linktoclass = window.location.origin+"/monitor/" + class_id;
+    let linktoclass = "/monitor/" + class_id;
     history.push(linktoclass);
   };
   const handleCloseModal = () => {
@@ -104,129 +105,148 @@ function Attendance(props) {
   };
 
   const renderCanvas = useCallback(async () => {
-    const ctx = canvas.current.getContext("2d");
-    const ctx_dest = destination.current.getContext("2d");
-    ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
-    if (count % 5 === 0 && count < 100 && loading < 10) {
-      canvas.current.width = CAM_WIDTH;
-      canvas.current.height = CAM_HEIGHT;
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.drawImage(video.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
+    if (canvas.current) {
+      const ctx = canvas.current.getContext("2d");
+      const ctx_dest = destination.current.getContext("2d");
+      ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
+      if (count % 5 === 0 && count < 100 && loading < 10) {
+        canvas.current.width = CAM_WIDTH;
+        canvas.current.height = CAM_HEIGHT;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(video.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
 
-      const onnxTensor = await processImgFromCanvas("srcCanvas");
-      // console.log(onnxTensor.data);
-      const prediction = await inferenceSession.run({ input: onnxTensor });
-      // console.log(prediction);
-      const scores = prediction.scores;
-      const boxes = prediction.boxes;
-      let numbers = boxes.dims[1];
-      //convert tensor to js array
-      const scoresTensor = ndarray(new Float32Array(scores.data), [numbers, 2]);
-      const boxesTensor = ndarray(new Float32Array(boxes.data), [numbers, 4]);
-      let locs = []; //location
-      for (var i = 0; i < numbers; ++i) {
-        var loc = new Float32Array(4);
-        for (var j = 0; j < 4; ++j) {
-          loc[j] = boxesTensor.get(i, j);
-        }
-        locs.push(loc);
-      }
-      let confs = new Float32Array(numbers); //confidences
-      for (var i = 0; i < numbers; ++i) {
-        confs[i] = scoresTensor.get(i, 1);
-      }
-      let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
-
-      if (dets.length > 1) {
-        setErrorManyFace(true);
-        setErrorNonFace(false);
-      } else if (dets.length === 1) {
-        setErrorManyFace(false);
-        setErrorNonFace(false);
-
-        drawAfterDetect("dstCanvas", dets[0]);
-        const onnxTensorVec = await processImgVectorizeFromCanvas(
-          dets[0],
-          canvas.current
-        );
-        const result = await inferenceSessionVec.run({ data: onnxTensorVec });
-        const embedding = result.reid_embedding;
-        const embeddingTensor = ndarray(new Float32Array(embedding.data), [
-          1,
-          embedding.dims[1],
+        const onnxTensor = await processImgFromCanvas("srcCanvas");
+        // console.log(onnxTensor.data);
+        const prediction = await inferenceSession.run({ input: onnxTensor });
+        // console.log(prediction);
+        const scores = prediction.scores;
+        const boxes = prediction.boxes;
+        let numbers = boxes.dims[1];
+        //convert tensor to js array
+        const scoresTensor = ndarray(new Float32Array(scores.data), [
+          numbers,
+          2,
         ]);
-        let embeddingArr = new Float32Array(256);
-        for (var i = 0; i < 256; ++i) {
-          embeddingArr[i] = embeddingTensor.get(0, i);
-        }
-        let stu_embeddingArr = new Float32Array(256);
-        for (var i = 0; i < 256; ++i) {
-          stu_embeddingArr[i] = stu_embedding[i] / 10000000000;
-        }
-        const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
-        console.log(sim_score);
-        if (sim_score >= 0.8) {
-          loading++;
-        } else {
-          if (count_imgs_report < 4) {
-            arr_Imgs.push(imgToServer("srcCanvas"));
-            count_imgs_report++;
+        const boxesTensor = ndarray(new Float32Array(boxes.data), [numbers, 4]);
+        let locs = []; //location
+        for (var i = 0; i < numbers; ++i) {
+          var loc = new Float32Array(4);
+          for (var j = 0; j < 4; ++j) {
+            loc[j] = boxesTensor.get(i, j);
           }
+          locs.push(loc);
         }
-        console.log(loading);
-        if (loading === 1) {
-          setLengthLoading(10);
-        } else if (loading === 2) {
-          setLengthLoading(20);
-        } else if (loading === 3) {
-          setLengthLoading(30);
-        } else if (loading === 4) {
-          setLengthLoading(40);
-        } else if (loading === 5) {
-          setLengthLoading(50);
-        } else if (loading === 6) {
-          setLengthLoading(60);
-        } else if (loading === 7) {
-          setLengthLoading(70);
-        } else if (loading === 8) {
-          setLengthLoading(80);
-        } else if (loading === 9) {
-          setLengthLoading(90);
-        } else if (loading === 10) {
-          let attendance_time = new Date().getTime();
-          setStartTime(formatTime(attendance_time));
-          setLengthLoading(100);
-          setSuccess(true);
-          setNotSuccess(false);
-          let time_late = parseInt(
-            (parseInt(attendance_time) - parseInt(start_time)) / 60000
+        let confs = new Float32Array(numbers); //confidences
+        for (var i = 0; i < numbers; ++i) {
+          confs[i] = scoresTensor.get(i, 1);
+        }
+        let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
+
+        if (dets.length > 1) {
+          setErrorManyFace(true);
+          setErrorNonFace(false);
+        } else if (dets.length === 1) {
+          setErrorManyFace(false);
+          setErrorNonFace(false);
+
+          drawAfterDetect("dstCanvas", dets[0]);
+          const onnxTensorVec = await processImgVectorizeFromCanvas(
+            dets[0],
+            canvas.current
           );
-          console.log(time_late);
-          if (time_late > time_to_late) {
-            socket.emit("attendanced", {
-              data: {
-                student_id: localStorage.getItem("student_id"),
-                class_id: class_id,
-                time_late: time_late,
-                timestamp: parseInt(attendance_time),
-              },
-            });
+          const result = await inferenceSessionVec.run({ data: onnxTensorVec });
+          const embedding = result.reid_embedding;
+          const embeddingTensor = ndarray(new Float32Array(embedding.data), [
+            1,
+            embedding.dims[1],
+          ]);
+          let embeddingArr = new Float32Array(256);
+          for (var i = 0; i < 256; ++i) {
+            embeddingArr[i] = embeddingTensor.get(0, i);
           }
+          let stu_embeddingArr = new Float32Array(256);
+          for (var i = 0; i < 256; ++i) {
+            stu_embeddingArr[i] = stu_embedding[i] / 10000000000;
+          }
+          const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
+          console.log(sim_score);
+          if (sim_score >= 0.8) {
+            loading++;
+          } else {
+            if (count_imgs_report < 4) {
+              arr_Imgs.push(imgToServer("srcCanvas"));
+              count_imgs_report++;
+            }
+          }
+          console.log(loading);
+          if (loading === 1) {
+            setLengthLoading(10);
+          } else if (loading === 2) {
+            setLengthLoading(20);
+          } else if (loading === 3) {
+            setLengthLoading(30);
+          } else if (loading === 4) {
+            setLengthLoading(40);
+          } else if (loading === 5) {
+            setLengthLoading(50);
+          } else if (loading === 6) {
+            setLengthLoading(60);
+          } else if (loading === 7) {
+            setLengthLoading(70);
+          } else if (loading === 8) {
+            setLengthLoading(80);
+          } else if (loading === 9) {
+            setLengthLoading(90);
+          } else if (loading === 10) {
+            stopCamera();
+            let attendance_time = new Date().getTime();
+            setStartTime(formatTime(attendance_time));
+            setLengthLoading(100);
+            setSuccess(true);
+            setNotSuccess(false);
+            let time_late = parseInt(
+              (parseInt(attendance_time) - parseInt(start_time)) / 60000
+            );
+            console.log(time_late);
+            if (time_late > time_to_late) {
+              socket.emit("attendanced_late", {
+                data: {
+                  student_id: localStorage.getItem("student_id"),
+                  class_id: class_id,
+                  time_late: time_late,
+                  timestamp: parseInt(attendance_time),
+                },
+              });
+            }else{
+              socket.emit("attendanced_ontime", {
+                data: {
+                  student_id: localStorage.getItem("student_id"),
+                  class_id: class_id,
+                },
+              });
+            }
+            setTimeout(() => {
+              let linktoclass = "/monitor/" + class_id;
+              // alert(linktoclass)
+              history.push(linktoclass);
+          }, 5000);         
+          }
+        } else {
+          setErrorNonFace(true);
+          setErrorManyFace(false);
+          //   return;
         }
       } else {
-        setErrorNonFace(true);
-        setErrorManyFace(false);
-        //   return;
+        if (loading !== 10 && count > 100) {
+          setSuccess(false);
+          setNotSuccess(true);
+          stopCamera();
+        }
       }
-    } else {
-      if (loading !== 10 && count > 100) {
-        setSuccess(false);
-        setNotSuccess(true);
-      }
+      // drawAfterDetect("dstCanvas", dets);
+      count = count + 1;
+      setTimeout(renderCanvas, 100);
     }
-    // drawAfterDetect("dstCanvas", dets);
-    count = count + 1;
-    setTimeout(renderCanvas, 100);
   }, [canvas]);
 
   // const detectFrame = useCallback(() => {
@@ -246,12 +266,16 @@ function Attendance(props) {
         },
       })
       .then((stream) => {
+        localStream = stream;
         video.current.srcObject = stream;
         video.current.onloadedmetadata = () => {
           video.current.play();
         };
       });
     renderCanvas();
+  };
+  const stopCamera = () => {
+    localStream.getTracks().forEach((track) => track.stop());
   };
   const reportToTeacher = () => {
     console.log(arr_Imgs);

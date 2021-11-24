@@ -156,10 +156,24 @@ class StudentController:
             }
             return result
 
+    def attendance_ontime_handling(db, student_id, class_id):
+        try:
+            StudentService.update_learning_student(db, class_id, student_id)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.attendance_ontime_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result
+
     def attendance_fault_handling(db, student_id, class_id, time_late, timestamp):
         try:
             idF = RandomTool.get_random_id()
             idN = RandomTool.get_random_id()
+            StudentService.update_learning_student(db, class_id, student_id)
             StudentService.add_late_fault(db, idF, idN, student_id, class_id, time_late, timestamp)
 
             result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
@@ -167,6 +181,20 @@ class StudentController:
                       }
             return result
         except Exception as ex:
-            print("Exception in StudentController.fault_handling", ex)
+            print("Exception in StudentController.attendance_fault_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result
+
+    def notification_monitor_handling(db, class_id, student_id, student_name, student_username, timestamp, list_imgs):
+        try:
+            idN = RandomTool.get_random_id()
+            StudentService.add_notification_monitor(db, class_id, student_id, student_name, student_username, timestamp, list_imgs, idN)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.notification_monitor_handling", ex)
             result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result

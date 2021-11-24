@@ -101,6 +101,15 @@ padding: 10px;
 .main-report-attendance .bottom-report .report-imgs .report-img{
     width: 50%;
 }
+.list-not-learned{
+    display: flex;
+}
+.list-not-learned .name{
+    font-weight: bold;
+}
+.list-not-learned .text{
+    margin-left: 5px;
+}
 /* width */
 ::-webkit-scrollbar {
     width: 10px;

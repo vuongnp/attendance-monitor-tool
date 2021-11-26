@@ -199,23 +199,6 @@ def deleteclass():
     result = TeacherController.deleteClassroom_handling(db, id, username)
     return result
 
-@socketio.on('joinClassroom')
-def joinClassroom(classId):
-    print('teacher joinClassroom '+classId)
-    join_room(classId)
-
-@socketio.on("report_attendance")
-def reportAttendance(message):
-    data = message['data']
-    class_id = data['class_id']
-    emit("report_attendance_from_student", {'data':data}, to=class_id)
-
-@socketio.on("class_stopped_learn")
-def class_stopped_learn(message):
-    data = message['data']
-    for item in data:
-        emit("lession_closed", to=item['id'])
-
 @app.route("/teacher/getclass/<class_id>")
 def getclass(class_id):
     result = TeacherController.getClassroom_handling(db, class_id)
@@ -267,11 +250,11 @@ def finishlearning():
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 
-@app.route("/teacher/getStudentLearned", methods=['POST'])
-def getStudentLearned():
+@app.route("/teacher/getStudentNotLearned", methods=['POST'])
+def getStudentNotLearned():
     query_params = request.json
     class_id = query_params['class_id']
-    result = TeacherController.getStudentLearned_handling(db, class_id)
+    result = TeacherController.getStudentNotLearned_handling(db, class_id)
     return result
 
 @app.route("/teacher/getNotification/<class_id>")
@@ -305,6 +288,45 @@ def acceptFaultMonitor():
     result = TeacherController.acceptFaultMonitor_handling(db, class_id, student_id, notification_id)
     return result
 
+@app.route("/teacher/saveFaultsNotLearn", methods=['POST'])
+def saveFaultsNotLearn():
+    data = request.json
+    class_id = data["class_id"]
+    result = TeacherController.saveFaultsNotLearn_handling(db, class_id)
+    return result
+
+@app.route("/teacher/saveFaultsStayin", methods=['POST'])
+def saveFaultsStayin():
+    data = request.json
+    class_id = data["class_id"]
+    result = TeacherController.saveFaultsStayIn_handling(db, class_id)
+    return result
+
+@socketio.on('joinClassroom')
+def joinClassroom(classId):
+    print('teacher joinClassroom '+classId)
+    join_room(classId)
+
+@socketio.on("report_attendance")
+def reportAttendance(message):
+    data = message['data']
+    class_id = data['class_id']
+    emit("report_attendance_from_student", {'data':data}, to=class_id)
+
+@socketio.on("class_stopped_learn")
+def class_stopped_learn(message):
+    data = message['data']
+    for item in data:
+        emit("lession_closed", to=item['id'])
+
+@socketio.on("check_student_stay_in")
+def check_student_stay_in(message):
+    data = message['data']
+    class_id = data['class_id']
+    students = data['students']
+    TeacherController.checkStudentStayIn_handling(db, class_id)
+    for student in students:
+        emit("are_you_stay_in", to=student['id'])
 
 
 ####################################################### Student ############################################################
@@ -348,14 +370,18 @@ def joinclass():
 
 @app.route("/student/outclass", methods=['POST'])
 def outclass():
-    # if 'student' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
-    # student_id = session['student_id']
     query_params = request.json
     student_id = GetParameter.check_and_get(query_params, 'student_id')
     class_id = GetParameter.check_and_get(query_params, 'class_id')
     result = StudentController.outClass_handling(db, student_id, class_id)
+    return result
+
+@app.route("/student/iStayIn", methods=['POST'])
+def iStayIn():
+    data = request.json
+    class_id = data['class_id']
+    student_id = data['student_id']
+    result = StudentController.iStayIn_handling(db, class_id, student_id)
     return result
 
 @socketio.on('check_code')
@@ -430,7 +456,7 @@ def posible_fault_monitor(message):
         list_imgs.append(url_uploaded)
     StudentController.notification_monitor_handling(db, class_id, student_id, student_name, student_username, timestamp, list_imgs)
     emit("posible_fault_monitor", to=class_id)
-
+        
 ####################################################### User ##############################################################
 
 @app.route("/logout")

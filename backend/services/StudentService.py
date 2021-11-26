@@ -251,7 +251,8 @@ class StudentService:
                 'class_id': class_id,
                 'student_id': student_id,
                 'type': 0,
-                'time_late': time_late
+                'time_late': time_late,
+                'description': 'fault attendance late'
             })
             # add fault to student
             student = user_collection.find_one(filter={'id': student_id})
@@ -305,4 +306,23 @@ class StudentService:
             print("Exception in StudentService addLateFault function:", ex)
             raise Exception from ex
 
+    def update_stay_in_student(db, class_id, student_id):
+        try:
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
+            classroom = class_collection.find_one(filter={'id': class_id})
+            list_student_ids = classroom['stayin_students']
+            if list_student_ids:
+                list_student_ids = list_student_ids+ [student_id]
+            else:
+                list_student_ids = [student_id]
+            class_collection.find_one_and_update(filter={'id': class_id},
+                                                            update={
+                                                                '$set': {'stayin_students': list_student_ids}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+            
+        except Exception as ex:
+            print("Exception in StudentService update_stay_in_student function:", ex)
+            raise Exception from ex
     

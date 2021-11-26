@@ -47,7 +47,7 @@ export default function TeacherClassroom(props) {
     time_to_fault_monitor: "",
     start_time: 0,
   });
-  const [studentdLearned, setStudentdLearned] = useState([]);
+  const [studentdNotLearned, setStudentdNotLearned] = useState([]);
   const [reportAttendanceItem, setReportAttendanceItem] = useState({});
 
   const [notifications, setNotifications] = useState([]);
@@ -63,6 +63,7 @@ export default function TeacherClassroom(props) {
   const [showSettingStartLearn, setShowSettingStartLearn] = useState(false);
   const [showReportAttendance, setShowReportAttendance] = useState(false);
   const [showStudentNotLearned, setShowListStudentNotLearned] = useState(false);
+  const [showTest, setShowTest] = useState(true);
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
@@ -137,10 +138,10 @@ export default function TeacherClassroom(props) {
     });
   };
   const renderTableNotLearned = () => {
-    return studentdLearned.map((item) => {
+    return studentdNotLearned.map((item) => {
       return (
         <tr className="one-row">
-          <td>{studentdLearned.indexOf(item) + 1}</td>
+          <td>{studentdNotLearned.indexOf(item) + 1}</td>
           <td>{item.username}</td>
           <td>{item.name}</td>
         </tr>
@@ -172,6 +173,7 @@ export default function TeacherClassroom(props) {
       .post(`${config.SERVER_URI}/teacher/selectmode`, itemUpdateMode)
       .then((response) => {
         console.log(response);
+        refreshPage();
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -225,9 +227,12 @@ export default function TeacherClassroom(props) {
   const handleStopLearning = () => {
     if (classroom.mode !== "1") {
       axios
-        .post(`${config.SERVER_URI}/teacher/getStudentLearned`, itemStartLearn)
+        .post(
+          `${config.SERVER_URI}/teacher/getStudentNotLearned`,
+          itemStartLearn
+        )
         .then((response) => {
-          setStudentdLearned(response.data.data);
+          setStudentdNotLearned(response.data.data);
           setShowListStudentNotLearned(true);
         })
         .catch((error) => {
@@ -242,7 +247,7 @@ export default function TeacherClassroom(props) {
       .catch((error) => {
         console.error("There was an error!", error);
       });
-    socket.emit("class_stopped_learn", {data: students});
+    socket.emit("class_stopped_learn", { data: students });
   };
 
   const handleRefuseAttendance = () => {
@@ -253,6 +258,50 @@ export default function TeacherClassroom(props) {
     setShowReportAttendance(false);
     socket.emit("accept_attenance", { data: reportAttendanceItem.student_id });
   };
+  const handleTest = () => {
+    socket.emit("check_student_stay_in", {
+      data: {
+        class_id: class_id,
+        students: students,
+      },
+    });
+    setShowTest(false);
+  };
+  const handleStopTest = () => {
+    setShowTest(true);
+    let itemSaveFaultsStayin = {
+      class_id: class_id,
+    };
+    axios
+      .post(
+        `${config.SERVER_URI}/teacher/saveFaultsStayin`,
+        itemSaveFaultsStayin
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+  const handleSaveFaultsNotLearn = () => {
+    setShowListStudentNotLearned(false);
+    let itemSaveFaultsNotLearn = {
+      class_id: class_id,
+    };
+    axios
+      .post(
+        `${config.SERVER_URI}/teacher/saveFaultsNotLearn`,
+        itemSaveFaultsNotLearn
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+
   socket.on("posible_fault_monitor", () => {
     setShowNotification(true);
     setNewNoti(true);
@@ -334,26 +383,50 @@ export default function TeacherClassroom(props) {
               />
             )}
           </div>
-          {showLearning === 0 && (
-            <Button
-              variant="success"
-              type="submit"
-              className=""
-              onClick={handleLearning}
-            >
-              Bắt đầu học
-            </Button>
-          )}
-          {showLearning === 1 && (
-            <Button
-              variant="danger"
-              type="submit"
-              className=""
-              onClick={handleStopLearning}
-            >
-              Kết thúc học
-            </Button>
-          )}
+          <div>
+            {showLearning === 1 && classroom.mode === "2" && showTest && (
+              <Button
+                variant="info"
+                type="submit"
+                className=""
+                style={{marginRight: "10px"}}
+                onClick={handleTest}
+              >
+                Kiểm tra bất chợt
+              </Button>
+            )}
+            {showLearning === 1 && classroom.mode === "2" && !showTest && (
+              <Button
+                variant="secondary"
+                type="submit"
+                className=""
+                style={{marginRight: "10px"}}
+                onClick={handleStopTest}
+              >
+                Dừng kiểm tra
+              </Button>
+            )}
+            {showLearning === 0 && (
+              <Button
+                variant="success"
+                type="submit"
+                className=""
+                onClick={handleLearning}
+              >
+                Bắt đầu học
+              </Button>
+            )}
+            {showLearning === 1 && (
+              <Button
+                variant="danger"
+                type="submit"
+                className=""
+                onClick={handleStopLearning}
+              >
+                Kết thúc học
+              </Button>
+            )}
+          </div>
         </div>
         <div className="center-class-container">
           <div className="left-center-class-container">
@@ -602,12 +675,12 @@ export default function TeacherClassroom(props) {
           </Modal.Footer>
         </Modal>
         {/* List Student Not Learned */}
-        <Modal show={showStudentNotLearned} onHide={handleCloseModal} >
+        <Modal show={showStudentNotLearned} onHide={handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>Danh sách không tham gia tiết học</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {studentdLearned && (
+            {studentdNotLearned && (
               <Table hover className="table-content">
                 <thead>
                   <tr>
@@ -623,6 +696,9 @@ export default function TeacherClassroom(props) {
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>
               Đóng
+            </Button>
+            <Button variant="info" onClick={handleSaveFaultsNotLearn}>
+              Lưu lại
             </Button>
           </Modal.Footer>
         </Modal>

@@ -198,3 +198,16 @@ class StudentController:
             print("Exception in StudentController.notification_monitor_handling", ex)
             result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result
+
+    def iStayIn_handling(db, class_id, student_id):
+        try:
+            StudentService.update_stay_in_student(db, class_id, student_id)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.iStayIn_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result

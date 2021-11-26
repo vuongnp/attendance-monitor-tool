@@ -344,9 +344,9 @@ class TeacherController:
             }
             return result
 
-    def getStudentLearned_handling(db, class_id):
+    def getStudentNotLearned_handling(db, class_id):
         try:
-            data = TeacherService.get_students_learned(db, class_id)
+            data = TeacherService.get_students_not_learned(db, class_id)
             result = {'code': '1000',
                       'message': AppConfig.RESPONSE_CODE[1000],
                       'data': data
@@ -372,6 +372,71 @@ class TeacherController:
             return result
         except Exception as ex:
             print("Exception in TeacherController refuseJoinClass_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def saveFaultsNotLearn_handling(db, class_id):
+        try:
+            classroom = TeacherService.get_basic_info_class(db, class_id)
+            students = classroom['students']
+            learning_students = classroom['learning_students']
+
+            for student_id in students:
+                if student_id not in learning_students:
+                    idF = RandomTool.get_random_id()
+                    TeacherService.add_fault_not_learn(db, class_id, student_id, idF)
+
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController saveFaultsNotLearn_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def checkStudentStayIn_handling(db, class_id):
+        try:
+            TeacherService.update_stayin_student(db, class_id)
+
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController checkStudentStayIn_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def saveFaultsStayIn_handling(db, class_id):
+        try:
+            classroom = TeacherService.get_basic_info_class(db, class_id)
+            stayin_students = classroom['stayin_students']
+            learning_students = classroom['learning_students']
+
+            for student_id in learning_students:
+                if student_id not in stayin_students:
+                    idF = RandomTool.get_random_id()
+                    TeacherService.add_fault_monitor(db, class_id, student_id, idF)
+
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController saveFaultsStayIn_handling", ex)
             result = {
                 'code': '1001',
                 'message': AppConfig.RESPONSE_CODE[1001]

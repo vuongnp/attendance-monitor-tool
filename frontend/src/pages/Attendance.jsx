@@ -24,9 +24,10 @@ import "./Attendance.css";
 
 let inferenceSession;
 let inferenceSessionVec;
-// const IMAGE_SIZE = 640;
+
 const CAM_WIDTH = 640;
 const CAM_HEIGHT = 480;
+const TIME_TO_STOP = 30000; //30s
 let stu_embedding;
 let start_time;
 let time_to_late;
@@ -34,8 +35,12 @@ let count_imgs_report = 0;
 let arr_Imgs = [];
 const student_id = localStorage.getItem("student_id");
 let class_id;
-let count = 0;
+// let count = 0;
 let loading = 0;
+let class_mode;
+let start_time_attendance;
+let current_time_attendance;
+let delta_time;
 var localStream;
 
 const loadModel = async () => {
@@ -68,6 +73,7 @@ const getInfoAttendance = async () => {
       if (response) {
         start_time = response.data.data.start_time;
         time_to_late = response.data.data.time_to_late;
+        class_mode = response.data.data.mode;
         console.log("Info Attendance loaded");
       }
     })
@@ -95,9 +101,13 @@ function Attendance(props) {
   const canvas = useRef();
   const destination = useRef();
 
-  const gotoLearning = () => {
-    let linktoclass = "/monitor/" + class_id;
-    history.push(linktoclass);
+  const gotoLearning = (class_mode) => {
+    if(class_mode==="0"){
+      history.push("/student_home");
+    }else{
+      let linktoclass = "/monitor/" + class_id;
+      history.push(linktoclass);
+    }
   };
   const handleCloseModal = () => {
     setShowAccept(false);
@@ -105,11 +115,14 @@ function Attendance(props) {
   };
 
   const renderCanvas = useCallback(async () => {
+    current_time_attendance= new Date().getTime();
+    delta_time = current_time_attendance-start_time_attendance;
     if (canvas.current) {
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
       ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
-      if (count % 5 === 0 && count < 100 && loading < 10) {
+      // if (count % 5 === 0 && count < 100 && loading < 10) {
+      if (delta_time<TIME_TO_STOP && loading < 10){
         canvas.current.width = CAM_WIDTH;
         canvas.current.height = CAM_HEIGHT;
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -226,9 +239,7 @@ function Attendance(props) {
               });
             }
             setTimeout(() => {
-              let linktoclass = "/monitor/" + class_id;
-              // alert(linktoclass)
-              history.push(linktoclass);
+              gotoLearning(class_mode);
           }, 5000);         
           }
         } else {
@@ -237,24 +248,18 @@ function Attendance(props) {
           //   return;
         }
       } else {
-        if (loading !== 10 && count > 100) {
+        if (delta_time>=TIME_TO_STOP) {
           setSuccess(false);
           setNotSuccess(true);
           stopCamera();
         }
       }
+      // console.log(count);
       // drawAfterDetect("dstCanvas", dets);
-      count = count + 1;
+      // count = count + 1;
       setTimeout(renderCanvas, 100);
     }
   }, [canvas]);
-
-  // const detectFrame = useCallback(() => {
-  //   renderCanvas();
-  //   // requestAnimationFrame(() => {
-  //   // 	renderCanvas();
-  //   // });
-  // }, [renderCanvas]);
 
   const openCamera = () => {
     setClickedOpenCam(false);
@@ -272,6 +277,7 @@ function Attendance(props) {
           video.current.play();
         };
       });
+    start_time_attendance = new Date().getTime();
     renderCanvas();
   };
   const stopCamera = () => {
@@ -296,7 +302,7 @@ function Attendance(props) {
       (parseInt(attendance_time) - parseInt(start_time)) / 60000
     );
     if (time_late > time_to_late) {
-      socket.emit("attendanced", {
+      socket.emit("attendanced_late", {
         data: {
           student_id: localStorage.getItem("student_id"),
           class_id: class_id,
@@ -304,9 +310,17 @@ function Attendance(props) {
           timestamp: parseInt(attendance_time),
         },
       });
+    }else{
+      socket.emit("attendanced_ontime", {
+        data: {
+          student_id: localStorage.getItem("student_id"),
+          class_id: class_id,
+        },
+      });
     }
-    let linktoclass = "/monitor/" + class_id;
-    history.push(linktoclass);
+    gotoLearning(class_mode);
+    // let linktoclass = "/monitor/" + class_id;
+    // history.push(linktoclass);
   };
 
   socket.on("attendance_refused", () => {
@@ -315,21 +329,6 @@ function Attendance(props) {
   socket.on("attendance_accepted", () => {
     setShowAccept(true);
   });
-  // useLayoutEffect(() => {
-  //   navigator.mediaDevices
-  //     .getUserMedia({
-  //       audio: false,
-  //       video: {
-  //         facingMode: "user",
-  //       },
-  //     })
-  //     .then((stream) => {
-  //       video.current.srcObject = stream;
-  //       video.current.onloadedmetadata = () => {
-  //         video.current.play();
-  //       };
-  //     });
-  // }, [detectFrame, video]);
 
   useLayoutEffect(() => {
     const init = async () => {
@@ -425,13 +424,13 @@ function Attendance(props) {
               <div style={{ fontSize: "18px", color: "#423c3c" }}>
                 Thời điểm {startTime}
               </div>
-              <Button
+              {/* <Button
                 variant="outline-info"
                 className="btn-status"
                 onClick={gotoLearning}
               >
                 Vào lớp học
-              </Button>
+              </Button> */}
             </div>
           )}
           {notSuccess && (
@@ -484,7 +483,7 @@ function Attendance(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleAccepted}>
-            Vào lớp học
+            OK
           </Button>
         </Modal.Footer>
       </Modal>

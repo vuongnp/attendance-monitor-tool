@@ -73,6 +73,7 @@ function Monitor() {
   const [errorNonFace, setErrorNonFace] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showLessonClosed, setShowLessonClosed] = useState(false);
+  const [showCheckStayin, setShowCheckStayin] = useState(false);
 
   const video = useRef();
   const canvas = useRef();
@@ -81,6 +82,7 @@ function Monitor() {
   const handleCloseModal = () => {
     setShowNotification(false);
     setShowLessonClosed(false);
+    setShowCheckStayin(false);
   };
 
   const renderCanvas = useCallback(async () => {
@@ -195,11 +197,30 @@ function Monitor() {
     setShowLessonClosed(false);
     history.push("/student_home");
   };
+  const handleIStayIn = ()=>{
+    let itemIstayin={
+      class_id: class_id,
+      student_id: student_id
+    }
+    axios
+    .post(`${config.SERVER_URI}/student/iStayIn`, itemIstayin)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.error("There was an error!", error);
+    });
+    setShowCheckStayin(false);
+  };
 
   socket.on("lession_closed", ()=>{
     stopCamera();
     setShowLessonClosed(true);
   });
+  socket.on("are_you_stay_in", ()=>{
+    setShowCheckStayin(true);
+  });
+
   useLayoutEffect(() => {
     navigator.mediaDevices
       .getUserMedia({
@@ -291,6 +312,17 @@ function Monitor() {
         <Modal.Footer>
           <Button variant="secondary" onClick={hanleOKLessonClosed}>
             OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Stay in */}
+      <Modal show={showCheckStayin} onHide={handleCloseModal}>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>Bạn còn ở đó chứ?</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleIStayIn}>
+            Tôi vẫn ở đây
           </Button>
         </Modal.Footer>
       </Modal>

@@ -56,6 +56,7 @@ class TeacherService:
                 'is_learning': 0,
                 'students': [],
                 'learning_students':[],
+                'stayin_students':[],
                 'start_time': ""
             }
             class_collection.insert_one(one_class)
@@ -383,7 +384,8 @@ class TeacherService:
                 'id': idF,
                 'class_id': class_id,
                 'student_id': student_id,
-                'type': 2
+                'type': 2,
+                'description': 'fault monitor'
             })
             # add fault to student
             student = user_collection.find_one(filter={'id': student_id})
@@ -399,8 +401,50 @@ class TeacherService:
         except Exception as ex:
             print("Exception in TeacherService add_fault_monitor function:", ex)
             raise Exception from ex
+    
+    def get_basic_info_class(db, id):
+        try:
+            # db = client.get_database(DatabaseConfig.DATABASE)
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
 
-    def get_students_learned(db, class_id):
+            classroom = class_collection.find_one(filter={'id': id})
+
+            return classroom
+        except Exception as ex:
+            print("Exception in TeacherService get_basic_info_class function:", ex)
+            raise Exception from ex
+
+    def add_fault_not_learn(db, class_id, student_id, idF):
+        try:
+            fault_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.FAULT_COLLECTION)
+            user_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.USER_COLLECTION)
+
+            fault_collection.insert_one({
+                'id': idF,
+                'class_id': class_id,
+                'student_id': student_id,
+                'type': 1,
+                'description': 'fault not learn'
+            })
+            # add fault to student
+            student = user_collection.find_one(filter={'id': student_id})
+            dict_class = student['faults']
+            if class_id not in dict_class:
+                dict_class[class_id] = [idF]
+            else:
+                dict_class[class_id] = dict_class[class_id] + [idF]
+            user_collection.find_one_and_update(filter={'id': student_id},
+                                                    update={'$set': {'faults': dict_class}},
+                    return_document=ReturnDocument.AFTER,
+                    upsert=False)
+        except Exception as ex:
+            print("Exception in TeacherService add_fault_not_learn function:", ex)
+            raise Exception from ex
+
+    def get_students_not_learned(db, class_id):
         try:
             class_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.CLASS_COLLECTION)
@@ -421,5 +465,20 @@ class TeacherService:
                     list_students.append(one_object)
             return list_students
         except Exception as ex:
-            print("Exception in TeacherService get_students_learned function:", ex)
+            print("Exception in TeacherService get_students_not_learned function:", ex)
             raise Exception from ex
+    
+    def update_stayin_student(db, class_id):
+        try:
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
+            result = class_collection.find_one_and_update(filter={'id': class_id},
+                                                          update={'$set': {
+                                                              'stayin_students':[]}},
+                                                          return_document=ReturnDocument.AFTER,
+                                                          upsert=False)
+            return result
+        except Exception as ex:
+            print("Exception in TeacherService update_stayin_student function:", ex)
+            raise Exception from ex
+    

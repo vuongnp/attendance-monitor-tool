@@ -284,6 +284,32 @@ class StudentService:
             print("Exception in StudentService addLateFault function:", ex)
             raise Exception from ex
 
+    def add_notification_report_attendance(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs, idN):
+        try:
+            print("BBBBBBBBBB")
+            noti_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.NOTIFICATION_COLLECTION)
+            noti_collection.insert_one({
+                            'id': idN,
+                            'class_id': class_id,
+                            'timestamp': timestamp,
+                            'type': 3,
+                            'message': {
+                                'student_id': student_id,
+                                'student_username': student_username,
+                                'student_name': student_name,
+                                'student_avt': student_avt,
+                                'imgs': list_imgs,
+                                'time_late': time_late,
+                                'time_to_late': time_to_late,
+                                'text': 'student report attendance'
+                            },
+                            'is_waiting': 1
+                    })
+        except Exception as ex:
+            print("Exception in StudentService add_notification_report_attendance function:", ex)
+            raise Exception from ex
+
     def add_notification_monitor(db, class_id, student_id, student_name, student_username, timestamp, list_imgs, idN):
         try:
             noti_collection = pymongo.collection.Collection(

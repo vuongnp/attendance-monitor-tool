@@ -3,6 +3,7 @@ import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import config from "../config/config";
 import "./OneNotification.css";
+import {socket} from "../App";
 import { formatHoursMinus, formatDate } from "../utils/format";
 
 export default function OneNotification(props) {
@@ -10,6 +11,7 @@ export default function OneNotification(props) {
   const date = formatDate(props.item.timestamp);
   const [showViewJoinClass, setShowViewJoinClass] = useState(false);
   const [showViewMonitorFault, setShowViewMonitorFault] = useState(false);
+  const [showReportAttendance, setShowReportAttendance] = useState(false);
   // const [showBottomBtn, setShowBottomBtn] = useState(false);
 
   // if(props.item.is_waiting === 1){
@@ -21,12 +23,16 @@ export default function OneNotification(props) {
   const handleViewJoinClass = () => {
     setShowViewJoinClass(true);
   };
+  const handleViewReportAttendance = () => {
+    setShowReportAttendance(true);
+  };
   const handleViewPosibleFaultMonitor = () => {
     setShowViewMonitorFault(true);
   };
   const handleClose = () => {
     setShowViewJoinClass(false);
     setShowViewMonitorFault(false);
+    setShowReportAttendance(false);
   };
   const handleRefuseJoinClass = () => {
     setShowViewJoinClass(false);
@@ -59,6 +65,57 @@ export default function OneNotification(props) {
       .catch((error) => {
         console.error("There was an error!", error);
       });
+  };
+  const handleRefuseAttendance = () => {
+    setShowReportAttendance(false);
+    socket.emit("refuse_attendance", {
+      data: {
+        student_id: props.item.student_id,
+        notification_id: props.item.id,
+      },
+    });
+    // let itemRefuse = {
+    //   student_id: props.item.student_id,
+    //   notification_id: props.item.id,
+    // };
+    // axios
+    //   .post(`${config.SERVER_URI}/teacher/refuseReportAttendance`, itemRefuse)
+    //   .then((response) => {
+    //     console.log(response);
+    //     // setShowBottomBtn(false);
+    //   })
+    //   .catch((error) => {
+    //     console.error("There was an error!", error);
+    //   });
+    // socket.emit("refuse_attendance", { data: props.item.student_id });
+  };
+  const handleAcceptAttendace = () => {
+    setShowReportAttendance(false);
+    socket.emit("accept_attendance", {
+      data: {
+        class_id: props.item.class_id,
+        student_id: props.item.student_id,
+        time_late: props.item.time_late,
+        time_to_late: props.item.time_to_late,
+        notification_id: props.item.id,
+      },
+    });
+    // let itemAccept = {
+    //   class_id: props.item.class_id,
+    //   student_id: props.item.student_id,
+    //   time_late: props.item.time_late,
+    //   time_to_late: props.item.time_to_late,
+    //   notification_id: props.item.id,
+    // };
+    // axios
+    //   .post(`${config.SERVER_URI}/teacher/acceptReportAttendance`, itemAccept)
+    //   .then((response) => {
+    //     console.log(response);
+    //     // setShowBottomBtn(false);
+    //   })
+    //   .catch((error) => {
+    //     console.error("There was an error!", error);
+    //   });
   };
   const handleAcceptFault = () => {
     setShowViewMonitorFault(false);
@@ -123,7 +180,7 @@ export default function OneNotification(props) {
         <div className="content">
           <div className="top-content">
             <div className="name">{props.item.student_name}</div>
-            <div className="message"> vào lớp muộn {props.item.time_late}</div>
+            <div className="message"> vào lớp muộn {props.item.time_late} phút</div>
           </div>
         </div>
       )}
@@ -140,6 +197,26 @@ export default function OneNotification(props) {
                 type="submit"
                 className=""
                 onClick={handleViewPosibleFaultMonitor}
+              >
+                Chi tiết
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+      {props.item.type === 3 && (
+        <div className="content">
+          <div className="top-content">
+            <div className="name">{props.item.student_name}</div>
+            <div className="message"> báo cáo lỗi điểm danh</div>
+          </div>
+          {props.item.is_waiting === 1 && (
+            <div className="bottom-content">
+              <Button
+                variant="outline-secondary"
+                type="submit"
+                className=""
+                onClick={handleViewReportAttendance}
               >
                 Chi tiết
               </Button>
@@ -202,6 +279,69 @@ export default function OneNotification(props) {
           </Button>
           <Button variant="info" onClick={handleAcceptJoinClass}>
             Cho phép
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* ReportAttendance */}
+      <Modal show={showReportAttendance} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Không thể điểm danh</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="main-report-attendance">
+            <div className="top-report">
+              <div className="top-report-text">
+                <p>{props.item.student_name}</p>
+                <p>{props.item.student_username}</p>
+              </div>
+              <img
+                className="top-report-img"
+                src={props.item.student_avt}
+                alt="ảnh đại diện"
+              ></img>
+            </div>
+            <div className="bottom-report">
+              <div className="report-imgs">
+                {props.item.imgs && (
+                  <img
+                    className="report-img"
+                    src={props.item.imgs[0]}
+                    alt=""
+                  ></img>
+                )}
+                {props.item.imgs && (
+                  <img
+                    className="report-img"
+                    src={props.item.imgs[1]}
+                    alt=""
+                  ></img>
+                )}
+              </div>
+              <div className="report-imgs">
+                {props.item.imgs && (
+                  <img
+                    className="report-img"
+                    src={props.item.imgs[2]}
+                    alt=""
+                  ></img>
+                )}
+                {props.item.imgs && (
+                  <img
+                    className="report-img"
+                    src={props.item.imgs[3]}
+                    alt=""
+                  ></img>
+                )}
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleRefuseAttendance}>
+            Bỏ qua
+          </Button>
+          <Button variant="info" onClick={handleAcceptAttendace}>
+            Cho vào lớp
           </Button>
         </Modal.Footer>
       </Modal>

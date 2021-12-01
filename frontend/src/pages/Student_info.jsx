@@ -105,7 +105,6 @@ export default function StudentInfo() {
           } else {
             setShowErrorNonFace(false);
             setShowErrorManyFace(false);
-            localStorage.setItem("student_avt", "ok");
             refreshPage();
           }
       })
@@ -120,6 +119,7 @@ export default function StudentInfo() {
         console.log(response);
         if (response) {
           setUser(response.data.data);
+          localStorage.setItem("student_avt", response.data.data.avatar);
         }
       })
       .catch((error) => {
@@ -299,6 +299,7 @@ export default function StudentInfo() {
                   </Form.Label>
                   <Col>
                     <Form.Control as="select" defaultValue={user.gender} onChange={handleChangeGender}>
+                      <option style={{ display: "none" }}>{user.gender}</option>
                       <option value="Nam">Nam</option>
                       <option value="Nữ">Nữ</option>
                       <option value="Khác">Khác</option>

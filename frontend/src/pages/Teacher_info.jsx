@@ -291,6 +291,7 @@ export default function TeacherInfo() {
                   </Form.Label>
                   <Col>
                     <Form.Control as="select" defaultValue={user.gender} onChange={handleChangeGender}>
+                      <option style={{ display: "none" }}>{user.gender}</option>
                       <option value="Nam">Nam</option>
                       <option value="Nữ">Nữ</option>
                       <option value="Khác">Khác</option>

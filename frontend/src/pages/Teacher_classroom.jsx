@@ -36,6 +36,8 @@ export default function TeacherClassroom(props) {
     code: "",
     is_learning: 0,
     students: [],
+    time_to_late: 0,
+    time_to_fault_monitor: 0
   });
   const [itemUpdateMode, setItemUpdateMode] = useState({
     id_class: class_id,
@@ -43,12 +45,12 @@ export default function TeacherClassroom(props) {
   });
   const [itemStartLearn, setItemStartLearn] = useState({
     class_id: class_id,
-    time_to_late: "",
-    time_to_fault_monitor: "",
+    time_to_late: 0,
+    time_to_fault_monitor: 0,
     start_time: 0,
   });
   const [studentdNotLearned, setStudentdNotLearned] = useState([]);
-  const [reportAttendanceItem, setReportAttendanceItem] = useState({});
+  // const [reportAttendanceItem, setReportAttendanceItem] = useState({});
 
   const [notifications, setNotifications] = useState([]);
   const [showMode0, setShowMode0] = useState(false);
@@ -61,7 +63,7 @@ export default function TeacherClassroom(props) {
   const [newNoti, setNewNoti] = useState(false);
   const [showLearning, setShowLearning] = useState(0);
   const [showSettingStartLearn, setShowSettingStartLearn] = useState(false);
-  const [showReportAttendance, setShowReportAttendance] = useState(false);
+  // const [showReportAttendance, setShowReportAttendance] = useState(false);
   const [showStudentNotLearned, setShowListStudentNotLearned] = useState(false);
   const [showTest, setShowTest] = useState(true);
 
@@ -83,7 +85,7 @@ export default function TeacherClassroom(props) {
     setShowNotification(false);
     setShowListNoti(false);
     setShowSettingStartLearn(false);
-    setShowReportAttendance(false);
+    // setShowReportAttendance(false);
     setShowListStudentNotLearned(false);
   };
   const handleChangeEditName = (e) => {
@@ -250,14 +252,14 @@ export default function TeacherClassroom(props) {
     socket.emit("class_stopped_learn", { data: students });
   };
 
-  const handleRefuseAttendance = () => {
-    setShowReportAttendance(false);
-    socket.emit("refuse_attendance", { data: reportAttendanceItem.student_id });
-  };
-  const handleAcceptAttendace = () => {
-    setShowReportAttendance(false);
-    socket.emit("accept_attenance", { data: reportAttendanceItem.student_id });
-  };
+  // const handleRefuseAttendance = () => {
+  //   setShowReportAttendance(false);
+  //   socket.emit("refuse_attendance", { data: reportAttendanceItem.student_id });
+  // };
+  // const handleAcceptAttendace = () => {
+  //   setShowReportAttendance(false);
+  //   socket.emit("accept_attenance", { data: reportAttendanceItem.student_id });
+  // };
   const handleTest = () => {
     socket.emit("check_student_stay_in", {
       data: {
@@ -310,10 +312,12 @@ export default function TeacherClassroom(props) {
     setShowNotification(true);
     setNewNoti(true);
   });
-  socket.on("report_attendance_from_student", (data) => {
-    setReportAttendanceItem(data["data"]);
-    console.log(reportAttendanceItem);
-    setShowReportAttendance(true);
+  socket.on("report_attendance_from_student", () => {
+    setShowNotification(true);
+    setNewNoti(true);
+    // setReportAttendanceItem(data["data"]);
+    // console.log(reportAttendanceItem);
+    // setShowReportAttendance(true);
   });
 
   useEffect(() => {
@@ -340,6 +344,9 @@ export default function TeacherClassroom(props) {
           } else {
             setShowMode2(true);
           }
+          itemStartLearn.time_to_late = response.data.data.time_to_late;
+          itemStartLearn.time_to_fault_monitor = response.data.data.time_to_fault_monitor;
+          setItemStartLearn({...itemStartLearn});
         }
       })
       .catch((error) => {
@@ -516,9 +523,10 @@ export default function TeacherClassroom(props) {
                       defaultValue={classroom.mode}
                       onChange={handleChangeMode}
                     >
-                      <option value="0">1</option>
-                      <option value="1">2</option>
-                      <option value="2">3</option>
+                      <option style={{ display: "none" }}>{classroom.mode}</option>
+                      <option value="0">0</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
                     </Form.Control>
                   </Col>
                   <Col>
@@ -570,7 +578,7 @@ export default function TeacherClassroom(props) {
           </div>
         </div>
         {/* ReportAttendance */}
-        <Modal show={showReportAttendance} onHide={handleCloseModal} size="lg">
+        {/* <Modal show={showReportAttendance} onHide={handleCloseModal} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>Không thể điểm danh</Modal.Title>
           </Modal.Header>
@@ -633,7 +641,7 @@ export default function TeacherClassroom(props) {
               Cho vào lớp
             </Button>
           </Modal.Footer>
-        </Modal>
+        </Modal> */}
         {/* Notification */}
         <Modal show={showNotification} onHide={handleCloseModal}>
           <Modal.Body style={{ textAlign: "center" }}>
@@ -750,6 +758,7 @@ export default function TeacherClassroom(props) {
                       defaultValue={classroom.type}
                       onChange={handleChangeEditType}
                     >
+                      <option style={{ display: "none" }}>{classroom.type}</option>
                       <option value="Lý thuyết">Lý thuyết</option>
                       <option value="Bài tập">Bài tập</option>
                       <option value="Lớp thi">Lớp thi</option>
@@ -820,7 +829,7 @@ export default function TeacherClassroom(props) {
                     <Form.Control
                       type="text"
                       placeholder=""
-                      value={classroom.time_to_late}
+                      value={itemStartLearn.time_to_late}
                       onChange={handleChangeTimeToLate}
                     />
                   </Col>
@@ -845,7 +854,7 @@ export default function TeacherClassroom(props) {
                     <Form.Control
                       type="text"
                       placeholder=""
-                      value={classroom.time_to_fault_monitor}
+                      value={itemStartLearn.time_to_fault_monitor}
                       onChange={handleChangeTimeToFaultMonitor}
                     />
                   </Col>

@@ -1,63 +1,90 @@
-.one-noti-item{
-    display: flex;
-    margin-left: 10px;
-    margin-right: 10px;
-    padding-top: 10px;
-    margin-top: 10px;
-    background-color: #f5f4f39e;
-    padding-bottom: 10px;
-    border-radius: 6px;
+.one-noti-item {
+  display: flex;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding-top: 10px;
+  margin-top: 10px;
+  background-color: #f5f4f39e;
+  padding-bottom: 10px;
+  border-radius: 6px;
 }
-.one-noti-item:hover{
-    display: flex;
-    margin-left: 10px;
-    margin-right: 10px;
-    padding-top: 10px;
-    margin-top: 10px;
-    background-color:#878e9052;
-    padding-bottom: 10px;
+.one-noti-item:hover {
+  display: flex;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding-top: 10px;
+  margin-top: 10px;
+  background-color: #878e9052;
+  padding-bottom: 10px;
 }
-.timestamp{
-    text-align: left;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 5px;
-    border-right: 1px solid gray;
-    /* border-bottom: 1px solid gray;*/
+.timestamp {
+  text-align: left;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  border-right: 1px solid gray;
+  /* border-bottom: 1px solid gray;*/
 }
-.timestamp .time{
-    font-size: 16px;
+.timestamp .time {
+  font-size: 16px;
 }
-.timestamp .date{
-    font-size: 10px;
-    color: gray;
+.timestamp .date {
+  font-size: 10px;
+  color: gray;
 }
-.one-noti-item .content{
-    margin-left: 15px;
-    margin-right: 5px;
-    /* border-bottom: 1px solid gray; */
+.one-noti-item .content {
+  margin-left: 15px;
+  margin-right: 5px;
+  /* border-bottom: 1px solid gray; */
 }
-.top-content{
-    font-size: 16px;
-    display: flex;
+.top-content {
+  font-size: 16px;
+  display: flex;
 }
-.top-content .name{
-    font-weight: bold;
+.top-content .name {
+  font-weight: bold;
 }
-.top-content .message{
-    margin-left: 5px;
+.top-content .message {
+  margin-left: 5px;
 }
-.bottom-content{
-    display: flex;
-    margin-top: 10px;
-    /* justify-content: space-between; */
+.bottom-content {
+  display: flex;
+  margin-top: 10px;
+  /* justify-content: space-between; */
 }
-.imgs-posible-fault-monitor{
-    overflow-y: scroll;
-    height: 300px;
-    overflow-x: clip;
+.imgs-posible-fault-monitor {
+  overflow-y: scroll;
+  height: 300px;
+  overflow-x: clip;
 }
-.img-posible-fault-monitor{
-    width: 250px;
-    /* height: 100px; */
+.img-posible-fault-monitor {
+  width: 250px;
+  /* height: 100px; */
+}
+.main-report-attendance {
+  padding: 10px;
+}
+.main-report-attendance .top-report {
+  display: flex;
+}
+.main-report-attendance .top-report .top-report-text {
+  text-align: center;
+  margin-left: 25%;
+  font-size: 20px;
+}
+.main-report-attendance .top-report .top-report-img {
+  margin-left: 10px;
+  width: 20%;
+  height: 20%;
+}
+.main-report-attendance .bottom-report {
+  margin-top: 10px;
+}
+.main-report-attendance .bottom-report .report-imgs {
+  display: flex;
+  margin-left: 15%;
+  width: 70%;
+}
+.main-report-attendance .bottom-report .report-imgs .report-img {
+  width: 50%;
 }

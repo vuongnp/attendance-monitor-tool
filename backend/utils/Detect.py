@@ -1,60 +1,61 @@
-import torch
 import numpy as np
 import cv2
-from .layers.prior_box import PriorBox
-from .utils.nms.py_cpu_nms import py_cpu_nms
-from .config.config import cfg_mnet as cfg
-from .utils.box_utils import decode, decode_landm
 
-device = torch.device("cpu")
+def box_iou(box1, box2):
+        # (x1,y1,x2,y2) box1
+        x11 = box1[0]
+        y11 = box1[1]
+        x12 = box1[2]
+        y12 = box1[3]
+        # (x1,y1,x2,y2) box2
+        x21 = box2[0]
+        y21 = box2[1]
+        x22 = box2[2]
+        y22 = box2[3]
+        #area1
+        area1 = (x12 - x11) * (y12 - y11)
+        #area2
+        area2 = (x22 - x21) * (y22 - y21)
+        #intersection
+        x1 = max(x11, x21)
+        x2 = min(x12, x22)
+        y1 = max(y11, y21)
+        y2 = min(y12, y22)
+        intersection = (x2 - x1) * (y2 - y1)
+        iou = intersection / (area1 + area2 - intersection)
+        return iou
 
 class Detect:
-    def get_bbox(retinaface, inname, img_raw, top_k=5000, keep_top_k=750, confidence_threshold=0.3, nms_threshold=0.4):
+    def process_img_detect(orig_image):
+        image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (640, 640))
+        image_mean = np.array([127, 127, 127])
+        image = (image - image_mean) / 128
+        image = np.transpose(image, [2, 0, 1])
+        image = np.expand_dims(image, axis=0)
+        image = image.astype(np.float32)
+        return image
+
+    def nms(width,height,scores,boxes,iou_threshold=0.5,conf_threshold=0.4):
+        zipped=[]
+        for i in range(len(scores)):
+            if scores[i]>conf_threshold:
+                zipped.append([scores[i],[boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][3]]])
+        zipped = sorted(zipped,key=lambda x: x[0], reverse=True)
+        # print(zipped)
+        selected=[]
+        for box in zipped:
+            toAdd = True
+            for i in range(len(selected)):
+                iou = box_iou(box[1],selected[i][1])
+                if iou>iou_threshold:
+                    toAdd=False
+            if toAdd:
+                selected.append(box)
+        for item in selected:
+            item[1][0] = int(item[1][0] * width)
+            item[1][1] = int(item[1][1] * height)
+            item[1][2] = int(item[1][2] * width)
+            item[1][3] = int(item[1][3] * height)
+        return selected
         
-        img = np.float32(img_raw)
-        # testing scale
-        target_size = 640
-        # max_size = 2150
-        im_shape = img.shape
-        resize = target_size/torch.Tensor([im_shape[1],im_shape[0],im_shape[1],im_shape[0]])
-        img = cv2.resize(img, (target_size, target_size))
-
-        im_height, im_width, _ = img.shape
-        scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
-        img -= (104, 117, 123)
-        img = img.transpose(2, 0, 1)
-        img = np.expand_dims(img, axis=0)
-
-        loc, conf, landms = retinaface.run(None, {inname[0]: img})
-
-        loc=torch.Tensor(loc)
-        conf=torch.Tensor(conf)
-        priorbox = PriorBox(cfg, image_size=(im_height, im_width))
-        priors = priorbox.forward()
-        priors = priors.to(device)
-        prior_data = priors.data
-        boxes = decode(loc.data.squeeze(0), prior_data, cfg['variance'])
-        boxes = boxes * scale / resize
-        boxes = boxes.cpu().numpy()
-        scores = conf.squeeze(0).data.cpu().numpy()[:, 1]
-        scale1 = torch.Tensor([img.shape[3], img.shape[2], img.shape[3], img.shape[2],img.shape[3], img.shape[2], img.shape[3], img.shape[2],img.shape[3], img.shape[2]])
-        scale1 = scale1.to(device)
-
-        # ignore low scores
-        inds = np.where(scores > confidence_threshold)[0]
-        boxes = boxes[inds]
-        scores = scores[inds]
-
-        # keep top-K before NMS
-        order = scores.argsort()[::-1][:top_k]
-        boxes = boxes[order]
-        scores = scores[order]
-
-        # do NMS
-        dets = np.hstack((boxes, scores[:, np.newaxis])).astype(np.float32, copy=False)
-        keep = py_cpu_nms(dets, nms_threshold)
-        dets = dets[keep, :]
-
-        # keep top-K faster NMS
-        dets = dets[:keep_top_k, :]
-        return dets

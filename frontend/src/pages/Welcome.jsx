@@ -55,7 +55,7 @@ export default function Welcome() {
             localStorage.setItem("student_id", response.data.data.id);
             localStorage.setItem("student_avt", response.data.data.avatar);
             history.push(RouterList.STUDENT_HOME);
-          } else {
+          } else if(response.data.data.role === 0) {
             localStorage.setItem("teacher_name", response.data.data.name);
             localStorage.setItem(
               "teacher_username",
@@ -63,6 +63,13 @@ export default function Welcome() {
             );
             localStorage.setItem("teacher_id", response.data.data.id);
             history.push(RouterList.TEACHER_HOME);
+          }else{
+            localStorage.setItem(
+              "admin_username",
+              response.data.data.username
+            );
+            localStorage.setItem("admin_id", response.data.data.id);
+            history.push(RouterList.ADMIN_HOME);
           }
         }
       })

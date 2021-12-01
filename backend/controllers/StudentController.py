@@ -169,6 +169,21 @@ class StudentController:
             result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result
 
+    def reportAttendance_handling(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs):
+        try:
+            print("AAAAAAAa")
+            idN = RandomTool.get_random_id()
+            StudentService.add_notification_report_attendance(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs, idN)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.reportAttendance_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result
+
     def attendance_fault_handling(db, student_id, class_id, time_late, timestamp):
         try:
             idF = RandomTool.get_random_id()

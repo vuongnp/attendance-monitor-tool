@@ -16,7 +16,7 @@ import { processImgVectorizeFromCanvas, cosinesim } from "../utils/vectorize";
 import config from "../config/config";
 import Header from "../components/header";
 import { formatTime } from "../utils/format";
-import { imgToServer } from "../utils/common";
+import { processImgToServer } from "../utils/common";
 import ModelDetect from "../models/face-detect-RFB.onnx";
 import ModelVectorize from "../models/mobilefacenet_vgg2.onnx";
 import { socket } from "../App";
@@ -96,6 +96,7 @@ function Attendance(props) {
   const [clickedOpenCam, setClickedOpenCam] = useState(true);
   const [showRefuse, setShowRefuse] = useState(false);
   const [showAccept, setShowAccept] = useState(false);
+  const [showReportedToTeacher, setShowReportedToTeacher] = useState(false);
 
   const video = useRef();
   const canvas = useRef();
@@ -112,6 +113,7 @@ function Attendance(props) {
   const handleCloseModal = () => {
     setShowAccept(false);
     setShowRefuse(false);
+    setShowReportedToTeacher(false);
   };
 
   const renderCanvas = useCallback(async () => {
@@ -156,13 +158,14 @@ function Attendance(props) {
         let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
 
         if (dets.length > 1) {
+          drawAfterDetect("dstCanvas", dets);
           setErrorManyFace(true);
           setErrorNonFace(false);
         } else if (dets.length === 1) {
           setErrorManyFace(false);
           setErrorNonFace(false);
 
-          drawAfterDetect("dstCanvas", dets[0]);
+          drawAfterDetect("dstCanvas", dets);
           const onnxTensorVec = await processImgVectorizeFromCanvas(
             dets[0],
             canvas.current
@@ -179,15 +182,18 @@ function Attendance(props) {
           }
           let stu_embeddingArr = new Float32Array(256);
           for (var i = 0; i < 256; ++i) {
-            stu_embeddingArr[i] = stu_embedding[i] / 10000000000;
+            stu_embeddingArr[i] = parseFloat(stu_embedding[i]);
           }
+          // console.log(stu_embeddingArr);
+          // console.log(embeddingArr);
           const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
           console.log(sim_score);
-          if (sim_score >= 0.8) {
+          if (sim_score >= config.ATTENDANCE_THRES) {
             loading++;
           } else {
             if (count_imgs_report < 4) {
-              arr_Imgs.push(imgToServer("srcCanvas"));
+              arr_Imgs.push(processImgToServer("srcCanvas", current_time_attendance));
+              // arr_Imgs.push(imgToServer("srcCanvas"));
               count_imgs_report++;
             }
           }
@@ -284,17 +290,43 @@ function Attendance(props) {
     localStream.getTracks().forEach((track) => track.stop());
   };
   const reportToTeacher = () => {
-    console.log(arr_Imgs);
+    // console.log(arr_Imgs);
+    // socket.emit("report_attendance", {
+    //   data: {
+    //     student_id: localStorage.getItem("student_id"),
+    //     student_username: localStorage.getItem("student_username"),
+    //     student_avt: localStorage.getItem("student_avt"),
+    //     student_name: localStorage.getItem("student_name"),
+    //     class_id: class_id,
+    //     imgs: arr_Imgs,
+    //   },
+    // });
+    let attendance_time = new Date().getTime();
+    let time_late = parseInt(
+      (parseInt(attendance_time) - parseInt(start_time)) / 60000
+    );
     socket.emit("report_attendance", {
-      data: {
+      data :{
         student_id: localStorage.getItem("student_id"),
         student_username: localStorage.getItem("student_username"),
         student_avt: localStorage.getItem("student_avt"),
         student_name: localStorage.getItem("student_name"),
         class_id: class_id,
         imgs: arr_Imgs,
+        time_late: time_late,
+        time_to_late: time_to_late,
+        timestamp: attendance_time
       },
     });
+    // axios
+    //   .post(`${config.SERVER_URI}/student/reportAttendance`, data)
+    //   .then((response) => {
+    //     console.log(response);
+    //   })
+    //   .catch((error) => {
+    //     console.error("There was an error!", error);
+    //   });
+    setShowReportedToTeacher(true);
   };
   const handleAccepted = () => {
     let attendance_time = new Date().getTime();
@@ -483,6 +515,17 @@ function Attendance(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleAccepted}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* ReportedToTeacher */}
+      <Modal show={showReportedToTeacher} onHide={handleCloseModal}>
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>Đã gửi báo cáo, chờ giáo viên xác nhận.</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
             OK
           </Button>
         </Modal.Footer>

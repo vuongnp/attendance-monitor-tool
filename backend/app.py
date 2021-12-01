@@ -12,6 +12,7 @@ from controllers.AuthController import AuthController
 from controllers.TeacherController import TeacherController
 from controllers.StudentController import StudentController
 from controllers.UserController import UserController
+from controllers.ManagerController import ManagerController
 from dotenv import load_dotenv
 import onnxruntime as nxrun
 from flask_socketio import SocketIO, emit, join_room
@@ -21,9 +22,10 @@ load_dotenv()
 cloudinary.config(cloud_name = os.getenv('CLOUD_NAME'), api_key=os.getenv('API_KEY'), 
     api_secret=os.getenv('API_SECRET'))
 
-retinaface = nxrun.InferenceSession("models/face-detect-retinaface.onnx")
-retina_inname = [input.name for input in retinaface.get_inputs()]
-
+# retinaface = nxrun.InferenceSession("models/face-detect-retinaface.onnx")
+# retina_inname = [input.name for input in retinaface.get_inputs()]
+ort_session_detect = nxrun.InferenceSession("models/face-detect-RFB.onnx")
+detect_inname = ort_session_detect.get_inputs()[0].name
 vectorize = nxrun.InferenceSession("models/mobilefacenet_vgg2.onnx")
 vectorize_inname = [input.name for input in vectorize.get_inputs()]
 
@@ -110,18 +112,18 @@ def login():
         username = GetParameter.check_and_get(query_params, 'username')
         password = GetParameter.check_and_get(query_params, 'password')
         result = AuthController.login_handling(db, username, password)
-        if result['code'] == '1000':
-            session.clear()
-            session['user_id'] = result['data']['id']
-            if result['data']['role'] == 0:
-                session['teacher'] = True
-                session['teacher_username'] = result['data']['username']
-                session['teacher_id'] = result['data']['id']
-                # return redirect(url_for('teacher_home'))
-            elif result['data']['role'] == 1:
-                session['student'] = True
-                session['student_username'] = result['data']['username']
-                session['student_id'] = result['data']['id']
+        # if result['code'] == '1000':
+        #     session.clear()
+        #     session['user_id'] = result['data']['id']
+        #     if result['data']['role'] == 0:
+        #         session['teacher'] = True
+        #         session['teacher_username'] = result['data']['username']
+        #         session['teacher_id'] = result['data']['id']
+        #         # return redirect(url_for('teacher_home'))
+        #     elif result['data']['role'] == 1:
+        #         session['student'] = True
+        #         session['student_username'] = result['data']['username']
+        #         session['student_id'] = result['data']['id']
                 # return redirect(url_for('student_home'))
         # else:
         return result
@@ -279,6 +281,27 @@ def acceptJoinClass():
     result = TeacherController.acceptJoinClass_handling(db, class_id, student_id, notification_id)
     return result
 
+# @app.route("/teacher/refuseReportAttendance", methods=['POST'])
+@socketio.on('refuse_attendance')
+def refuse_attendance(message):
+    data = message['data']
+    student_id = data["student_id"]
+    notification_id = data["notification_id"]
+    TeacherController.refuseReportAttendance_handling(db, notification_id)
+    emit("attendance_refused", to=student_id)
+
+# @app.route("/teacher/acceptReportAttendance", methods=['POST'])
+@socketio.on('accept_attendance')
+def accept_attendance(message):
+    data = message['data']
+    class_id = data["class_id"]
+    student_id = data["student_id"]
+    time_late = data["time_late"]
+    time_to_late = data["time_to_late"]
+    notification_id = data["notification_id"]
+    TeacherController.acceptReportAttendance_handling(db, class_id, student_id, time_late, time_to_late, notification_id)
+    emit("attendance_accepted", to=student_id)
+
 @app.route("/teacher/acceptFaultMonitor", methods=['POST'])
 def acceptFaultMonitor():
     data = request.json
@@ -295,6 +318,11 @@ def saveFaultsNotLearn():
     result = TeacherController.saveFaultsNotLearn_handling(db, class_id)
     return result
 
+@app.route("/teacher_statistic/<teacher_id>")
+def teacher_statistic(teacher_id):
+    result = TeacherController.getTeacherStatistic(db, teacher_id)
+    return result
+
 @app.route("/teacher/saveFaultsStayin", methods=['POST'])
 def saveFaultsStayin():
     data = request.json
@@ -307,11 +335,11 @@ def joinClassroom(classId):
     print('teacher joinClassroom '+classId)
     join_room(classId)
 
-@socketio.on("report_attendance")
-def reportAttendance(message):
-    data = message['data']
-    class_id = data['class_id']
-    emit("report_attendance_from_student", {'data':data}, to=class_id)
+# @socketio.on("report_attendance")
+# def reportAttendance(message):
+#     data = message['data']
+#     class_id = data['class_id']
+#     emit("report_attendance_from_student", {'data':data}, to=class_id)
 
 @socketio.on("class_stopped_learn")
 def class_stopped_learn(message):
@@ -376,6 +404,35 @@ def outclass():
     result = StudentController.outClass_handling(db, student_id, class_id)
     return result
 
+# @app.route("/student/reportAttendance", methods=['POST'])
+# def reportAttendance():
+@socketio.on("report_attendance")
+def reportAttendance(message):
+    data = message['data']
+    class_id = data['class_id']
+    student_id = data['student_id']
+    student_name = data['student_name']
+    student_username = data['student_username']
+    student_avt = data['student_avt']
+    timestamp = data['timestamp']
+    time_late = data['time_late']
+    time_to_late = data['time_to_late']
+    imgs = data['imgs']
+    list_imgs = []
+    for one_item in imgs:
+        imgstring = one_item['imgstring']
+        tstamp = one_item['timestamp']
+        imgdata = base64.b64decode(imgstring)
+        filename = './upload_imgs/'+str(class_id)+"_"+str(student_id)+"_"+str(tstamp)+".jpg"
+        with open(filename, 'wb') as f:
+            f.write(imgdata)
+            f.close()
+        upload_result = cloudinary.uploader.upload(filename)
+        url_uploaded = upload_result['url']
+        list_imgs.append(url_uploaded)
+    StudentController.reportAttendance_handling(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs)
+    emit("report_attendance_from_student", to=class_id)
+
 @app.route("/student/iStayIn", methods=['POST'])
 def iStayIn():
     data = request.json
@@ -423,15 +480,15 @@ def attendanced_ontime(message):
     class_id = data['class_id']
     StudentController.attendance_ontime_handling(db, student_id, class_id)
 
-@socketio.on('refuse_attendance')
-def refuse_attendance(message):
-    student_id = message['data']
-    emit("attendance_refused", to=student_id)
+# @socketio.on('refuse_attendance')
+# def refuse_attendance(message):
+#     student_id = message['data']
+#     emit("attendance_refused", to=student_id)
 
-@socketio.on('accept_attenance')
-def accept_attendance(message):
-    student_id = message['data']
-    emit("attendance_accepted", to=student_id)
+# @socketio.on('accept_attenance')
+# def accept_attendance(message):
+#     student_id = message['data']
+#     emit("attendance_accepted", to=student_id)
 
 @socketio.on("posible_fault_monitor")
 def posible_fault_monitor(message):
@@ -447,7 +504,7 @@ def posible_fault_monitor(message):
         imgstring = one_item['imgstring']
         tstamp = one_item['timestamp']
         imgdata = base64.b64decode(imgstring)
-        filename = './monitor_imgs/'+str(class_id)+"_"+str(student_id)+"_"+str(tstamp)+".jpg"
+        filename = './upload_imgs/'+str(class_id)+"_"+str(student_id)+"_"+str(tstamp)+".jpg"
         with open(filename, 'wb') as f:
             f.write(imgdata)
             f.close()
@@ -518,17 +575,37 @@ def changestudentavt():
         avatar = upload_result['url']
         result = UserController.changeAvatar_handling(db, user_id, avatar)
         if result["code"]=="1000":
-            result = UserController.updateEmbedding_handing(db, user_id, retinaface, retina_inname, vectorize, vectorize_inname, avatar)
+            result = UserController.updateEmbedding_handing(db, user_id, ort_session_detect, detect_inname, vectorize, vectorize_inname, avatar)
+            # result = UserController.updateEmbedding_handing(db, user_id, retinaface, retina_inname, vectorize, vectorize_inname, avatar)
             return result
         return result
 
-################################################ ATTENDANCE #########################################################
+################################################ ADMIN #########################################################
 
+@app.route("/admin_home_data")
+def admin_home_data():
+    result = ManagerController.getAdminHome_handling(db)
+    return result
 
+@app.route("/admin_statistic")
+def admin_statistic():
+    result = ManagerController.getAdminStatistic_handling(db)
+    return result
 
+@app.route("/admin/get_setting_mode")
+def get_setting_mode():
+    result = ManagerController.getSettingMode_handling(db)
+    return result
 
+@app.route("/admin/update_setting_mode", methods=['POST'])
+def update_setting_mode():
+    data = request.json
+    type1 = data['type1']
+    type2 = data['type2']
+    type3 = data['type3']
 
-    
+    result = ManagerController.updateSettingMode_handling(db, type1, type2, type3)
+    return result
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support

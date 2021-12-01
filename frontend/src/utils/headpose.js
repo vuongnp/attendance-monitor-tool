@@ -43,7 +43,7 @@ export function processImgHeadposeFromCanvas(det, imgSrc){
         dataProcessedTensor.pick(0, 2, null, null),
         dataTensor.pick(null, null, 1)
     );
-    ops.divseq(dataProcessedTensor, 256);
+    ops.divseq(dataProcessedTensor, 255);
     ops.subseq(dataProcessedTensor.pick(0, 1, null, null), 0.485);
     ops.subseq(dataProcessedTensor.pick(0, 2, null, null), 0.456);
     ops.subseq(dataProcessedTensor.pick(0, 0, null, null), 0.406);

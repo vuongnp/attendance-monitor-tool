@@ -269,16 +269,32 @@ export function nms(
   });
   return selected;
 }
-export function drawAfterDetect(canvasid, det) {
+// export function drawAfterDetect(canvasid, det) {
+//   var canvasDes = document.getElementById(canvasid);
+//   var context = canvasDes.getContext("2d");
+//   // context.beginPath();
+//   let x = det[1][0];
+//   let y = det[1][1];
+//   let w = det[1][2] - x;
+//   let h = det[1][3] - y;
+//   context.lineWidth = 5;
+//   context.strokeStyle = "green";
+//   context.strokeRect(x, y, w, h);
+//   context.stroke();
+// }
+export function drawAfterDetect(canvasid, dets) {
   var canvasDes = document.getElementById(canvasid);
   var context = canvasDes.getContext("2d");
   // context.beginPath();
-  let x = det[1][0];
-  let y = det[1][1];
-  let w = det[1][2] - x;
-  let h = det[1][3] - y;
-  context.lineWidth = 5;
-  context.strokeStyle = "green";
-  context.strokeRect(x, y, w, h);
-  context.stroke();
+  for (var i=0;i<dets.length;i++){
+    let x = dets[i][1][0];
+    let y = dets[i][1][1];
+    let w = dets[i][1][2] - x;
+    let h = dets[i][1][3] - y;
+    context.lineWidth = 5;
+    context.strokeStyle = "green";
+    context.strokeRect(x, y, w, h);
+    context.stroke();
+  }
+  
 }

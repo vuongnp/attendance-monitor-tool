@@ -74,7 +74,7 @@ tr th{
     margin-bottom: -10px;
     margin-top: -5px;
 }
-.main-report-attendance{
+/* .main-report-attendance{
 padding: 10px;
 }
 .main-report-attendance .top-report{
@@ -100,7 +100,7 @@ padding: 10px;
 }
 .main-report-attendance .bottom-report .report-imgs .report-img{
     width: 50%;
-}
+} */
 .list-not-learned{
     display: flex;
 }

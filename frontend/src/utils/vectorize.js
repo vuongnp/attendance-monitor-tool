@@ -15,10 +15,12 @@ export function processImgVectorizeFromCanvas(det, imgSrc){
     const imageData = ctx.getImageData(x, y, w, h);
     let src = cv.matFromImageData(imageData);
     let img = new cv.Mat();
-    cv.resize(src, img, dsize, 0, 0);
+    let image = new cv.Mat();
+    cv.cvtColor(src, img, cv.COLOR_BGR2RGBA, 0);
+    cv.resize(img, image, dsize, 0, 0);
     let arr = [];
     if (src.isContinuous()) {
-        arr = src.data;
+        arr = image.data;
     }
     const dataTensor = ndarray(new Float32Array(arr), [
         target_size,
@@ -41,6 +43,7 @@ export function processImgVectorizeFromCanvas(det, imgSrc){
         dataProcessedTensor.pick(0, 2, null, null),
         dataTensor.pick(null, null, 1)
     );
+    ops.divseq(dataProcessedTensor, 255);
     const tensor = new Tensor(
         new Float32Array(3 * target_size * target_size),
         "float32",
@@ -48,6 +51,7 @@ export function processImgVectorizeFromCanvas(det, imgSrc){
     );
     tensor.data.set(dataProcessedTensor.data);
     img.delete();
+    image.delete();
     return tensor;
 }
 

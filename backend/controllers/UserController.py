@@ -200,7 +200,7 @@ class UserController:
             }
             return result
 
-    def updateEmbedding_handing(db, id, retinaface, retina_inname, vectorize, vectorize_inname, avatar):
+    def updateEmbedding_handing(db, id, ort_session_detect, input_name, vectorize, vectorize_inname, avatar):
         try:
             req = urlopen(avatar)
             npimg = np.asarray(bytearray(req.read()), dtype=np.uint8)
@@ -210,7 +210,13 @@ class UserController:
             # npimg = np.fromfile(image, np.uint8)
             # print("npimg", npimg)
             img_raw = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-            dets = Detect.get_bbox(retinaface, retina_inname, img_raw)
+            image = Detect.process_img_detect(img_raw)
+            confidences, boxes = ort_session_detect.run(None, {input_name: image})
+            scores = confidences[0][:,1]
+            boxes = boxes[0]
+            dets = Detect.nms(img_raw.shape[1], img_raw.shape[0], scores, boxes)
+            print('dets', dets)
+            # dets = Detect.get_bbox(retinaface, retina_inname, img_raw)
             # print("Boxs: ",dets)
             # face not found
             if len(dets) <1:
@@ -226,7 +232,7 @@ class UserController:
                 return result
             # one face
             else:
-                b = dets[0]
+                b = dets[0][1]
                 b = list(map(int, b))
                 # print(b)
                 b[0] = int(b[0])
@@ -236,8 +242,8 @@ class UserController:
                 crop_img = img_raw[(int(b[1])):(int(b[3])), (int(b[0])):(int(b[2]))]
                 crop_img = Vectorize.precess_img_vectorize(crop_img)
                 embedding = Vectorize.get_vectorize(vectorize, vectorize_inname, crop_img)
-                str_embedding = [(i*10000000000) for i in list(embedding)]
-                # UserService.update_embedding(db, id, str(list(embedding)))
+                str_embedding = [str(i) for i in list(embedding)]
+                # UserService.update_embedding(db, id, (list(embedding)))
                 UserService.update_embedding(db, id, str_embedding)
                 # print("Embedding: ",list(embedding))
                 result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],

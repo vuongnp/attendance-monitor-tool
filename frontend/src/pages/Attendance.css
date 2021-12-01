@@ -1,7 +1,7 @@
 .attendance-container{
-    width: 100%;
+    /* width: 100%;
     position: relative;
-    height: 100vh;
+    height: 100vh; */
 }
 .attendance-container .main-attendance{
     width: 80%; 

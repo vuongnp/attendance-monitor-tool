@@ -7,7 +7,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import config from "../config/config";
 import RouterList from "../router/routerList";
 import "./OneClass.css";
-import Monitor from "../pages/Monitor";
+// import Monitor from "../pages/Monitor";
 
 export default function OneStudentClass(props) {
   const history = useHistory();

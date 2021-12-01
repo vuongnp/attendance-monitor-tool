@@ -151,6 +151,8 @@ class TeacherController:
                         'duration': data['classroom']['duration'],
                         'code': data['classroom']['code'],
                         'is_learning': data['classroom']['is_learning'],
+                        'time_to_late': data['classroom']['time_to_late'],
+                        'time_to_fault_monitor': data['classroom']['time_to_fault_monitor'],
                         'students': data['students']
                         # 'notifications': data['notifications']
                 }
@@ -343,6 +345,41 @@ class TeacherController:
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
             return result
+    
+    def refuseReportAttendance_handling(db, notification_id):
+        try:
+            TeacherService.checked_notification(db, notification_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController refuseReportAttendance_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def acceptReportAttendance_handling(db, class_id, student_id, time_late, time_to_late, notification_id):
+        try:
+            if(int(time_late)>int(time_to_late)):
+                idF = RandomTool.get_random_id()
+                TeacherService.add_fault_attendance_late(db, class_id, student_id, time_late, idF)          
+            TeacherService.checked_notification(db, notification_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in TeacherController acceptReportAttendance_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
 
     def getStudentNotLearned_handling(db, class_id):
         try:
@@ -437,6 +474,27 @@ class TeacherController:
             return result
         except Exception as ex:
             print("Exception in TeacherController saveFaultsStayIn_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def getTeacherStatistic(db, teacher_id):
+        try:
+            class_stat = TeacherService.get_class_statistic(db,teacher_id)
+            top_class_fault = TeacherService.get_top_class_fault_statistic(db,teacher_id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {
+                              'class_stat': class_stat,
+                              'top_class_fault': top_class_fault
+                      }
+                      }
+            return result
+
+        except Exception as ex:
+            print("Exception in TeacherController getTeacherStatistic", ex)
             result = {
                 'code': '1001',
                 'message': AppConfig.RESPONSE_CODE[1001]

@@ -5,7 +5,7 @@ export function imgToServer(canvasId) {
 
   };
 
-export function precessImgMonitorToServer(canvasId, timestamp){
+export function processImgToServer(canvasId, timestamp){
   let type = "image/jpeg"
   let imgElement = document.getElementById(canvasId);
   var data = imgElement.toDataURL(type);

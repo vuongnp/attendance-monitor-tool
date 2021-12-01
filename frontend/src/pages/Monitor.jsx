@@ -17,7 +17,7 @@ import {
 import config from "../config/config";
 import Header from "../components/header";
 // import { formatTime } from "../utils/format";
-import { precessImgMonitorToServer } from "../utils/common";
+import { processImgToServer } from "../utils/common";
 import ModelDetect from "../models/face-detect-RFB.onnx";
 import ModelHeadpose from "../models/headpose_MobileNetv2_regression.onnx";
 import { socket } from "../App";
@@ -120,6 +120,7 @@ function Monitor() {
       let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
       current_time = new Date().getTime();
       if (dets.length > 1) {
+        drawAfterDetect("dstCanvas1", dets);
         status.push(false);
         setErrorManyFace(true);
         setErrorNonFace(false);
@@ -127,7 +128,7 @@ function Monitor() {
         setErrorManyFace(false);
         setErrorNonFace(false);
 
-        drawAfterDetect("dstCanvas1", dets[0]);
+        drawAfterDetect("dstCanvas1", dets);
         const onnxTensorHeadpose = await processImgHeadposeFromCanvas(
           dets[0],
           canvas.current
@@ -142,7 +143,7 @@ function Monitor() {
           count_to_delete_fault=0;
           console.log("not look");
           if((current_time-start_time_to_save_img)>28000){
-            arr_Imgs.push(precessImgMonitorToServer("srcCanvas1", current_time));
+            arr_Imgs.push(processImgToServer("srcCanvas1", current_time));
             start_time_to_save_img=current_time;
           }
         } else {
@@ -179,7 +180,7 @@ function Monitor() {
       console.log("delta_time", delta_time / 60000);
       console.log("count_to_delete_fault", count_to_delete_fault);
       count = count + 1;
-      setTimeout(renderCanvas, 100);
+      setTimeout(renderCanvas, 50);
     }
   }, [canvas]);
 

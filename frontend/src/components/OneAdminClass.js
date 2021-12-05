@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import { Modal, Form, Button} from "react-bootstrap";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
 import "./OneClass.css";
 
 export default function OneAdminClass(props) {

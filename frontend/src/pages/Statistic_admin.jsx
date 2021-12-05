@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../config/config";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
 import Header from "../components/header";
+import LoadingImg from "../assert/loading.gif";
 import "./Statistic.css";
 
 export default function StatisticAdmin() {
@@ -18,11 +19,14 @@ export default function StatisticAdmin() {
     labels: [],
     stats: [],
   });
+  const [showLoading, setShowLoading] = useState(false);
 
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`${config.SERVER_URI}/admin_statistic`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setClassStat(response.data.data.class_stat);
@@ -92,6 +96,7 @@ export default function StatisticAdmin() {
   };
   return (
     <div className="stat-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header home="admin_home" name="Quản lý đào tạo" />
       <div className="main-stat-container">
         <h3 style={{ color: "black", marginTop: "100px", textAlign: "center" }}>

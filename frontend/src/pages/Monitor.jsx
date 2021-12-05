@@ -16,7 +16,7 @@ import {
 } from "../utils/headpose";
 import config from "../config/config";
 import Header from "../components/header";
-// import { formatTime } from "../utils/format";
+import LoadingImg from "../assert/loading.gif";
 import { processImgToServer } from "../utils/common";
 import ModelDetect from "../models/face-detect-RFB.onnx";
 import ModelHeadpose from "../models/headpose_MobileNetv2_regression.onnx";
@@ -74,6 +74,7 @@ function Monitor() {
   const [showNotification, setShowNotification] = useState(false);
   const [showLessonClosed, setShowLessonClosed] = useState(false);
   const [showCheckStayin, setShowCheckStayin] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const video = useRef();
   const canvas = useRef();
@@ -241,8 +242,10 @@ function Monitor() {
 
   useLayoutEffect(() => {
     const init = async () => {
+      setShowLoading(true);
       await loadModel();
       await getInfoMonitor();
+      setShowLoading(false);
       socket.emit("student_join", student_id);
       renderCanvas();
     };
@@ -251,6 +254,7 @@ function Monitor() {
 
   return (
     <div className="monitor-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header name={localStorage.getItem("student_name")} home="student_home" />
       <div className="main-monitor">
         {/* <Button onClick={stopCamera}>Stop Cam</Button> */}

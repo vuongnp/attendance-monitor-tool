@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button } from "react-bootstrap";
+import { Form, Col, Button } from "react-bootstrap";
 import axios from "axios";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
@@ -86,6 +86,7 @@ export default function SettingMode() {
         console.error("There was an error!", error);
       });
   };
+
   useEffect(() => {
     axios
       .get(`${config.SERVER_URI}/admin/get_setting_mode`)

@@ -5,7 +5,8 @@ import axios from "axios";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
 import Header from "../components/header";
-import DefaultInfoAvt from "../assert/default_avt.png"
+import DefaultInfoAvt from "../assert/default_avt.png";
+import LoadingImg from "../assert/loading.gif";
 import "./UserInfo.css";
 
 export default function TeacherInfo() {
@@ -24,6 +25,7 @@ export default function TeacherInfo() {
   const [showEdit, setShowEdit] = useState(false);
   const [showErrorParam, setShowErrorParam] = useState(false);
   const [showErrorPhone, setShowErrorPhone] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const handleClose = () => {
     setShowErrorParam(false);
@@ -112,9 +114,11 @@ export default function TeacherInfo() {
       });
   };
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`http://localhost:5000/user/userinfo/${teacher_id}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setUser(response.data.data);
@@ -126,6 +130,7 @@ export default function TeacherInfo() {
   }, [teacher_id]);
   return (
     <div className="user-info-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       {user && <Header name={user.name} home="teacher_home" />}
       <div className="info-main-container">
         <div className="left-info">

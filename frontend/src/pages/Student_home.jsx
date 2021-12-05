@@ -9,6 +9,7 @@ import config from "../config/config";
 import Header from "../components/header";
 import GridClassStudent from "../components/GridClassStudent";
 import GridRequireClassStudent from "../components/GridRequireClassStudent";
+import LoadingImg from "../assert/loading.gif";
 import "./Student_home.css";
 
 export default function StudentHome() {
@@ -34,6 +35,7 @@ export default function StudentHome() {
     timestamp: 0,
   })
   const [showErrorCode, setShowErrorCode] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const handleSearch = () => {
     let classesResult = [];
@@ -85,10 +87,12 @@ export default function StudentHome() {
     });
 
   useEffect(() => {
+    setShowLoading(true);
     socket.emit("student_join", localStorage.getItem("student_id"));
     axios
       .get(`${config.SERVER_URI}/student_home_data/${student_username}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           // setDatahome(response.data.data);
@@ -105,7 +109,7 @@ export default function StudentHome() {
 
   return (
     <div id="student-container">
-      {/* {datahome && <Header name={datahome.name} home="student_home" />} */}
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       {name && <Header name={name} home="student_home" />}
       <div className="main-container">
         <div className="top-container">

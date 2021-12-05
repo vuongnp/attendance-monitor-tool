@@ -7,6 +7,7 @@ import config from "../config/config";
 // import RouterList from "../router/routerList";
 import Header from "../components/header";
 import GridClassTeacher from "../components/GridClassTeacher";
+import LoadingImg from "../assert/loading.gif";
 import "./Teacher_home.css";
 
 export default function TeacherHome() {
@@ -37,7 +38,7 @@ export default function TeacherHome() {
     }
   };
   const [showAdd, setShowAdd] = useState(false);
-
+  const [showLoading, setShowLoading] = useState(false);
   const [showErrorParam, setShowErrorParam] = useState(false);
 
   const refreshPage = () => {
@@ -89,9 +90,11 @@ export default function TeacherHome() {
       });
   };
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`${config.SERVER_URI}/teacher_home_data/${teacher_username}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           // setDatahome(response.data.data);
@@ -107,7 +110,7 @@ export default function TeacherHome() {
 
   return (
     <div id="teacher-container">
-      {/* {datahome && <Header name={datahome.name} home="teacher_home"/>} */}
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       {name && <Header name={name} home="teacher_home" />}
       <div className="main-container">
         <div className="top-container">

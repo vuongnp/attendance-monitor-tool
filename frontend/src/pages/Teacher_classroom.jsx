@@ -13,6 +13,7 @@ import Header from "../components/header";
 import StudentClassroomItem from "../components/StudentClassroomItem";
 import OneNotification from "../components/OneNotification";
 import Paging from "../components/Pagination";
+import LoadingImg from "../assert/loading.gif";
 import { socket } from "../App";
 import "./Teacher_classroom.css";
 
@@ -66,6 +67,7 @@ export default function TeacherClassroom(props) {
   // const [showReportAttendance, setShowReportAttendance] = useState(false);
   const [showStudentNotLearned, setShowListStudentNotLearned] = useState(false);
   const [showTest, setShowTest] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
@@ -321,11 +323,13 @@ export default function TeacherClassroom(props) {
   });
 
   useEffect(() => {
+    setShowLoading(true);
     console.log(classroom.mode);
     socket.emit("joinClassroom", class_id);
     axios
       .get(`http://localhost:5000/teacher/getclass/${class_id}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setClassroom(response.data.data);
@@ -355,6 +359,7 @@ export default function TeacherClassroom(props) {
   }, [class_id]);
   return (
     <div id="classroom-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header name={teacher_name} home="teacher_home" />
       <div className="main-class-container">
         <Link to={RouterList.TEACHER_HOME}>Quản lý danh sách lớp</Link>

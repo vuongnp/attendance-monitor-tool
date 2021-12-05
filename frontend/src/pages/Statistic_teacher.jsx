@@ -3,6 +3,7 @@ import axios from "axios";
 import config from "../config/config";
 import { Bar, Doughnut } from "react-chartjs-2";
 import Header from "../components/header";
+import LoadingImg from "../assert/loading.gif";
 import "./Statistic.css";
 
 export default function StatisticTeacher() {
@@ -16,11 +17,14 @@ export default function StatisticTeacher() {
     labels: [],
     stats: [],
   });
+  const [showLoading, setShowLoading] = useState(false);
 
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`${config.SERVER_URI}/teacher_statistic/${teacher_id}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setClassStat(response.data.data.class_stat);
@@ -69,6 +73,7 @@ export default function StatisticTeacher() {
 
   return (
     <div className="stat-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header home="teacher_home" name={teacher_name} />
       <div className="main-stat-container">
         <h3 style={{ color: "black", marginTop: "100px", textAlign: "center" }}>

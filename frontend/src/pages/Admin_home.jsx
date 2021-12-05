@@ -6,6 +6,7 @@ import axios from "axios";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
 import Header from "../components/header";
+import LoadingImg from "../assert/loading.gif";
 import GridClassAdmin from "../components/GridClassAdmin";
 import "./Admin_home.css";
 
@@ -14,7 +15,7 @@ export default function AdminHome() {
 //   const [name, setName] = useState("User");
   const [classes, setClasses] = useState([]);
   const [oriClasses, setOriClasses] = useState([]);
-
+  const [showLoading, setShowLoading] = useState(false);
   const [textSeach, setTextSearch] = useState("");
   const handleSearch = () => {
     let classesResult = [];
@@ -37,9 +38,11 @@ export default function AdminHome() {
 //   };
 
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`${config.SERVER_URI}/admin_home_data`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setClasses(response.data.data.classes);
@@ -53,7 +56,7 @@ export default function AdminHome() {
 
   return (
     <div id="admin-container">
-      {/* {datahome && <Header name={datahome.name} home="teacher_home"/>} */}
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header home="admin_home" name="Quản lý đào tạo"/>
       <div className="main-container">
         <div className="top-container">

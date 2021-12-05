@@ -15,6 +15,7 @@ import {
 import { processImgVectorizeFromCanvas, cosinesim } from "../utils/vectorize";
 import config from "../config/config";
 import Header from "../components/header";
+import LoadingImg from "../assert/loading.gif";
 import { formatTime } from "../utils/format";
 import { processImgToServer } from "../utils/common";
 import ModelDetect from "../models/face-detect-RFB.onnx";
@@ -97,6 +98,7 @@ function Attendance(props) {
   const [showRefuse, setShowRefuse] = useState(false);
   const [showAccept, setShowAccept] = useState(false);
   const [showReportedToTeacher, setShowReportedToTeacher] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const video = useRef();
   const canvas = useRef();
@@ -364,10 +366,12 @@ function Attendance(props) {
 
   useLayoutEffect(() => {
     const init = async () => {
+      setShowLoading(true);
       await loadModel();
       await getEmbeddingDatabase();
       await getInfoAttendance();
       socket.emit("student_join", localStorage.getItem("student_id"));
+      setShowLoading(false);
       // renderCanvas();
     };
     init();
@@ -375,6 +379,7 @@ function Attendance(props) {
 
   return (
     <div className="attendance-container">
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header name={localStorage.getItem("student_name")} home="student_home" />
       <div className="main-attendance">
         <div className="left-main-attendance">

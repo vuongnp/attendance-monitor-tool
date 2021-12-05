@@ -4,7 +4,8 @@ import { Modal, Form, Col, Button} from "react-bootstrap";
 import axios from "axios";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
-import DefaultInfoAvt from "../assert/default_avt.png"
+import LoadingImg from "../assert/loading.gif";
+import DefaultInfoAvt from "../assert/default_avt.png";
 import Header from "../components/header";
 import "./UserInfo.css";
 
@@ -25,6 +26,7 @@ export default function StudentInfo() {
   const [showErrorPhone, setShowErrorPhone] = useState(false);
   const [showErrorNonFace, setShowErrorNonFace] = useState(false);
   const [showErrorManyFace, setShowErrorManyFace] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const handleClose = () => {
     setShowErrorParam(false);
@@ -85,6 +87,7 @@ export default function StudentInfo() {
     setSelectedFile(event.target.files[0]);
   };
   const handleUploadImg = () => {
+    setShowLoading(true);
     if (!selectedFile) return;
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -96,6 +99,7 @@ export default function StudentInfo() {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((response) => {
+        setShowLoading(false);
         if (response.data.code === "9993") {
             setShowErrorNonFace(false);
             setShowErrorManyFace(true);
@@ -113,9 +117,11 @@ export default function StudentInfo() {
       });
   };
   useEffect(() => {
+    setShowLoading(true);
     axios
       .get(`http://localhost:5000/user/userinfo/${student_id}`)
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         if (response) {
           setUser(response.data.data);
@@ -128,7 +134,8 @@ export default function StudentInfo() {
   }, [student_id]);
   return (
     <div className="user-info-container">
-      {user && <Header name={user.name} home="student_home" />}
+      {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
+      {user && <Header name={user.name} home="student_home" />}   
       <div className="info-main-container">
         <div className="left-info">
           <Form>

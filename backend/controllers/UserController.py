@@ -242,7 +242,7 @@ class UserController:
                 crop_img = img_raw[(int(b[1])):(int(b[3])), (int(b[0])):(int(b[2]))]
                 crop_img = Vectorize.precess_img_vectorize(crop_img)
                 embedding = Vectorize.get_vectorize(vectorize, vectorize_inname, crop_img)
-                str_embedding = [str(i) for i in list(embedding)]
+                str_embedding = [float(i) for i in list(embedding)]
                 # UserService.update_embedding(db, id, (list(embedding)))
                 UserService.update_embedding(db, id, str_embedding)
                 # print("Embedding: ",list(embedding))

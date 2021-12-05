@@ -32,3 +32,11 @@
     width: 41%;
     margin: auto;
 }
+.loading-img{
+    position: absolute;
+    width: 20%;
+    top: 35%;
+    left: 40%;
+    /* height: 100vh; */
+    z-index: 10;
+}

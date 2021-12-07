@@ -62,7 +62,7 @@ export default function SignupTeacher() {
   const handleSignup = () => {
       console.log(user);
     axios
-      .post(`${config.SERVER_URI}/signup_student`, user)
+      .post(`${config.SERVER_URI}/signup_teacher`, user)
       .then((response) => {
         console.log(response.data);
         if(response.data.code==='1002'){

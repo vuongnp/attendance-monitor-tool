@@ -215,7 +215,7 @@ class UserController:
             scores = confidences[0][:,1]
             boxes = boxes[0]
             dets = Detect.nms(img_raw.shape[1], img_raw.shape[0], scores, boxes)
-            print('dets', dets)
+            # print('dets', dets)
             # dets = Detect.get_bbox(retinaface, retina_inname, img_raw)
             # print("Boxs: ",dets)
             # face not found

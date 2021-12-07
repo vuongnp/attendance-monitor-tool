@@ -34,13 +34,14 @@ export default function OneNotification(props) {
     setShowViewMonitorFault(false);
     setShowReportAttendance(false);
   };
-  const handleRefuseJoinClass = () => {
+  const handleRefuseNotification = () => {
+    setShowViewMonitorFault(false);
     setShowViewJoinClass(false);
     let itemRefuse = {
       notification_id: props.item.id,
     };
     axios
-      .post(`${config.SERVER_URI}/teacher/refuseJoinClass`, itemRefuse)
+      .post(`${config.SERVER_URI}/teacher/refuseNotification`, itemRefuse)
       .then((response) => {
         console.log(response);
         // setShowBottomBtn(false);
@@ -274,7 +275,7 @@ export default function OneNotification(props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={handleRefuseJoinClass}>
+          <Button variant="danger" onClick={handleRefuseNotification}>
             Bỏ qua
           </Button>
           <Button variant="info" onClick={handleAcceptJoinClass}>
@@ -394,7 +395,7 @@ export default function OneNotification(props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={handleClose}>
+          <Button variant="danger" onClick={handleRefuseNotification}>
             Bỏ qua
           </Button>
           <Button variant="info" onClick={handleAcceptFault}>

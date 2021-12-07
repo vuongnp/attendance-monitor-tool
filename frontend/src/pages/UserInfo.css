@@ -1,42 +1,67 @@
-.user-info-container .info-main-container{
-    width: 80%;
-    margin: auto;
-    margin-top: 6%;
-    display: flex;
-    justify-content: space-between;
-    padding: 50px;
-    border: 1px solid #e8dbdb;
-    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
+.user-info-container .info-main-container {
+  width: 80%;
+  margin: auto;
+  margin-top: 6%;
+  display: flex;
+  justify-content: space-between;
+  padding: 50px;
+  border: 1px solid #e8dbdb;
+  box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
 }
-.left-info{
-    width: 50%;
-    border: 1px solid #e8dbdb;
-    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
-    padding: 30px;
+.left-info {
+  width: 50%;
+  border: 1px solid #e8dbdb;
+  box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
+  padding: 30px;
 }
-.btn-update-info, .btn-update-img{
-    text-align: center;
-    margin-top: 10px;
+.btn-update-info,
+.btn-update-img {
+  text-align: center;
+  margin-top: 10px;
 }
-.right-info{
-    width: 45%;
-    text-align: center;
+.right-info {
+  width: 45%;
+  text-align: center;
 }
-.right-info img{
-    width: 350px;
-    height: 350px;
-    margin-bottom: 20px;
-    border-radius: 50%;
+.right-info img {
+    aspect-ratio: 1;
+  margin-bottom: 20px;
+  border-radius: 50%;
 }
-.form-img{
-    width: 41%;
-    margin: auto;
+.form-img {
+  width: 41%;
+  margin: auto;
 }
-.loading-img{
-    position: absolute;
-    width: 20%;
-    top: 35%;
-    left: 40%;
-    /* height: 100vh; */
-    z-index: 10;
+.loading-img {
+  position: absolute;
+  width: 20%;
+  top: 35%;
+  left: 40%;
+  /* height: 100vh; */
+  z-index: 10;
 }
+@media screen and (min-width: 1001px) {
+  .right-info img {
+    width: 70%;
+    /* height: 60%; */
+  }
+}
+
+/* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+@media screen and (max-width: 1000px) {
+  .right-info img {
+    width: 90%;
+  }
+}
+/* @media screen and (min-height: 601px) {
+    .right-info img {
+      height: 60%;
+    }
+  } */
+  
+  /* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+  /* @media screen and (max-height: 600px) {
+    .right-info img {
+        height: 30%;
+    }
+  } */

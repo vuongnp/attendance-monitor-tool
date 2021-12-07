@@ -313,7 +313,7 @@ class TeacherController:
             }
             return result
 
-    def refuseJoinClass_handling(db, notification_id):
+    def refuseNotification_handling(db, notification_id):
         try:
             TeacherService.checked_notification(db, notification_id)
             result = {'code': '1000',

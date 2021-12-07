@@ -265,11 +265,11 @@ def getNotification(class_id):
     # result = TeacherController.toggleStartFinish_handling(db, id_class)
     return result
 
-@app.route("/teacher/refuseJoinClass", methods=['POST'])
+@app.route("/teacher/refuseNotification", methods=['POST'])
 def refuseJoinClass():
     data = request.json
     notification_id = data["notification_id"]
-    result = TeacherController.refuseJoinClass_handling(db, notification_id)
+    result = TeacherController.refuseNotification_handling(db, notification_id)
     return result
 
 @app.route("/teacher/acceptJoinClass", methods=['POST'])
@@ -280,27 +280,6 @@ def acceptJoinClass():
     notification_id = data["notification_id"]
     result = TeacherController.acceptJoinClass_handling(db, class_id, student_id, notification_id)
     return result
-
-# @app.route("/teacher/refuseReportAttendance", methods=['POST'])
-@socketio.on('refuse_attendance')
-def refuse_attendance(message):
-    data = message['data']
-    student_id = data["student_id"]
-    notification_id = data["notification_id"]
-    TeacherController.refuseReportAttendance_handling(db, notification_id)
-    emit("attendance_refused", to=student_id)
-
-# @app.route("/teacher/acceptReportAttendance", methods=['POST'])
-@socketio.on('accept_attendance')
-def accept_attendance(message):
-    data = message['data']
-    class_id = data["class_id"]
-    student_id = data["student_id"]
-    time_late = data["time_late"]
-    time_to_late = data["time_to_late"]
-    notification_id = data["notification_id"]
-    TeacherController.acceptReportAttendance_handling(db, class_id, student_id, time_late, time_to_late, notification_id)
-    emit("attendance_accepted", to=student_id)
 
 @app.route("/teacher/acceptFaultMonitor", methods=['POST'])
 def acceptFaultMonitor():
@@ -329,6 +308,27 @@ def saveFaultsStayin():
     class_id = data["class_id"]
     result = TeacherController.saveFaultsStayIn_handling(db, class_id)
     return result
+
+# @app.route("/teacher/refuseReportAttendance", methods=['POST'])
+@socketio.on('refuse_attendance')
+def refuse_attendance(message):
+    data = message['data']
+    student_id = data["student_id"]
+    notification_id = data["notification_id"]
+    TeacherController.refuseReportAttendance_handling(db, notification_id)
+    emit("attendance_refused", to=student_id)
+
+# @app.route("/teacher/acceptReportAttendance", methods=['POST'])
+@socketio.on('accept_attendance')
+def accept_attendance(message):
+    data = message['data']
+    class_id = data["class_id"]
+    student_id = data["student_id"]
+    time_late = data["time_late"]
+    time_to_late = data["time_to_late"]
+    notification_id = data["notification_id"]
+    TeacherController.acceptReportAttendance_handling(db, class_id, student_id, time_late, time_to_late, notification_id)
+    emit("attendance_accepted", to=student_id)
 
 @socketio.on('joinClassroom')
 def joinClassroom(classId):

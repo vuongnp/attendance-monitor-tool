@@ -36,7 +36,7 @@ let count_imgs_report = 0;
 let arr_Imgs = [];
 const student_id = localStorage.getItem("student_id");
 let class_id;
-// let count = 0;
+let finished = false;
 let loading = 0;
 let class_mode;
 let start_time_attendance;
@@ -121,7 +121,8 @@ function Attendance(props) {
   const renderCanvas = useCallback(async () => {
     current_time_attendance= new Date().getTime();
     delta_time = current_time_attendance-start_time_attendance;
-    if (canvas.current) {
+    // if (canvas.current) {
+    if(!finished){
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
       ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
@@ -189,7 +190,7 @@ function Attendance(props) {
           // console.log(stu_embeddingArr);
           // console.log(embeddingArr);
           const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
-          console.log(sim_score);
+          // console.log(sim_score);
           if (sim_score >= config.ATTENDANCE_THRES) {
             loading++;
           } else {
@@ -199,7 +200,7 @@ function Attendance(props) {
               count_imgs_report++;
             }
           }
-          console.log(loading);
+          // console.log(loading);
           if (loading === 1) {
             setLengthLoading(10);
           } else if (loading === 2) {
@@ -219,6 +220,7 @@ function Attendance(props) {
           } else if (loading === 9) {
             setLengthLoading(90);
           } else if (loading === 10) {
+            finished=true;
             stopCamera();
             let attendance_time = new Date().getTime();
             setStartTime(formatTime(attendance_time));
@@ -251,12 +253,14 @@ function Attendance(props) {
           }, 5000);         
           }
         } else {
+          console.log("noneface");
           setErrorNonFace(true);
           setErrorManyFace(false);
           //   return;
         }
       } else {
         if (delta_time>=TIME_TO_STOP) {
+          finished=true;
           setSuccess(false);
           setNotSuccess(true);
           stopCamera();
@@ -265,7 +269,7 @@ function Attendance(props) {
       // console.log(count);
       // drawAfterDetect("dstCanvas", dets);
       // count = count + 1;
-      setTimeout(renderCanvas, 100);
+      setTimeout(renderCanvas, 200);
     }
   }, [canvas]);
 

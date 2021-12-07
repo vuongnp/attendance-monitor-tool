@@ -1,54 +1,69 @@
-.one-class-item{
-    padding: 20px;
-    border: 1px solid #bdc5c7;
-    margin: 15px;
-    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
-    border-bottom-left-radius: 20px;
-    border-top-right-radius: 20px;
+.one-class-item {
+  padding: 20px;
+  border: 1px solid #bdc5c7;
+  margin: 15px;
+  box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
+  border-bottom-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
-.classname{
-    width: 100%;
-    height: 50px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 25px;
+.classname {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.classname a{
-    color: #32899e;
+.classname a {
+  color: #32899e;
 }
-.one-class-item p, .classname a{
-    /* width: 100%;
+.one-class-item p,
+.classname a {
+  /* width: 100%;
     height: 50px; */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.start-delete{
-    /* width: 90%;
+.start-delete {
+  /* width: 90%;
     
     margin: auto; */
-    height: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0px;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px;
 }
-.title-name{
-    font-weight: bold;
+.title-name {
+  font-weight: bold;
 }
-.name-class{
-    text-align: center;
-    font-weight: bold;
-    color: #32899e;
+.name-class {
+  text-align: center;
+  font-weight: bold;
+  color: #32899e;
 }
-.learn-view-out{
-    height: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0px;
+.learn-view-out {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px;
 }
-.view-out{
-    height: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0px;
+.view-out {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px;
+}
+@media screen and (min-width: 1201px) {
+  div.learn-view-out button {
+    font-size: 18px;
+  }
+}
+
+/* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+@media screen and (max-width: 1200px) {
+  div.learn-view-out button {
+    font-size: 13px;
+  }
 }

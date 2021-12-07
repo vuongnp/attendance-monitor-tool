@@ -117,7 +117,7 @@ export default function Welcome() {
             {showErrorUser && (
               <div className="text-error">Tài khoản không tồn tại</div>
             )}
-            <div style={{ fontSize: "20px" }}>
+            <div className="label-to-signup">
               Chưa có tài khoản? Đăng ký ngay
             </div>
             <div className="link-to-signup">

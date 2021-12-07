@@ -1,11 +1,11 @@
-import React, { useState} from "react";
-import { Modal, Form, Button} from "react-bootstrap";
-// import VisibilityIcon from "@mui/icons-material/Visibility";
+import React, { useState } from "react";
+import { Modal, Form, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import "./OneClass.css";
 
 export default function OneAdminClass(props) {
   const [showViewClass, setShowViewClass] = useState(false);
-  
+
   const handleCloseModal = () => {
     setShowViewClass(false);
   };
@@ -14,7 +14,9 @@ export default function OneAdminClass(props) {
   };
   return (
     <div className="one-class-item">
-      <h3 className="name-class">{props.class.name}</h3>
+      <div className="classname">
+        <Link to="#">{props.class.name}</Link>
+      </div>
       <p>
         <span className="title-name">Giáo viên: </span>
         {props.class.teacher}
@@ -48,7 +50,7 @@ export default function OneAdminClass(props) {
             // className=""
             // size="small"
             onClick={handleShowViewClass}
-            style={{textAlign: "center"}}
+            style={{ textAlign: "center" }}
           >
             {/* <VisibilityIcon
               style={{ color: "rgb(94 132 220)", fontSize: 45 }}

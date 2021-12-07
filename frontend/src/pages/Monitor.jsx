@@ -40,6 +40,7 @@ let delta_time;
 let current_time;
 let status = [true];
 var localStream;
+let finished=false;
 
 const loadModel = async () => {
   inferenceSession = await InferenceSession.create(ModelDetect);
@@ -87,7 +88,8 @@ function Monitor() {
   };
 
   const renderCanvas = useCallback(async () => {
-    if (canvas.current) {
+    // if (canvas.current) {
+    if(!finished){
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
       ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT)
@@ -142,7 +144,7 @@ function Monitor() {
         if (!checkLookScreen(angles[0], angles[1])) {
           status.push(false);
           count_to_delete_fault=0;
-          console.log("not look");
+          // console.log("not look");
           if((current_time-start_time_to_save_img)>28000){
             arr_Imgs.push(processImgToServer("srcCanvas1", current_time));
             start_time_to_save_img=current_time;
@@ -152,9 +154,10 @@ function Monitor() {
           if (status[count - 1] === true) {
             count_to_delete_fault++;
           }
-          console.log("look");
+          // console.log("look");
         }
       } else {
+        console.log("nonface")
         status.push(false);
         setErrorNonFace(true);
         setErrorManyFace(false);
@@ -164,6 +167,10 @@ function Monitor() {
         start_time = current_time;
         count_to_delete_fault=0;
       }
+      console.log("c",current_time);
+      console.log("s",start_time)
+      console.log(delta_time);
+      console.log("t", time_to_fault_monitor);
       delta_time = current_time - start_time;
       if (delta_time > time_to_fault_monitor) {
         start_time = current_time;
@@ -178,10 +185,10 @@ function Monitor() {
         arr_Imgs=[];
         setShowNotification(true);
       }     
-      console.log("delta_time", delta_time / 60000);
-      console.log("count_to_delete_fault", count_to_delete_fault);
+      // console.log("delta_time", delta_time / 60000);
+      // console.log("count_to_delete_fault", count_to_delete_fault);
       count = count + 1;
-      setTimeout(renderCanvas, 50);
+      setTimeout(renderCanvas, 200);
     }
   }, [canvas]);
 
@@ -216,6 +223,7 @@ function Monitor() {
   };
 
   socket.on("lession_closed", ()=>{
+    finished=true;
     stopCamera();
     setShowLessonClosed(true);
   });

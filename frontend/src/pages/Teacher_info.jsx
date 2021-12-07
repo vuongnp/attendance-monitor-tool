@@ -93,6 +93,7 @@ export default function TeacherInfo() {
     setSelectedFile(event.target.files[0]);
   };
   const handleUploadImg = () => {
+    setShowLoading(true);
     if (!selectedFile) return;
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -106,6 +107,7 @@ export default function TeacherInfo() {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((response) => {
+        setShowLoading(false);
         console.log(response);
         refreshPage();
       })

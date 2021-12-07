@@ -14,6 +14,7 @@ import StudentClassroomItem from "../components/StudentClassroomItem";
 import OneNotification from "../components/OneNotification";
 import Paging from "../components/Pagination";
 import LoadingImg from "../assert/loading.gif";
+import urlAudio from "../assert/ring.mp3";
 import { socket } from "../App";
 import "./Teacher_classroom.css";
 
@@ -68,13 +69,16 @@ export default function TeacherClassroom(props) {
   const [showStudentNotLearned, setShowListStudentNotLearned] = useState(false);
   const [showTest, setShowTest] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
+  const [audio] = useState(new Audio(urlAudio));
 
   const handleNextPage = (event, page) => {
     let start = (page - 1) * numberStudentsPage;
     let end = start + numberStudentsPage;
     setStudentsPage(students.slice(start, end));
   };
-
+const playAudio=(audio)=>{
+  audio.play();
+};
   const refreshPage = () => {
     window.location.reload();
   };
@@ -307,14 +311,17 @@ export default function TeacherClassroom(props) {
   };
 
   socket.on("posible_fault_monitor", () => {
+    playAudio(audio);
     setShowNotification(true);
     setNewNoti(true);
   });
   socket.on("student_need_join", () => {
+    playAudio(audio);
     setShowNotification(true);
     setNewNoti(true);
   });
   socket.on("report_attendance_from_student", () => {
+    playAudio(audio);
     setShowNotification(true);
     setNewNoti(true);
     // setReportAttendanceItem(data["data"]);

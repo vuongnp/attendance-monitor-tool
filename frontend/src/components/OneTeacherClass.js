@@ -20,8 +20,8 @@ export default function OneTeacherClass(props) {
   const [itemClass, setItemClass] = useState({
     username: localStorage.getItem("teacher_username"),
     id: props.class.id,
-    start_time: 0
-  })
+    start_time: 0,
+  });
   // const itemClass = {
   //   username: localStorage.getItem("teacher_username"),
   //   id: props.class.id,
@@ -39,7 +39,7 @@ export default function OneTeacherClass(props) {
   const handleDeleteClass = () => {
     itemClass.username = localStorage.getItem("teacher_username");
     itemClass.id = props.class.id;
-    setItemClass({...itemClass})
+    setItemClass({ ...itemClass });
     axios
       .post(`${config.SERVER_URI}/teacher/deleteclass`, itemClass)
       .then((response) => {
@@ -51,7 +51,7 @@ export default function OneTeacherClass(props) {
         console.error("There was an error!", error);
       });
   };
-  const handleGotoManagerClass=()=>{
+  const handleGotoManagerClass = () => {
     history.push(linktoclass);
   };
   // const handleLearning = () => {
@@ -90,7 +90,6 @@ export default function OneTeacherClass(props) {
       <div className="classname">
         <Link to={linktoclass}>{props.class.name}</Link>
       </div>
-
       <p>
         <span className="title-name">Mô tả: </span>
         {props.class.description}
@@ -138,13 +137,13 @@ export default function OneTeacherClass(props) {
           </Button>
         )} */}
         <Button
-            variant="success"
-            type="submit"
-            className=""
-            onClick={handleGotoManagerClass}
-          >
-            Quản lý lớp
-          </Button>
+          variant="success"
+          type="submit"
+          className=""
+          onClick={handleGotoManagerClass}
+        >
+          Quản lý lớp
+        </Button>
         <Button
           variant="outlined"
           //   color="secondary"

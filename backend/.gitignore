@@ -2,4 +2,4 @@
 .env
 ## model deeplearning
 models
-monitor_imgs/*
+upload_imgs/*

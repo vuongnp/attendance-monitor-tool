@@ -26,8 +26,10 @@ import "./Attendance.css";
 let inferenceSession;
 let inferenceSessionVec;
 
-const CAM_WIDTH = 640;
-const CAM_HEIGHT = 480;
+// const CAM_WIDTH = 640;
+// const CAM_HEIGHT = 480;
+const CAM_WIDTH = 800;
+const CAM_HEIGHT = 640;
 const TIME_TO_STOP = 30000; //30s
 let stu_embedding;
 let start_time;
@@ -125,7 +127,7 @@ function Attendance(props) {
     if(!finished){
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
-      ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
+      // ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
       // if (count % 5 === 0 && count < 100 && loading < 10) {
       if (delta_time<TIME_TO_STOP && loading < 10){
         canvas.current.width = CAM_WIDTH;
@@ -158,8 +160,8 @@ function Attendance(props) {
         for (var i = 0; i < numbers; ++i) {
           confs[i] = scoresTensor.get(i, 1);
         }
-        let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
-
+        let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, config.IOU_THRES, config.CONFIDENCE_THRES);
+        ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
         if (dets.length > 1) {
           drawAfterDetect("dstCanvas", dets);
           setErrorManyFace(true);
@@ -269,7 +271,7 @@ function Attendance(props) {
       // console.log(count);
       // drawAfterDetect("dstCanvas", dets);
       // count = count + 1;
-      setTimeout(renderCanvas, 200);
+      setTimeout(renderCanvas, 100);
     }
   }, [canvas]);
 

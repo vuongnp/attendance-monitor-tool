@@ -26,8 +26,8 @@ import "./Monitor.css";
 let inferenceSession;
 let inferenceSessionHeadpose;
 // const IMAGE_SIZE = 640;
-const CAM_WIDTH = 640;
-const CAM_HEIGHT = 480;
+const CAM_WIDTH = 960;
+const CAM_HEIGHT = 720;
 let time_to_fault_monitor;
 const student_id = localStorage.getItem("student_id");
 let class_id;
@@ -44,8 +44,10 @@ let finished=false;
 
 const loadModel = async () => {
   inferenceSession = await InferenceSession.create(ModelDetect);
+  // inferenceSession = await InferenceSession.create(ModelDetect, { executionProviders: ['webgl'] })
   console.log("Model detect loaded");
   inferenceSessionHeadpose = await InferenceSession.create(ModelHeadpose);
+  // inferenceSessionHeadpose = await InferenceSession.create(ModelHeadpose, { executionProviders: ['webgl'] });
   console.log("Model headpose loaded");
 };
 
@@ -92,7 +94,7 @@ function Monitor() {
     if(!finished){
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
-      ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT)
+      // ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT)
       canvas.current.width = CAM_WIDTH;
       canvas.current.height = CAM_HEIGHT;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -120,8 +122,9 @@ function Monitor() {
       for (var i = 0; i < numbers; ++i) {
         confs[i] = scoresTensor.get(i, 1);
       }
-      let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, 0.5, 0.4);
+      let dets = nms(CAM_WIDTH, CAM_HEIGHT, confs, locs, config.IOU_THRES, config.CONFIDENCE_THRES);
       current_time = new Date().getTime();
+      ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
       if (dets.length > 1) {
         drawAfterDetect("dstCanvas1", dets);
         status.push(false);
@@ -167,10 +170,10 @@ function Monitor() {
         start_time = current_time;
         count_to_delete_fault=0;
       }
-      console.log("c",current_time);
-      console.log("s",start_time)
-      console.log(delta_time);
-      console.log("t", time_to_fault_monitor);
+      // console.log("c",current_time);
+      // console.log("s",start_time)
+      // console.log(delta_time);
+      // console.log("t", time_to_fault_monitor);
       delta_time = current_time - start_time;
       if (delta_time > time_to_fault_monitor) {
         start_time = current_time;
@@ -188,7 +191,7 @@ function Monitor() {
       // console.log("delta_time", delta_time / 60000);
       // console.log("count_to_delete_fault", count_to_delete_fault);
       count = count + 1;
-      setTimeout(renderCanvas, 200);
+      setTimeout(renderCanvas, 50);
     }
   }, [canvas]);
 

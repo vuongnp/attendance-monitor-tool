@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import { Modal, Form, Col, Button } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 // import { Link, useHistory } from "react-router-dom";
 import SearchBar from "material-ui-search-bar";
 import axios from "axios";
@@ -12,7 +12,7 @@ import "./Admin_home.css";
 
 export default function AdminHome() {
   const admin_username = localStorage.getItem("admin_username");
-//   const [name, setName] = useState("User");
+  //   const [name, setName] = useState("User");
   const [classes, setClasses] = useState([]);
   const [oriClasses, setOriClasses] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
@@ -31,11 +31,11 @@ export default function AdminHome() {
     }
   };
 
-//   const [showErrorParam, setShowErrorParam] = useState(false);
+  //   const [showErrorParam, setShowErrorParam] = useState(false);
 
-//   const refreshPage = () => {
-//     window.location.reload();
-//   };
+  //   const refreshPage = () => {
+  //     window.location.reload();
+  //   };
 
   useEffect(() => {
     setShowLoading(true);
@@ -57,21 +57,23 @@ export default function AdminHome() {
   return (
     <div id="admin-container">
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
-      <Header home="admin_home" name="Quản lý đào tạo"/>
+      <Header home="admin_home" name="Quản lý đào tạo" />
       <div className="main-container">
-        <div className="top-container">
-          <SearchBar
-            onChange={(text) => setTextSearch(text)}
-            onRequestSearch={handleSearch}
-            style={{
-              //   margin: "0 auto",
-              width: "40%",
-              maxWidth: 700,
-            }}
-          />
-        </div>
-        {/* {datahome && <GridClassTeacher classes={datahome.classes} />} */}
-        {classes && <GridClassAdmin classes={classes} />}
+        <Container>
+          <div className="top-container">
+            <SearchBar
+              onChange={(text) => setTextSearch(text)}
+              onRequestSearch={handleSearch}
+              style={{
+                //   margin: "0 auto",
+                width: "40%",
+                maxWidth: 700,
+              }}
+            />
+          </div>
+          {/* {datahome && <GridClassTeacher classes={datahome.classes} />} */}
+          {classes && <GridClassAdmin classes={classes} />}
+        </Container>
       </div>
     </div>
   );

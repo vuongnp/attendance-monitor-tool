@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button } from "react-bootstrap";
-// import { Link, useHistory } from "react-router-dom";
+import { Container, Modal, Form, Col, Button } from "react-bootstrap";
 import SearchBar from "material-ui-search-bar";
 import axios from "axios";
 import config from "../config/config";
@@ -113,27 +112,29 @@ export default function TeacherHome() {
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       {name && <Header name={name} home="teacher_home" />}
       <div className="main-container">
-        <div className="top-container">
-          <Button
-            variant="outline-info"
-            type="submit"
-            className=""
-            onClick={handleShowAdd}
-          >
-            Thêm lớp mới
+        <Container>
+          <div className="top-container">
+            <Button
+              variant="outline-info"
+              type="submit"
+              className=""
+              onClick={handleShowAdd}
+            >
+              Thêm lớp mới
           </Button>
-          <SearchBar
-            onChange={(text) => setTextSearch(text)}
-            onRequestSearch={handleSearch}
-            style={{
-              //   margin: "0 auto",
-              width: "40%",
-              maxWidth: 700,
-            }}
-          />
-        </div>
-        {/* {datahome && <GridClassTeacher classes={datahome.classes} />} */}
-        {classes && <GridClassTeacher classes={classes} />}
+            <SearchBar
+              onChange={(text) => setTextSearch(text)}
+              onRequestSearch={handleSearch}
+              style={{
+                //   margin: "0 auto",
+                width: "40%",
+                maxWidth: 700,
+              }}
+            />
+          </div>
+          {classes && <GridClassTeacher classes={classes} />}
+        </Container>
+
         <Modal show={showAdd} onHide={handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>Thêm lớp học</Modal.Title>

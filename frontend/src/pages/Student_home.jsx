@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {Button, FormControl } from "react-bootstrap";
-// import { Link, useHistory } from "react-router-dom";
+import { Container, Button, FormControl } from "react-bootstrap";
 import SearchBar from "material-ui-search-bar";
 import axios from "axios";
-import {socket} from "../App";
+import { socket } from "../App";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
 import Header from "../components/header";
@@ -13,7 +12,7 @@ import LoadingImg from "../assert/loading.gif";
 import "./Student_home.css";
 
 export default function StudentHome() {
-  const student_id= localStorage.getItem("student_id");
+  const student_id = localStorage.getItem("student_id");
   const student_username = localStorage.getItem("student_username");
   const [name, setName] = useState("User");
   const [classes, setClasses] = useState([]);
@@ -57,7 +56,7 @@ export default function StudentHome() {
     itemCheckCode.code = e.target.value;
     setItemCheckCode({ ...itemCheckCode });
   };
-  const handleJoinClass = () =>{
+  const handleJoinClass = () => {
     socket.emit("check_code", itemCheckCode);
     // axios
     // .post(`${config.SERVER_URI}/student/joinclass`, itemJoinClass)
@@ -76,15 +75,15 @@ export default function StudentHome() {
   }
   socket.on("code_not_found", () => {
     setShowErrorCode(true);
-    });
-  socket.on("code_found",(data)=>{
+  });
+  socket.on("code_found", (data) => {
     setShowErrorCode(false);
     itemJoinClass.timestamp = parseInt(new Date().getTime());
     itemJoinClass.class_id = data["class_id"];
     setItemJoinClass({ ...itemJoinClass });
-    socket.emit("require_join", {'data':itemJoinClass});
+    socket.emit("require_join", { 'data': itemJoinClass });
     refreshPage();
-    });
+  });
 
   useEffect(() => {
     setShowLoading(true);
@@ -112,42 +111,44 @@ export default function StudentHome() {
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       {name && <Header name={name} home="student_home" />}
       <div className="main-container">
-        <div className="top-container">
-          <div className="join-class">
-            <FormControl
-              className="input-join"
-              placeholder="Mã lớp"
-              value={itemJoinClass.code}
-              onChange={handleChangeCodeJoin}
-            />
-            <Button
-              variant="info"
-              type="submit"
-              className=""
-              onClick={handleJoinClass}
-            >
-              Đăng ký
+        <Container>
+          <div className="top-container">
+            <div className="join-class">
+              <FormControl
+                className="input-join"
+                placeholder="Mã lớp"
+                value={itemJoinClass.code}
+                onChange={handleChangeCodeJoin}
+              />
+              <Button
+                variant="info"
+                type="submit"
+                className=""
+                onClick={handleJoinClass}
+              >
+                Đăng ký
             </Button>
-            {showErrorCode && (
-              <div className="text-error" style={{"marginLeft": "5px", "lineHeight":"50px"}}>
-                Không tìm thấy mã lớp
-              </div>
-            )}
-          </div>
+              {showErrorCode && (
+                <div className="text-error" style={{ "marginLeft": "5px", "lineHeight": "50px" }}>
+                  Không tìm thấy mã lớp
+                </div>
+              )}
+            </div>
 
-          <SearchBar
-            onChange={(text) => setTextSearch(text)}
-            onRequestSearch={handleSearch}
-            style={{
-              //   margin: "0 auto",
-              width: "40%",
-              maxWidth: 700,
-            }}
-          />
-        </div>
-        {/* {datahome && <GridClassStudent classes={datahome.classes} />} */}
-        {classes && <GridClassStudent classes={classes} />}
-        {require_classes && <GridRequireClassStudent classes={require_classes} />}
+            <SearchBar
+              onChange={(text) => setTextSearch(text)}
+              onRequestSearch={handleSearch}
+              style={{
+                //   margin: "0 auto",
+                width: "40%",
+                maxWidth: 700,
+              }}
+            />
+          </div>
+          {/* {datahome && <GridClassStudent classes={datahome.classes} />} */}
+          {classes && <GridClassStudent classes={classes} />}
+          {require_classes && <GridRequireClassStudent classes={require_classes} />}
+        </Container>
       </div>
     </div>
   );

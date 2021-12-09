@@ -58,8 +58,11 @@
   overflow-x: clip;
 }
 .img-posible-fault-monitor {
-  width: 250px;
+  width: 100%;
   /* height: 100px; */
+}
+.imgs-posible-fault-monitor .row{
+  margin-right: 0px !important;
 }
 .main-report-attendance {
   padding: 10px;

@@ -266,8 +266,8 @@ class TeacherController:
         try:
             if time_to_late is None or time_to_fault_monitor is None or time_to_fault_monitor=='' or time_to_late=='':
                 return CheckParameter.get_result_for_miss_parameter()
-            time_to_late = int(time_to_late)
-            time_to_fault_monitor= int(time_to_fault_monitor)
+            time_to_late = float(time_to_late)
+            time_to_fault_monitor= float(time_to_fault_monitor)
             TeacherService.update_classroom_start_learn(db, class_id, start_time, time_to_late, time_to_fault_monitor)
             result = {'code': '1000',
                       'message': AppConfig.RESPONSE_CODE[1000],

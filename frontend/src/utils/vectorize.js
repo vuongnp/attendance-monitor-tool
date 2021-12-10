@@ -50,6 +50,7 @@ export function processImgVectorizeFromCanvas(det, imgSrc){
         [1, 3, target_size, target_size]
     );
     tensor.data.set(dataProcessedTensor.data);
+    src.delete();
     img.delete();
     image.delete();
     return tensor;

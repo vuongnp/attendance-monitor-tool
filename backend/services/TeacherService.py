@@ -168,23 +168,24 @@ class TeacherService:
             students=[]
             for id_student in list_ids:
                 one_student = user_collection.find_one(filter={'id': id_student})
-                number_faults = None
-                if id in one_student['faults']:
-                    number_faults = len(one_student['faults'][id])
-                else:
-                    number_faults = 0
-                one_object = {
-                    'id': id_student,
-                    'phone': one_student['phone'],
-                    'username': one_student['username'],
-                    'name': one_student['name'],
-                    'email': one_student['email'],
-                    'gender': one_student['gender'],
-                    'age': one_student['age'],
-                    'faults': number_faults,
-                    'avatar': one_student['avatar']
-                }
-                students.append(one_object)
+                if one_student:
+                    number_faults = None
+                    if id in one_student['faults']:
+                        number_faults = len(one_student['faults'][id])
+                    else:
+                        number_faults = 0
+                    one_object = {
+                        'id': id_student,
+                        'phone': one_student['phone'],
+                        'username': one_student['username'],
+                        'name': one_student['name'],
+                        'email': one_student['email'],
+                        'gender': one_student['gender'],
+                        'age': one_student['age'],
+                        'faults': number_faults,
+                        'avatar': one_student['avatar']
+                    }
+                    students.append(one_object)
             result = {'classroom': classroom, 'students': students}
             return result
         except Exception as ex:
@@ -534,11 +535,12 @@ class TeacherService:
             for id in students:
                 if id not in learning_students:
                     student = user_collection.find_one(filter={'id': id})
-                    one_object={
-                        'name': student['name'],
-                        'username': student['username']
-                    }
-                    list_students.append(one_object)
+                    if student:
+                        one_object={
+                            'name': student['name'],
+                            'username': student['username']
+                        }
+                        list_students.append(one_object)
             return list_students
         except Exception as ex:
             print("Exception in TeacherService get_students_not_learned function:", ex)

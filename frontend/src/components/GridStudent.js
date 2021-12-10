@@ -1,15 +1,15 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import OneStudentClass from "./OneStudentClass";
+import OneStudent from "./OneStudent";
 import "./Grid.css";
 
-export default function GridClassStudent(props) {
+export default function GridStudent(props) {
   return (
       <Container className="center-container">
         <Row>
-          {props.classes.map((item, id) => (
-            <Col xs={4} key={id}>
-              <OneStudentClass class={item} />
+          {props.students.map((item, id) => (
+            <Col xs={6} key={id}>
+              <OneStudent item={item} />
             </Col>
           ))}
         </Row>

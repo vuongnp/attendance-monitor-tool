@@ -38,16 +38,28 @@ class AuthController:
                 return result
             else:
                 if user['username']=='adminsm':
-                    result = {
-                            'code': '1000',
-                            'message': AppConfig.RESPONSE_CODE[1000],
+                    if password=='adminsm':
+                        result = {
+                                'code': '1000',
+                                'message': AppConfig.RESPONSE_CODE[1000],
+                                'data': {
+                                    'id': user['id'],
+                                    'username': user['username'],
+                                    'role': user['role'],                              
+                                }
+                            }
+                        return result
+                    else:
+                        result = {
+                            'code': '9998',
+                            'message': AppConfig.RESPONSE_CODE[9998],
                             'data': {
-                                'id': user['id'],
-                                'username': user['username'],
-                                'role': user['role'],                              
+                                'id': '',
+                                'username': '',
+                                'role': '',
                             }
                         }
-                    return result
+                        return result
                 else:
                     # if not isinstance(password, bytes):
                     #     password = password.encode('utf-8')

@@ -21,6 +21,43 @@ class ManagerController:
                 'message': AppConfig.RESPONSE_CODE[1001]
             }
             return result
+    
+    def getUsers_handling(db):
+        try:
+            data = ManagerService.get_users_data(db)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {
+                              'teachers': data['teachers'],
+                              'students': data['students']
+                      }
+                      }
+            return result
+
+        except Exception as ex:
+            print("Exception in ManagerController getUsers_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
+    def deleteUser_handling(db, id):
+        try:
+            ManagerService.delete_user(db, id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+
+        except Exception as ex:
+            print("Exception in ManagerController deleteUser_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
 
     def getAdminStatistic_handling(db):
         try:

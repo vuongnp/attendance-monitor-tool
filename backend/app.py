@@ -367,33 +367,28 @@ def student_join(student_id):
 
 @app.route("/student_home_data/<username>")
 def student_home_data(username):
-    # if 'student' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
-    # # session.pop('matched_accounts', None)
-    # username = session['student_username']
     result = StudentController.getStudent_home_handling(db, username)
-    # result = json.loads(json_util.dumps(result))
     return result
 
 @app.route("/student/getinfoclass/<class_id>")
 def getinfoclass(class_id):
-    # if 'student' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
     result = StudentController.getClassJoined_handling(db, class_id)
     return result
 
 @app.route("/student/joinclass", methods=['POST'])
 def joinclass():
-    # if 'student' not in session:
-    #     # session['error_login'] = "Please login first!"
-    #     return redirect(url_for('index'))
-    # student_id = session['student_id']
     query_params = request.json
     code = GetParameter.check_and_get(query_params, 'code')
     student_id = GetParameter.check_and_get(query_params, 'student_id')
     result = StudentController.joinClass_handling(db, student_id, code)
+    return result
+
+@app.route("/student/updategpu", methods=['POST'])
+def updategpu():
+    data = request.json
+    student_id = data['student_id']
+    gpu = data['gpu']
+    result = StudentController.updateGPU_handling(db, student_id, gpu)
     return result
 
 @app.route("/student/outclass", methods=['POST'])
@@ -585,6 +580,18 @@ def changestudentavt():
 @app.route("/admin_home_data")
 def admin_home_data():
     result = ManagerController.getAdminHome_handling(db)
+    return result
+
+@app.route("/admin_get_users")
+def admin_get_users():
+    result = ManagerController.getUsers_handling(db)
+    return result
+
+@app.route("/admin/deleteuser", methods=['POST'])
+def deleteuser():
+    data = request.json
+    id = data['id']
+    result = ManagerController.deleteUser_handling(db, id)
     return result
 
 @app.route("/admin_statistic")

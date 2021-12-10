@@ -226,3 +226,16 @@ class StudentController:
             print("Exception in StudentController.iStayIn_handling", ex)
             result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result
+    
+    def updateGPU_handling(db, student_id, gpu):
+        try:
+            StudentService.update_gpu(db, student_id, gpu)
+
+            result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+        except Exception as ex:
+            print("Exception in StudentController.updateGPU_handling", ex)
+            result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
+            return result

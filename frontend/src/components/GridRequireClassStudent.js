@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import OneStudentRequireClass from "./OneStudentRequireClass";
-import "./GridClass.css";
+import "./Grid.css";
 
 export default function GridRequireClassStudent(props) {
   return (

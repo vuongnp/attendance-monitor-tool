@@ -44,6 +44,7 @@ let class_mode;
 let start_time_attendance;
 let current_time_attendance;
 let delta_time;
+let timeout;
 var localStream;
 
 const loadModel = async () => {
@@ -52,14 +53,19 @@ const loadModel = async () => {
   inferenceSessionVec = await InferenceSession.create(ModelVectorize);
   console.log("Model vectorize loaded");
 };
-const getEmbeddingDatabase = async () => {
-  console.log("Loading embedding");
+const getAttendanceDatabase = async () => {
+  console.log("Loading embedding and device");
   await axios
     .get(`${config.SERVER_URI}/user/userinfo/${student_id}`)
     .then((response) => {
       if (response) {
         stu_embedding = response.data.data.embedding;
-        console.log("Embedding loaded");
+        if(response.data.data.gpu===1){
+          timeout = config.TIMEOUT_GPU;
+        }else{
+          timeout = config.TIMEOUT_CPU;
+        }
+        console.log("Embedding and device loaded");
       }
     })
     .catch((error) => {
@@ -271,7 +277,7 @@ function Attendance(props) {
       // console.log(count);
       // drawAfterDetect("dstCanvas", dets);
       // count = count + 1;
-      setTimeout(renderCanvas, 100);
+      setTimeout(renderCanvas, timeout);
     }
   }, [canvas]);
 
@@ -373,8 +379,8 @@ function Attendance(props) {
   useLayoutEffect(() => {
     const init = async () => {
       setShowLoading(true);
+      await getAttendanceDatabase();
       await loadModel();
-      await getEmbeddingDatabase();
       await getInfoAttendance();
       socket.emit("student_join", localStorage.getItem("student_id"));
       setShowLoading(false);

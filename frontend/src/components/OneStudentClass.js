@@ -17,12 +17,14 @@ export default function OneStudentClass(props) {
   const [showViewClass, setShowViewClass] = useState(false);
   const [showClassNotStart, setShowClassNotStart] = useState(false);
   const [showSetAvt, setShowSetAvt] = useState(false);
+  const [showGPU, setShowGPU] = useState(false);
   const student_avt = localStorage.getItem("student_avt");
   //   const [showLearning, setShowLearning] = useState(flag);
   const itemOutClass = {
     student_id: localStorage.getItem("student_id"),
     class_id: props.class.id,
   };
+  const [modeClass, setModeClass] = useState('2');
   const refreshPage = () => {
     window.location.reload();
   };
@@ -34,6 +36,7 @@ export default function OneStudentClass(props) {
     setShowViewClass(false);
     setShowClassNotStart(false);
     setShowSetAvt(false);
+    setShowGPU(false);
   };
   const handleShowViewClass = () => {
     setShowViewClass(true);
@@ -50,6 +53,30 @@ export default function OneStudentClass(props) {
         console.error("There was an error!", error);
       });
   };
+  // const handleJoinLearn = () => {
+  //   axios
+  //     .get(`${config.SERVER_URI}/student/getinfoclass/${props.class.id}`)
+  //     .then((response) => {
+  //       console.log(response);
+  //       if(response.data.data.is_learning===0){
+  //         setShowClassNotStart(true);
+  //       }else{
+  //         if(student_avt===""){
+  //           setShowSetAvt(true);
+  //         }else{
+  //           if(response.data.data.mode==="1"){
+  //             history.push(linktomonitor);
+  //           }else{
+  //             history.push(linktoattendance);
+  //           }
+  //         }
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error!", error);
+  //     });
+  //   // history.push(linktoclass);
+  // };
   const handleJoinLearn = () => {
     axios
       .get(`${config.SERVER_URI}/student/getinfoclass/${props.class.id}`)
@@ -61,11 +88,8 @@ export default function OneStudentClass(props) {
           if(student_avt===""){
             setShowSetAvt(true);
           }else{
-            if(response.data.data.mode==="1"){
-              history.push(linktomonitor);
-            }else{
-              history.push(linktoattendance);
-            }
+            setModeClass(response.data.data.mode);
+            setShowGPU(true);
           }
         }
       })
@@ -74,9 +98,49 @@ export default function OneStudentClass(props) {
       });
     // history.push(linktoclass);
   };
+  const handleHaveGPU=()=>{
+    let item={
+      student_id: localStorage.getItem("student_id"),
+      gpu: 1
+    };
+    axios
+      .post(`${config.SERVER_URI}/student/updategpu`,item)
+      .then((response) => {
+        console.log(response);
+        setShowGPU(false);
+        if(modeClass==="1"){
+          history.push(linktomonitor);
+        }else{
+          history.push(linktoattendance);
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+  const handleNotHaveGPU=()=>{
+    let item={
+      student_id: localStorage.getItem("student_id"),
+      gpu: 0
+    };
+    axios
+      .post(`${config.SERVER_URI}/student/updategpu`,item)
+      .then((response) => {
+        console.log(response);
+        setShowGPU(false);
+        if(modeClass==="1"){
+          history.push(linktomonitor);
+        }else{
+          history.push(linktoattendance);
+        }
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
   const handleToInfo=()=>{
     history.push(RouterList.STUDENT_INFO);
-  }
+  };
   return (
     <div className="one-class-item">
       <h3 className="name-class">{props.class.name}</h3>
@@ -274,6 +338,28 @@ export default function OneStudentClass(props) {
           </Button>
           <Button variant="info" onClick={handleToInfo}>
             Cập nhật
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* GPU */}
+      <Modal show={showGPU} onHide={handleCloseModal}>
+        {/* <Modal.Header closeButton>
+          <Modal.Title>Rời lớp học</Modal.Title>
+        </Modal.Header> */}
+        <Modal.Body style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 24 }}>
+            Máy tính bạn có GPU không?
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={handleHaveGPU}>
+            Có
+          </Button>
+          <Button variant="info" onClick={handleNotHaveGPU}>
+            Không
+          </Button>
+          <Button variant="secondary" onClick={handleNotHaveGPU}>
+            Tôi không biết
           </Button>
         </Modal.Footer>
       </Modal>

@@ -5,48 +5,55 @@ import SearchBar from "material-ui-search-bar";
 import axios from "axios";
 import config from "../config/config";
 // import RouterList from "../router/routerList";
+import GridStudent from "../components/GridStudent";
+import GridTeacher from "../components/GridTeacher";
 import Header from "../components/header";
 import LoadingImg from "../assert/loading.gif";
-import GridClassAdmin from "../components/GridClassAdmin";
 import "./Admin_home.css";
 
-export default function AdminHome() {
+export default function UserManagement() {
   const admin_username = localStorage.getItem("admin_username");
   //   const [name, setName] = useState("User");
-  const [classes, setClasses] = useState([]);
-  const [oriClasses, setOriClasses] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [oriTeachers, setOriTeachers] = useState([]);
+  const [oriStudents, setOriStudents] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
   const [textSeach, setTextSearch] = useState("");
   const handleSearch = () => {
-    let classesResult = [];
+    let teachersResult = [];
+    let studentsResult = [];
     if (textSeach !== "") {
-      for (var i = 0, c = oriClasses.length; i < c; i++) {
-        if (oriClasses[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
-          classesResult.push(oriClasses[i]);
+      for (var i = 0, c = oriTeachers.length; i < c; i++) {
+        if (oriTeachers[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
+            teachersResult.push(oriTeachers[i]);
         }
-        setClasses(classesResult);
+        setTeachers(teachersResult);
+      }
+      for (var i = 0, c = oriStudents.length; i < c; i++) {
+        if (oriStudents[i].name.toLowerCase().includes(textSeach.toLowerCase())) {
+            studentsResult.push(oriStudents[i]);
+        }
+        setStudents(studentsResult);
       }
     } else {
-      setClasses(oriClasses);
+        setTeachers(oriTeachers);
+        setStudents(oriStudents);
     }
   };
-
-  //   const [showErrorParam, setShowErrorParam] = useState(false);
-
-  //   const refreshPage = () => {
-  //     window.location.reload();
-  //   };
 
   useEffect(() => {
     setShowLoading(true);
     axios
-      .get(`${config.SERVER_URI}/admin_home_data`)
+      .get(`${config.SERVER_URI}/admin_get_users`)
       .then((response) => {
         setShowLoading(false);
         console.log(response);
         if (response) {
-          setClasses(response.data.data.classes);
-          setOriClasses(response.data.data.classes);
+            setTeachers(response.data.data.teachers);
+            setOriTeachers(response.data.data.teachers);
+            setStudents(response.data.data.students);
+            setOriStudents(response.data.data.students);
         }
       })
       .catch((error) => {
@@ -71,8 +78,8 @@ export default function AdminHome() {
               }}
             />
           </div>
-          {/* {datahome && <GridClassTeacher classes={datahome.classes} />} */}
-          {classes && <GridClassAdmin classes={classes} />}
+          {students && <GridStudent students={students} />}
+          {teachers && <GridTeacher teachers={teachers} />}
         </Container>
       </div>
     </div>

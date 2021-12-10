@@ -10,6 +10,7 @@ const RouterList = {
     STUDENT_INFO: "/student_info",
     ATTENDANCE: "/attendance/:id_class",
     MONITOR: "/monitor/:id_class",
+    ADMIN_USER_MANAGEMENT: "/admin_user_management",
     ADMIN_STATISTIC: "/admin_statistic",
     TEACHER_STATISTIC: "/teacher_statistic",
     SETTING_MODE: "/setting_mode"

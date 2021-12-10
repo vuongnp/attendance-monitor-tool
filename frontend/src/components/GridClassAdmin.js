@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import OneAdminClass from "./OneAdminClass";
-import "./GridClass.css";
+import "./Grid.css";
 
 export default function GridClassAdmin(props) {
   return (

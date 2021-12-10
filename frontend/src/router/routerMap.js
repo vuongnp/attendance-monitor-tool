@@ -11,12 +11,12 @@ import SignupTeacher from "../pages/Signup_teacher";
 import StudentHome from "../pages/Student_home";
 import TeacherHome from "../pages/Teacher_home";
 import AdminHome from "../pages/Admin_home";
+import UserManagement from "../pages/User_management";
 import TeacherClassroom from "../pages/Teacher_classroom";
 import TeacherInfo from "../pages/Teacher_info";
 import StudentInfo from "../pages/Student_info";
 import Attendance from "../pages/Attendance.jsx";
-// import Monitor from "../pages/Monitor";
-import Monitor from "../pages/M";
+import Monitor from "../pages/Monitor";
 import StatisticAdmin from "../pages/Statistic_admin";
 import StatisticTeacher from "../pages/Statistic_teacher";
 import SettingMode from "../pages/Setting_mode.jsx";
@@ -36,6 +36,7 @@ export default function RouterMap() {
           <Route exact path={RouterList.ATTENDANCE} component={Attendance} />
           <Route exact path={RouterList.MONITOR} component={Monitor} />
           <Route exact path={RouterList.ADMIN_HOME} component={AdminHome} />
+          <Route exact path={RouterList.ADMIN_USER_MANAGEMENT} component={UserManagement} />
           <Route exact path={RouterList.ADMIN_STATISTIC} component={StatisticAdmin} />
           <Route exact path={RouterList.TEACHER_STATISTIC} component={StatisticTeacher} />
           <Route exact path={RouterList.SETTING_MODE} component={SettingMode} />

@@ -1,0 +1,8 @@
+.center-container{
+    padding: 15px;
+    border: 1px solid #bdc5c7;
+    margin-top: 20px;
+    /* border-radius: 10px; */
+    box-shadow: 5px 5px 5px 1px rgb(0 0 255 / 20%);
+    margin-bottom: 100px;
+}

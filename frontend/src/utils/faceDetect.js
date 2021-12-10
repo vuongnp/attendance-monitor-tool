@@ -91,50 +91,74 @@ export function setContextFromTensor(tensor, ctx) {
 }
 export function processImgFromCanvas(canvasId) {
   //   var ctx = document.getElementById(canvasId).getContext("2d");
-  let imgElement = document.getElementById(canvasId);
-  let image = cv.imread(imgElement);
+  var imgElement = document.getElementById(canvasId);
+  // console.log(imgElement);
+  var image = cv.imread(imgElement);
+  // console.log(image);
+  // console.log(image.cols);
 //   const target_size = 640;
   //   const h = ctx.canvas.height;
   //   const w = ctx.canvas.width;
-  let img = new cv.Mat();
-  let src = new cv.Mat();
+  var img = new cv.Mat();
+  // console.log(img);
+  // console.log(img.cols);
+  var src = new cv.Mat();
+  // console.log(src);
+  // console.log(src.cols);
   cv.cvtColor(image, img, cv.COLOR_BGR2RGBA, 0);
+  // console.log(img);
   cv.resize(img, src, dsize, 0, 0);
-  let arr = [];
+  // console.log(src);
+  var arr = [];
+  // console.log('2');
   if (src.isContinuous()) {
     arr = src.data;
+    // console.log('2');
   }
   const dataTensor = ndarray(new Float32Array(arr), [
     target_size,
     target_size,
     4,
   ]);
+  // console.log('2');
   const dataProcessedTensor = ndarray(
     new Float32Array(target_size * target_size * 3),
     [1, 3, target_size, target_size]
   );
+  // console.log('2');
   ops.assign(
     dataProcessedTensor.pick(0, 0, null, null),
     dataTensor.pick(null, null, 2)
   );
+  // console.log('2');
   ops.assign(
     dataProcessedTensor.pick(0, 1, null, null),
     dataTensor.pick(null, null, 0)
   );
+  // console.log('2');
   ops.assign(
     dataProcessedTensor.pick(0, 2, null, null),
     dataTensor.pick(null, null, 1)
   );
+  // console.log('2');
   ops.subseq(dataProcessedTensor, 127);
+  // console.log('2');
   ops.divseq(dataProcessedTensor, 128);
+  // console.log('2');
   const tensor = new Tensor(
     new Float32Array(3 * target_size * target_size),
     "float32",
     [1, 3, target_size, target_size]
   );
+  // console.log('2');
   tensor.data.set(dataProcessedTensor.data);
+  // console.log('2');
+  image.delete();
+  // console.log('2');
   img.delete();
+  // console.log('2');
   src.delete();
+  // console.log(tensor);
   return tensor;
 }
 export function canvasToTensor(canvasId) {

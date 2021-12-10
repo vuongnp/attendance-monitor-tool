@@ -286,7 +286,6 @@ class StudentService:
 
     def add_notification_report_attendance(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs, idN):
         try:
-            print("BBBBBBBBBB")
             noti_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.NOTIFICATION_COLLECTION)
             noti_collection.insert_one({
@@ -352,3 +351,16 @@ class StudentService:
             print("Exception in StudentService update_stay_in_student function:", ex)
             raise Exception from ex
     
+    def update_gpu(db, student_id, gpu):
+        try:
+            user_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.USER_COLLECTION)
+            user_collection.find_one_and_update(filter={'id': student_id},
+                                                            update={
+                                                                '$set': {'gpu': int(gpu)}},
+                                                            return_document=ReturnDocument.AFTER,
+                                                            upsert=False)
+            
+        except Exception as ex:
+            print("Exception in StudentService update_stay_in_student function:", ex)
+            raise Exception from ex

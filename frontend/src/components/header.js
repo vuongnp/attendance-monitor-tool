@@ -12,6 +12,7 @@ export default function Header(props) {
   // console.log(window.location.origin);
   // console.log(props.home);
   const link_to_home = window.location.origin + "/" + props.home;
+  const link_to_user_management_admin = window.location.origin + RouterList.ADMIN_USER_MANAGEMENT;
   const link_to_stat_admin = window.location.origin + RouterList.ADMIN_STATISTIC;
   const link_to_stat_teacher = window.location.origin + RouterList.TEACHER_STATISTIC;
   const link_to_setting_mode = window.location.origin + RouterList.SETTING_MODE;
@@ -140,6 +141,10 @@ export default function Header(props) {
             <NavDropdown.Divider />
             <NavDropdown.Item href={link_to_stat_admin}>
               Xem thống kê
+            </NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item href={link_to_user_management_admin}>
+              Quản lý tài khoản
             </NavDropdown.Item>
             <NavDropdown.Divider />
             <NavDropdown.Item href={link_to_setting_mode}>

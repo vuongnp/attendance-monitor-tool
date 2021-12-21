@@ -38,7 +38,7 @@ let class_id;
 let count = 1;
 let count_to_delete_fault = 0;
 let arr_Imgs = [];
-let start_time_to_save_img = start_time;
+let start_time_to_save_img;
 let start_time;
 let delta_time;
 let current_time;
@@ -242,6 +242,7 @@ function Monitor() {
                             student_id: student_id,
                             student_username: localStorage.getItem("student_username"),
                             student_name: localStorage.getItem("student_name"),
+                            student_avt: localStorage.getItem("student_avt"),
                             imgs: arr_Imgs,
                             class_id: class_id,
                             timestamp: current_time,
@@ -325,6 +326,7 @@ function Monitor() {
             await getInfoMonitor();
             start_time = new Date().getTime();
             current_time = start_time;
+            start_time_to_save_img = start_time;
             setShowLoading(false);
             socket.emit("student_join", student_id);
             renderCanvas();

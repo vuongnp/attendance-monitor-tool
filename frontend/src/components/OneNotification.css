@@ -52,6 +52,19 @@
   margin-top: 10px;
   /* justify-content: space-between; */
 }
+.top-posible-fault-monitor{
+  display: flex;
+}
+.top-posible-fault-monitor .top-posible-text{
+  text-align: center;
+  margin-left: 25%;
+  font-size: 20px;
+}
+.top-posible-fault-monitor .top-posible-img{
+  margin-left: 10px;
+  width: 20%;
+  height: 20%;
+}
 .imgs-posible-fault-monitor {
   overflow-y: scroll;
   height: 300px;

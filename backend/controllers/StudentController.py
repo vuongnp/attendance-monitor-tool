@@ -200,10 +200,10 @@ class StudentController:
             result = {'code': '1001', 'message': AppConfig.RESPONSE_CODE[1001]}
             return result
 
-    def notification_monitor_handling(db, class_id, student_id, student_name, student_username, timestamp, list_imgs):
+    def notification_monitor_handling(db, class_id, student_id, student_name, student_username, student_avt, timestamp, list_imgs):
         try:
             idN = RandomTool.get_random_id()
-            StudentService.add_notification_monitor(db, class_id, student_id, student_name, student_username, timestamp, list_imgs, idN)
+            StudentService.add_notification_monitor(db, class_id, student_id, student_name, student_username, student_avt, timestamp, list_imgs, idN)
 
             result = {'code': '1000', 'message': AppConfig.RESPONSE_CODE[1000],
                       'data': {}

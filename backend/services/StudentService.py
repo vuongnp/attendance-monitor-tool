@@ -309,7 +309,7 @@ class StudentService:
             print("Exception in StudentService add_notification_report_attendance function:", ex)
             raise Exception from ex
 
-    def add_notification_monitor(db, class_id, student_id, student_name, student_username, timestamp, list_imgs, idN):
+    def add_notification_monitor(db, class_id, student_id, student_name, student_username, student_avt, timestamp, list_imgs, idN):
         try:
             noti_collection = pymongo.collection.Collection(
                 db, DatabaseConfig.NOTIFICATION_COLLECTION)
@@ -322,6 +322,7 @@ class StudentService:
                                 'student_id': student_id,
                                 'student_username': student_username,
                                 'student_name': student_name,
+                                'student_avt': student_avt,
                                 'imgs': list_imgs,
                                 'text': 'student distraction'
                             },

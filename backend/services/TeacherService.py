@@ -337,6 +337,7 @@ class TeacherService:
                         'student_id': noti['message']['student_id'],
                         'student_username': noti['message']['student_username'],
                         'student_name': noti['message']['student_name'],
+                        'student_avt': noti['message']['student_avt'],
                         'imgs': noti['message']['imgs'],
                         'type': 2,
                         'timestamp': noti['timestamp'],

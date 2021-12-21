@@ -77,6 +77,11 @@ export default function Welcome() {
         console.error("There was an error!", error);
       });
   };
+  const handlePressEnter=(e)=>{
+    if(e.key==='Enter'){
+      handleSignin();
+    }
+  };
   return (
     <div className="home-container">
       {/* <div className="left-welcome"> */}
@@ -92,6 +97,7 @@ export default function Welcome() {
                 placeholder="Nhập tên đăng nhập"
                 value={user.username}
                 onChange={handleChangeUsername}
+                onKeyPress={handlePressEnter}
               />
             </Form.Group>
 
@@ -102,6 +108,7 @@ export default function Welcome() {
                 placeholder="Nhập mật khẩu"
                 value={user.password}
                 onChange={handleChangePassword}
+                onKeyPress={handlePressEnter}
               />
             </Form.Group>
           </Form>

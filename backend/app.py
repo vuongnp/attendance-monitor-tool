@@ -492,6 +492,7 @@ def posible_fault_monitor(message):
     student_id = data['student_id']
     student_name = data['student_name']
     student_username = data['student_username']
+    student_avt = data['student_avt']
     timestamp = data['timestamp']
     imgs = data['imgs']
     list_imgs = []
@@ -506,7 +507,7 @@ def posible_fault_monitor(message):
         upload_result = cloudinary.uploader.upload(filename)
         url_uploaded = upload_result['url']
         list_imgs.append(url_uploaded)
-    StudentController.notification_monitor_handling(db, class_id, student_id, student_name, student_username, timestamp, list_imgs)
+    StudentController.notification_monitor_handling(db, class_id, student_id, student_name, student_username, student_avt, timestamp, list_imgs)
     emit("posible_fault_monitor", to=class_id)
         
 ####################################################### User ##############################################################

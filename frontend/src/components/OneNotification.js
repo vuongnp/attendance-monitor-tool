@@ -353,7 +353,7 @@ export default function OneNotification(props) {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group>
+            {/* <Form.Group>
               <Form.Row>
                 <Form.Label column lg={4} style={{ fontWeight: "bold" }}>
                   Họ và tên
@@ -372,7 +372,18 @@ export default function OneNotification(props) {
                   {props.item.student_username}
                 </Form.Label>
               </Form.Row>
-            </Form.Group>
+            </Form.Group> */}
+             <div className="top-posible-fault-monitor">
+              <div className="top-posible-text">
+                <p>{props.item.student_name}</p>
+                <p>{props.item.student_username}</p>
+              </div>
+              <img
+                className="top-posible-img"
+                src={props.item.student_avt}
+                alt="ảnh đại diện"
+              ></img>
+            </div>
             <Form.Group>
               <Form.Label style={{ fontWeight: "bold", textAlign: "center" }}>
                 Ảnh minh chứng

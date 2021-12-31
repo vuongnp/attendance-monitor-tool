@@ -46,6 +46,8 @@ let status = [true];
 var localStream;
 let finished = false;
 let timeout;
+let s;
+let f;
 
 const loadModel = async () => {
     inferenceSession = await InferenceSession.create(ModelDetect);
@@ -55,6 +57,7 @@ const loadModel = async () => {
     // inferenceSessionHeadpose = await InferenceSession.create(ModelHeadpose, { executionProviders: ['webgl'] });
     console.log("Model headpose loaded");
     inferenceSessionVec = await InferenceSession.create(ModelVectorize);
+    // inferenceSessionVec = await InferenceSession.create(ModelVectorize, { executionProviders: ['webgl'] });
     console.log("Model vectorize loaded");
 };
 const getEmbeddingAndDevice = async () => {
@@ -119,6 +122,7 @@ function Monitor() {
         try {
             // if (canvas.current) {
             if (!finished) {
+                s = new Date().getTime();
                 const ctx = canvas.current.getContext("2d");
                 const ctx_dest = destination.current.getContext("2d");
                 // ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT)
@@ -175,7 +179,7 @@ function Monitor() {
                         status.push(false);
                         count_to_delete_fault = 0;
                         // console.log("not look");
-                        if ((current_time - start_time_to_save_img) > 28000) {
+                        if ((current_time - start_time_to_save_img) > 9000) {
                             arr_Imgs.push(processImgToServer("srcCanvas1", current_time));
                             start_time_to_save_img = current_time;
                         }
@@ -211,7 +215,7 @@ function Monitor() {
                             status.push(false);
                             count_to_delete_fault = 0;
                             // console.log("not look");
-                            if ((current_time - start_time_to_save_img) > 28000) {
+                            if ((current_time - start_time_to_save_img) > 9000) {
                                 arr_Imgs.push(processImgToServer("srcCanvas1", current_time));
                                 start_time_to_save_img = current_time;
                             }
@@ -251,6 +255,8 @@ function Monitor() {
                     arr_Imgs = [];
                     setShowNotification(true);
                 }
+                f = new Date().getTime();
+                console.log(f-s);
                 // console.log("delta_time", delta_time / 60000);
                 // console.log("count_to_delete_fault", count_to_delete_fault);
                 count = count + 1;

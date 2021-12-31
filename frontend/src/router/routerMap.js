@@ -20,6 +20,7 @@ import Monitor from "../pages/Monitor";
 import StatisticAdmin from "../pages/Statistic_admin";
 import StatisticTeacher from "../pages/Statistic_teacher";
 import SettingMode from "../pages/Setting_mode.jsx";
+import NotFound from "../pages/NotFound";
   
 export default function RouterMap() {
     return (
@@ -42,6 +43,7 @@ export default function RouterMap() {
           <Route exact path={RouterList.SETTING_MODE} component={SettingMode} />
           {/* <Route exact path={RouterList.ATTENDANCE} component={() => (<Attendance socket="value" />)} /> */}
           {/* <Route match = {false} component={() => <Redirect to={RouterList.WELCOME}/>} /> */}
+          <Route component={NotFound}/>
         </Switch>
       </BrowserRouter>
     );

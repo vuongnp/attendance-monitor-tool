@@ -15,6 +15,17 @@ export function formatTime(date) {
   );
 };
 
+export function formatHoursMinusSeconds(timestamp) {
+  const time = new Date(timestamp);
+  return (
+    time.getHours().toString().padStart(2, "0") +
+    ":" +
+    time.getMinutes().toString().padStart(2, "0") +
+    ":" +
+    time.getSeconds().toString().padStart(2, "0")
+  );
+};
+
 export function formatHoursMinus(timestamp) {
   const time = new Date(timestamp);
   return (

@@ -75,7 +75,7 @@ export default function StatisticTeacher() {
     <div className="stat-container">
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header home="teacher_home" name={teacher_name} />
-      <div className="main-stat-container">
+      <div className="main-teacher-stat-container">
         <h3 style={{ color: "black", marginTop: "100px", textAlign: "center" }}>
           Top những lớp có nhiều vi phạm
         </h3>

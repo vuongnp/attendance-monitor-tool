@@ -3,8 +3,8 @@ import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import config from "../config/config";
 import "./OneNotification.css";
-import {socket} from "../App";
-import { formatHoursMinus, formatDate } from "../utils/format";
+import { socket } from "../App";
+import { formatHoursMinusSeconds, formatHoursMinus, formatDate } from "../utils/format";
 
 export default function OneNotification(props) {
   const time = formatHoursMinus(props.item.timestamp);
@@ -373,7 +373,7 @@ export default function OneNotification(props) {
                 </Form.Label>
               </Form.Row>
             </Form.Group> */}
-             <div className="top-posible-fault-monitor">
+            <div className="top-posible-fault-monitor">
               <div className="top-posible-text">
                 <p>{props.item.student_name}</p>
                 <p>{props.item.student_username}</p>
@@ -393,11 +393,20 @@ export default function OneNotification(props) {
                   {props.item.imgs &&
                     props.item.imgs.map((item) => (
                       <Col xs={4} key={props.item.imgs.indexOf(item)}>
-                        <img
-                          className="img-posible-fault-monitor"
-                          src={item}
-                          alt="anh minh chung"
-                        ></img>
+                        {item.timestamp && <div>
+                          <div style={{textAlign: 'center',fontSize: '15px'}}>{formatHoursMinusSeconds(item.timestamp)}</div>
+                          <img
+                            className="img-posible-fault-monitor"
+                            src={item.url}
+                            alt="anh minh chung"
+                          ></img>
+                        </div>}
+                        {!item.timestamp &&
+                          <img
+                            className="img-posible-fault-monitor"
+                            src={item}
+                            alt="anh minh chung"
+                          ></img>}
                       </Col>
                     ))}
                 </Row>

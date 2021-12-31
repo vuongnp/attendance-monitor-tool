@@ -69,7 +69,8 @@ class UserService:
                 db, DatabaseConfig.USER_COLLECTION)
             user_collection.find_one_and_update(filter={'id': id},
                                                 update={'$set': {
-                                                    'embedding': embedding}},
+                                                    'embedding': embedding,
+                                                    'avtOK': 1}},
                                                 return_document=ReturnDocument.AFTER,
                                                 upsert=False)
         except Exception as ex:

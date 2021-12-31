@@ -18,40 +18,42 @@ class StudentService:
             require_classes = []
             for id in list_ids:
                 one_class = class_collection.find_one(filter={'id': id})
-                one_teacher = user_collection.find_one(filter={'id': one_class['teacher']})
-                one_object = {
-                    'id': id,
-                    'name': one_class['name'],
-                    'description': one_class['description'],
-                    'schedule': one_class['schedule'],
-                    'type': one_class['type'],
-                    'duration': one_class['duration'],
-                    'teacher': one_teacher['name'],
-                    'code': one_class['code'],
-                    'mode': one_class['mode'],
-                    'is_learning': one_class['is_learning'],
-                    'start_time': one_class['start_time'],
-                    'students': one_class['students']
-                }
-                classes.append(one_object)
+                if one_class:
+                    one_teacher = user_collection.find_one(filter={'id': one_class['teacher']})
+                    one_object = {
+                        'id': id,
+                        'name': one_class['name'],
+                        'description': one_class['description'],
+                        'schedule': one_class['schedule'],
+                        'type': one_class['type'],
+                        'duration': one_class['duration'],
+                        'teacher': one_teacher['name'],
+                        'code': one_class['code'],
+                        'mode': one_class['mode'],
+                        'is_learning': one_class['is_learning'],
+                        'start_time': one_class['start_time'],
+                        'students': one_class['students']
+                    }
+                    classes.append(one_object)
             for id in list_require_ids:
                 one_class = class_collection.find_one(filter={'id': id})
-                one_teacher = user_collection.find_one(filter={'id': one_class['teacher']})
-                one_object = {
-                    'id': id,
-                    'name': one_class['name'],
-                    'description': one_class['description'],
-                    'schedule': one_class['schedule'],
-                    'type': one_class['type'],
-                    'duration': one_class['duration'],
-                    'teacher': one_teacher['name'],
-                    'code': one_class['code'],
-                    'mode': one_class['mode'],
-                    'is_learning': one_class['is_learning'],
-                    'start_time': one_class['start_time'],
-                    'students': one_class['students']
-                }
-                require_classes.append(one_object)
+                if one_class:
+                    one_teacher = user_collection.find_one(filter={'id': one_class['teacher']})
+                    one_object = {
+                        'id': id,
+                        'name': one_class['name'],
+                        'description': one_class['description'],
+                        'schedule': one_class['schedule'],
+                        'type': one_class['type'],
+                        'duration': one_class['duration'],
+                        'teacher': one_teacher['name'],
+                        'code': one_class['code'],
+                        'mode': one_class['mode'],
+                        'is_learning': one_class['is_learning'],
+                        'start_time': one_class['start_time'],
+                        'students': one_class['students']
+                    }
+                    require_classes.append(one_object)
             result = {'student': student, 'classes': classes, 'require_classes': require_classes}
             return result
         except Exception as ex:

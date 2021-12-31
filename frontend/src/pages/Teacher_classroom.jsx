@@ -24,7 +24,7 @@ export default function TeacherClassroom(props) {
   const class_id = window.location.pathname.split("/")[2];
   const teacher_name = localStorage.getItem("teacher_name");
   const [students, setStudents] = useState([]);
-  const numberStudentsPage = 1;
+  const numberStudentsPage = 10;
   const [studentsPage, setStudentsPage] = useState([]);
   const [numberPages, setNumberPages] = useState(1);
   const [classroom, setClassroom] = useState({
@@ -834,7 +834,7 @@ const playAudio=(audio)=>{
               <Form.Group>
                 <Form.Row>
                   <Form.Label column lg={9}>
-                    Thời điểm vào vào muộn{" "}
+                    Thời điểm vào lớp muộn{" "}
                     <span style={{ color: "red" }}>*</span>
                   </Form.Label>
                   <Col>

@@ -99,20 +99,27 @@ export default function StatisticAdmin() {
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
       <Header home="admin_home" name="Quản lý đào tạo" />
       <div className="main-stat-container">
-        <h3 style={{ color: "black", marginTop: "100px", textAlign: "center" }}>
-          Top những lớp có nhiều vi phạm
-        </h3>
-        <Bar data={topClassFaultStatData} />
-
-        <h3 style={{ color: "black", marginTop: "50px", textAlign: "center" }}>
-          Thống kê số lượng lớp học theo thể loại
-        </h3>
-        <Doughnut data={classStatData} />
-
-        <h3 style={{ color: "black", marginTop: "50px", textAlign: "center" }}>
-          Thống kê loại vi phạm
-        </h3>
-        <Bar options={options} data={faultStatData} />
+        <div className="top-stat">
+          <div className="left-stat">
+            <h3 style={{ color: "black", marginTop: "75px", textAlign: "center" }}>
+              Top những lớp có nhiều vi phạm
+            </h3>
+            <Bar data={topClassFaultStatData} />
+          </div>
+          <div className="right-stat">
+            <h3 style={{ color: "black", marginTop: "75px", textAlign: "center" }}>
+            Thống kê loại vi phạm
+            </h3>
+            <Bar options={options} data={faultStatData} />
+          </div>
+        </div>
+       
+        <div className="bottom-stat">
+          <h3 style={{ color: "black", marginTop: "50px", textAlign: "center" }}>
+            Thống kê số lượng lớp học theo thể loại
+          </h3>
+          <Doughnut data={classStatData} />
+        </div>
       </div>
     </div>
   );

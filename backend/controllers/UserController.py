@@ -65,7 +65,8 @@ class UserController:
                             'classes': len_classes,
                             'avatar': data['avatar'],
                             'embedding': data['embedding'],
-                            'gpu': data['gpu']
+                            'gpu': data['gpu'],
+                            'avtOK': data['avtOK']
                         }
                     }
                     return result

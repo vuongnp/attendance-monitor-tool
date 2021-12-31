@@ -575,12 +575,13 @@ class TeacherService:
             count3 = 0 #lop thi
             for id in class_ids:
                 one_class = class_collection.find_one(filter={'id': id})
-                if one_class['type']=='Lý thuyết':
-                    count1 +=1
-                elif one_class['type']=='Bài tập':
-                    count2 +=1
-                else:
-                    count3 +=1
+                if one_class:
+                    if one_class['type']=='Lý thuyết':
+                        count1 +=1
+                    elif one_class['type']=='Bài tập':
+                        count2 +=1
+                    else:
+                        count3 +=1
             labels = ['Lý thuyết','Bài tập','Lớp thi']
             stats = [count1, count2, count3]
             result = {'labels': labels, 'stats': stats}
@@ -602,9 +603,11 @@ class TeacherService:
             teacher = user_collection.find_one(filter={'id': teacher_id})
             class_ids = teacher['classes']
             for id in class_ids:
-                fault_list = fault_collection.find(filter={'class_id': id})
+                # fault_list = fault_collection.find(filter={'class_id': id})
                 one_class = class_collection.find_one(filter={'id': id})
-                result[one_class['name']] = len(list(fault_list))
+                if one_class:
+                    fault_list = fault_collection.find(filter={'class_id': id})
+                    result[one_class['name']] = len(list(fault_list))
             result =  sorted(result.items(), key=lambda x: x[1], reverse=True)[:10]
             labels = []
             stats = []

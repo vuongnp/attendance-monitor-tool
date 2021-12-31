@@ -46,11 +46,14 @@ let current_time_attendance;
 let delta_time;
 let timeout;
 var localStream;
-
+let s;
+let f;
 const loadModel = async () => {
   inferenceSession = await InferenceSession.create(ModelDetect);
+  // inferenceSession = await InferenceSession.create(ModelDetect, { executionProviders: ['webgl'] });
   console.log("Model detect loaded");
   inferenceSessionVec = await InferenceSession.create(ModelVectorize);
+  // inferenceSessionVec = await InferenceSession.create(ModelVectorize, { executionProviders: ['webgl'] });
   console.log("Model vectorize loaded");
 };
 const getAttendanceDatabase = async () => {
@@ -131,6 +134,7 @@ function Attendance(props) {
     delta_time = current_time_attendance-start_time_attendance;
     // if (canvas.current) {
     if(!finished){
+      s = new Date().getTime();
       const ctx = canvas.current.getContext("2d");
       const ctx_dest = destination.current.getContext("2d");
       // ctx_dest.drawImage(canvas.current, 0, 0, CAM_WIDTH, CAM_HEIGHT);
@@ -274,6 +278,8 @@ function Attendance(props) {
           stopCamera();
         }
       }
+      f = new Date().getTime();
+      console.log(f-s);
       // console.log(count);
       // drawAfterDetect("dstCanvas", dets);
       // count = count + 1;

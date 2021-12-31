@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Col, Button} from "react-bootstrap";
+import { Modal, Form, Col, Button } from "react-bootstrap";
 // import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import config from "../config/config";
@@ -21,6 +21,7 @@ export default function StudentInfo() {
     classes: "",
     student_id: "",
   });
+  const [showBtnAvt, setShowBtnAvt] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   const [showErrorParam, setShowErrorParam] = useState(false);
   const [showErrorPhone, setShowErrorPhone] = useState(false);
@@ -101,16 +102,16 @@ export default function StudentInfo() {
       .then((response) => {
         setShowLoading(false);
         if (response.data.code === "9993") {
-            setShowErrorNonFace(false);
-            setShowErrorManyFace(true);
-          } else if (response.data.code === "9994") {
-            setShowErrorNonFace(true);
-            setShowErrorManyFace(false);
-          } else {
-            setShowErrorNonFace(false);
-            setShowErrorManyFace(false);
-            refreshPage();
-          }
+          setShowErrorNonFace(false);
+          setShowErrorManyFace(true);
+        } else if (response.data.code === "9994") {
+          setShowErrorNonFace(true);
+          setShowErrorManyFace(false);
+        } else {
+          setShowErrorNonFace(false);
+          setShowErrorManyFace(false);
+          refreshPage();
+        }
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -125,6 +126,9 @@ export default function StudentInfo() {
         console.log(response);
         if (response) {
           setUser(response.data.data);
+          if (response.data.data.avatar !== '' && response.data.data.avtOK === 1) {
+            setShowBtnAvt(false);
+          }
           localStorage.setItem("student_avt", response.data.data.avatar);
         }
       })
@@ -135,7 +139,7 @@ export default function StudentInfo() {
   return (
     <div className="user-info-container">
       {showLoading && <img src={LoadingImg} alt="loading" className="loading-img"></img>}
-      {user && <Header name={user.name} home="student_home" />}   
+      {user && <Header name={user.name} home="student_home" />}
       <div className="info-main-container">
         <div className="left-info">
           <Form>
@@ -217,34 +221,41 @@ export default function StudentInfo() {
           </div>
         </div>
         <div className="right-info">
-        {user.avatar !=="" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}
-          <div>
-              Ảnh cần chụp chính diện, nhìn rõ khuôn mặt
-          </div>
-          <div>
-              Không nhiều hơn một khuôn mặt
-          </div>
+          {user.avatar !== "" ? <img src={user.avatar} alt="ảnh đại diện"></img> : <img src={DefaultInfoAvt} alt="ảnh đại diện"></img>}
+          {showBtnAvt && (
+            <div>
+              <div>
+                Ảnh cần chụp chính diện, nhìn rõ khuôn mặt
+              </div>
+              <div>
+                Không nhiều hơn một khuôn mặt
+              </div>
+            </div>
+          )}
+
           {showErrorNonFace && (
-                <div className="text-error" style={{"textAlign":"center"}}>
-                  Không tìm thấy khuôn mặt trong ảnh
-                </div>
-              )}
-              {showErrorManyFace && (
-                <div className="text-error" style={{"textAlign":"center"}}>
-                    Có quá nhiều khuôn mặt trong ảnh
-                </div>
-              )}
-          <Form.File
+            <div className="text-error" style={{ "textAlign": "center" }}>
+              Không tìm thấy khuôn mặt trong ảnh
+            </div>
+          )}
+          {showErrorManyFace && (
+            <div className="text-error" style={{ "textAlign": "center" }}>
+              Có quá nhiều khuôn mặt trong ảnh
+            </div>
+          )}
+          {showBtnAvt && <Form.File
             type="file"
             label=""
             onChange={(e) => changeFile(e)}
             className="form-img"
-          />
-          <div className="btn-update-img">
-            <Button variant="info" onClick={handleUploadImg}>
-              Cập nhật ảnh đại diện
-            </Button>
-          </div>
+          />}
+          {showBtnAvt && (
+            <div className="btn-update-img">
+              <Button variant="info" onClick={handleUploadImg}>
+                Cập nhật ảnh đại diện
+              </Button>
+            </div>
+          )}
         </div>
         {/* Edit */}
         <Modal show={showEdit} onHide={handleClose}>
@@ -331,16 +342,16 @@ export default function StudentInfo() {
                 </Form.Row>
               </Form.Group>
             </Form>
-              {showErrorParam && (
-                <div className="text-error" style={{"textAlign":"center"}}>
-                  Vui lòng nhập đầy đủ thông tin bắt buộc
-                </div>
-              )}
-              {showErrorPhone && (
-                <div className="text-error" style={{"textAlign":"center"}}>
-                    Số điện thoại không tồn tại
-                </div>
-              )}
+            {showErrorParam && (
+              <div className="text-error" style={{ "textAlign": "center" }}>
+                Vui lòng nhập đầy đủ thông tin bắt buộc
+              </div>
+            )}
+            {showErrorPhone && (
+              <div className="text-error" style={{ "textAlign": "center" }}>
+                Số điện thoại không tồn tại
+              </div>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>

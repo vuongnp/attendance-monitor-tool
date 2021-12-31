@@ -171,7 +171,6 @@ class StudentController:
 
     def reportAttendance_handling(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs):
         try:
-            print("AAAAAAAa")
             idN = RandomTool.get_random_id()
             StudentService.add_notification_report_attendance(db, class_id, student_id, student_name, student_username, student_avt, time_late, time_to_late, timestamp, list_imgs, idN)
 

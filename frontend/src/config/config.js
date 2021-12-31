@@ -3,7 +3,7 @@ const config = {
     ATTENDANCE_THRES: 0.5,
     CONFIDENCE_THRES: 0.6,
     IOU_THRES: 0.5,
-    TIMEOUT_CPU: 300,
+    TIMEOUT_CPU: 150,
     TIMEOUT_GPU: 50
   }
   

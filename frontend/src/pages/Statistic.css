@@ -1,6 +1,28 @@
 .stat-container .main-stat-container{
-    margin-top: 6%;
+    margin-top: 4%;
+    /* width: 45%; */
+    /* margin: auto; */
+    margin-bottom: 100px;
+}
+.stat-container .main-teacher-stat-container{
+    margin-top: 4%;
     width: 45%;
     margin: auto;
     margin-bottom: 100px;
+}
+.top-stat{
+    display: flex;
+    width: 95%;
+    justify-content: space-around;
+    margin: auto;
+}
+.top-stat .left-stat{
+    width: 45%;
+}
+.top-stat .right-stat{
+    width: 45%;
+}
+.bottom-stat{
+    width: 40%;
+    margin: auto;
 }

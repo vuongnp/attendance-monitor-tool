@@ -182,9 +182,9 @@ export default function SignupTeacher() {
               </Form.Label>
               <Col>
                 <Form.Control as="select" onChange={handleChangeGender}>
-                  <option value="Male">Nam</option>
-                  <option value="Female">Nữ</option>
-                  <option value="Other">Khác</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác</option>
                 </Form.Control>
               </Col>
             </Form.Row>

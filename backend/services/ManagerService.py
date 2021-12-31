@@ -126,7 +126,7 @@ class ManagerService:
                     count2 += 1
                 else:
                     count3 += 1
-            labels = ['Vào lớp muộn', 'Không tham dự', 'Mất tập trung']
+            labels = ['Vào lớp muộn', 'Không tham dự', 'Giám sát']
             stats = [count1, count2, count3]
             result = {'labels': labels, 'stats': stats}
             return result
@@ -146,10 +146,11 @@ class ManagerService:
             for one_fault in list_faults:
                 one_class = class_collection.find_one(
                     filter={'id': one_fault['class_id']})
-                if one_class['name'] not in result:
-                    result[one_class['name']] = 1
-                else:
-                    result[one_class['name']] = result[one_class['name']] + 1
+                if one_class:
+                    if one_class['name'] not in result:
+                        result[one_class['name']] = 1
+                    else:
+                        result[one_class['name']] = result[one_class['name']] + 1
             result = sorted(
                 result.items(), key=lambda x: x[1], reverse=True)[:10]
             labels = []

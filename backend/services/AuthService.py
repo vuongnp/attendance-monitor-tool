@@ -82,7 +82,8 @@ class AuthService:
                 'avatar': '',
                 'embedding': [],
                 'faults': {},
-                'gpu': 0
+                'gpu': 0,
+                'avtOK': 0
             })
         except Exception as ex:
             print("Exception in AuthService.signup_student", ex)

@@ -17,7 +17,7 @@ export default function OneStudentClass(props) {
   const [showViewClass, setShowViewClass] = useState(false);
   const [showClassNotStart, setShowClassNotStart] = useState(false);
   const [showSetAvt, setShowSetAvt] = useState(false);
-  const [showGPU, setShowGPU] = useState(false);
+  // const [showGPU, setShowGPU] = useState(false);
   const student_avt = localStorage.getItem("student_avt");
   //   const [showLearning, setShowLearning] = useState(flag);
   const itemOutClass = {
@@ -36,7 +36,7 @@ export default function OneStudentClass(props) {
     setShowViewClass(false);
     setShowClassNotStart(false);
     setShowSetAvt(false);
-    setShowGPU(false);
+    // setShowGPU(false);
   };
   const handleShowViewClass = () => {
     setShowViewClass(true);
@@ -88,8 +88,13 @@ export default function OneStudentClass(props) {
           if(student_avt===""){
             setShowSetAvt(true);
           }else{
-            setModeClass(response.data.data.mode);
-            setShowGPU(true);
+            // setModeClass(response.data.data.mode);
+            // setShowGPU(true);
+            if(response.data.data.mode==="1"){
+              history.push(linktomonitor);
+            }else{
+              history.push(linktoattendance);
+            }
           }
         }
       })
@@ -98,46 +103,46 @@ export default function OneStudentClass(props) {
       });
     // history.push(linktoclass);
   };
-  const handleHaveGPU=()=>{
-    let item={
-      student_id: localStorage.getItem("student_id"),
-      gpu: 1
-    };
-    axios
-      .post(`${config.SERVER_URI}/student/updategpu`,item)
-      .then((response) => {
-        console.log(response);
-        setShowGPU(false);
-        if(modeClass==="1"){
-          history.push(linktomonitor);
-        }else{
-          history.push(linktoattendance);
-        }
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
-  };
-  const handleNotHaveGPU=()=>{
-    let item={
-      student_id: localStorage.getItem("student_id"),
-      gpu: 0
-    };
-    axios
-      .post(`${config.SERVER_URI}/student/updategpu`,item)
-      .then((response) => {
-        console.log(response);
-        setShowGPU(false);
-        if(modeClass==="1"){
-          history.push(linktomonitor);
-        }else{
-          history.push(linktoattendance);
-        }
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
-  };
+  // const handleHaveGPU=()=>{
+  //   let item={
+  //     student_id: localStorage.getItem("student_id"),
+  //     gpu: 1
+  //   };
+  //   axios
+  //     .post(`${config.SERVER_URI}/student/updategpu`,item)
+  //     .then((response) => {
+  //       console.log(response);
+  //       setShowGPU(false);
+  //       if(modeClass==="1"){
+  //         history.push(linktomonitor);
+  //       }else{
+  //         history.push(linktoattendance);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error!", error);
+  //     });
+  // };
+  // const handleNotHaveGPU=()=>{
+  //   let item={
+  //     student_id: localStorage.getItem("student_id"),
+  //     gpu: 0
+  //   };
+  //   axios
+  //     .post(`${config.SERVER_URI}/student/updategpu`,item)
+  //     .then((response) => {
+  //       console.log(response);
+  //       setShowGPU(false);
+  //       if(modeClass==="1"){
+  //         history.push(linktomonitor);
+  //       }else{
+  //         history.push(linktoattendance);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was an error!", error);
+  //     });
+  // };
   const handleToInfo=()=>{
     history.push(RouterList.STUDENT_INFO);
   };
@@ -342,11 +347,11 @@ export default function OneStudentClass(props) {
         </Modal.Footer>
       </Modal>
       {/* GPU */}
-      <Modal show={showGPU} onHide={handleCloseModal}>
+      {/* <Modal show={showGPU} onHide={handleCloseModal}> */}
         {/* <Modal.Header closeButton>
           <Modal.Title>Rời lớp học</Modal.Title>
         </Modal.Header> */}
-        <Modal.Body style={{ textAlign: "center" }}>
+        {/* <Modal.Body style={{ textAlign: "center" }}>
           <span style={{ fontSize: 24 }}>
             Máy tính bạn có GPU không?
           </span>
@@ -362,7 +367,7 @@ export default function OneStudentClass(props) {
             Tôi không biết
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

@@ -68,11 +68,12 @@ const getEmbeddingAndDevice = async () => {
         if (response) {
         console.log(response);
           stu_embedding = response.data.data.embedding;
-          if(response.data.data.gpu===1){
-            timeout = config.TIMEOUT_GPU;
-          }else{
-            timeout = config.TIMEOUT_CPU;
-          }
+          timeout = config.TIMEOUT_GPU;
+        //   if(response.data.data.gpu===1){
+        //     timeout = config.TIMEOUT_GPU;
+        //   }else{
+        //     timeout = config.TIMEOUT_CPU;
+        //   }
           console.log("Embedding and device loaded");
         }
       })

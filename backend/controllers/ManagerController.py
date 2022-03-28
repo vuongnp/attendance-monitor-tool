@@ -59,6 +59,23 @@ class ManagerController:
             }
             return result
 
+    def deleteClass_handling(db, id):
+        try:
+            ManagerService.delete_class(db, id)
+            result = {'code': '1000',
+                      'message': AppConfig.RESPONSE_CODE[1000],
+                      'data': {}
+                      }
+            return result
+
+        except Exception as ex:
+            print("Exception in ManagerController deleteClass_handling", ex)
+            result = {
+                'code': '1001',
+                'message': AppConfig.RESPONSE_CODE[1001]
+            }
+            return result
+
     def getAdminStatistic_handling(db):
         try:
             class_stat = ManagerService.get_class_statistic(db)

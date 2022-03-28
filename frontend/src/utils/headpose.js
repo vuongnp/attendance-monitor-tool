@@ -63,7 +63,7 @@ export function processImgHeadposeFromCanvas(det, imgSrc){
 }
 
 export function checkLookScreen(yaw,pitch){
-    if(Math.abs(yaw) <=15 && Math.abs(pitch)<=15){
+    if(Math.abs(yaw) <=20 && Math.abs(pitch)<=20){
         return true;
     }else{
         return false;

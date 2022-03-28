@@ -179,7 +179,7 @@ function Monitor() {
                     if (!checkLookScreen(angles[0], angles[1])) {
                         status.push(false);
                         count_to_delete_fault = 0;
-                        // console.log("not look");
+                        console.log("not look");
                         if ((current_time - start_time_to_save_img) > 9000) {
                             arr_Imgs.push(processImgToServer("srcCanvas1", current_time));
                             start_time_to_save_img = current_time;
@@ -206,7 +206,7 @@ function Monitor() {
                         // console.log(stu_embeddingArr);
                         // console.log(embeddingArr);
                         const sim_score = cosinesim(embeddingArr, stu_embeddingArr);
-                        // console.log(sim_score);
+                        console.log(sim_score);
                         if (sim_score >= config.ATTENDANCE_THRES) {
                             status.push(true);
                             if (status[count - 1] === true) {
@@ -231,7 +231,7 @@ function Monitor() {
                     setErrorManyFace(false);
                     //   return;
                 }
-                if (count_to_delete_fault >= 10) {
+                if (count_to_delete_fault >= 20) {
                     start_time = current_time;
                     count_to_delete_fault = 0;
                 }

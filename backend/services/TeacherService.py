@@ -16,20 +16,21 @@ class TeacherService:
             classes=[]
             for id in list_ids:
                 one_class = class_collection.find_one(filter={'id': id})
-                one_object = {
-                'id': id,
-                'name': one_class['name'],
-                'description': one_class['description'],
-                'schedule': one_class['schedule'],
-                'type': one_class['type'],
-                'duration': one_class['duration'],
-                'teacher': one_class['teacher'],
-                'code': one_class['code'],
-                'mode': one_class['mode'],
-                'is_learning': one_class['is_learning'],
-                'students': one_class['students']
-                }
-                classes.append(one_object)
+                if one_class:
+                    one_object = {
+                    'id': id,
+                    'name': one_class['name'],
+                    'description': one_class['description'],
+                    'schedule': one_class['schedule'],
+                    'type': one_class['type'],
+                    'duration': one_class['duration'],
+                    'teacher': one_class['teacher'],
+                    'code': one_class['code'],
+                    'mode': one_class['mode'],
+                    'is_learning': one_class['is_learning'],
+                    'students': one_class['students']
+                    }
+                    classes.append(one_object)
             result = {'teacher': teacher, 'classes': classes}
             return result
         except Exception as ex:

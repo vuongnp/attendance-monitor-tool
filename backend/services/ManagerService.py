@@ -88,6 +88,15 @@ class ManagerService:
             print("Exception in ManagerService delete_user function", ex)
             raise Exception from ex
 
+    def delete_class(db, id):
+        try:
+            class_collection = pymongo.collection.Collection(
+                db, DatabaseConfig.CLASS_COLLECTION)
+            class_collection.delete_one({'id': id})
+        except Exception as ex:
+            print("Exception in ManagerService delete_class function", ex)
+            raise Exception from ex
+
     def get_class_statistic(db):
         try:
             class_collection = pymongo.collection.Collection(

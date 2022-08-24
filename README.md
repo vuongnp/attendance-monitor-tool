@@ -4,4 +4,4 @@
 2. cd frontend -> start front server
 
 ## Demo
-&emsp;&emsp;&emsp;&emsp;&emsp;![Alt text](smart-assistant.gif?raw=true "Demo application")
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![Alt text](smart-assistant.gif?raw=true "Demo application")

@@ -595,6 +595,13 @@ def deleteuser():
     result = ManagerController.deleteUser_handling(db, id)
     return result
 
+@app.route("/admin/deleteclass", methods=['POST'])
+def deleteclassadmin():
+    data = request.json
+    id = data['id']
+    result = ManagerController.deleteClass_handling(db, id)
+    return result
+
 @app.route("/admin_statistic")
 def admin_statistic():
     result = ManagerController.getAdminStatistic_handling(db)

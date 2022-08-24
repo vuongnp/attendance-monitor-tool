@@ -24,7 +24,7 @@ export default function TeacherClassroom(props) {
   const class_id = window.location.pathname.split("/")[2];
   const teacher_name = localStorage.getItem("teacher_name");
   const [students, setStudents] = useState([]);
-  const numberStudentsPage = 10;
+  const numberStudentsPage = 6;
   const [studentsPage, setStudentsPage] = useState([]);
   const [numberPages, setNumberPages] = useState(1);
   const [classroom, setClassroom] = useState({
